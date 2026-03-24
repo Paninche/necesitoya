@@ -33,7 +33,7 @@ export default function Home() {
         <h2 style={{textAlign: "center", fontSize: "28px", color: "#1a1a2e", marginBottom: "4px"}}>What do you need?</h2>
         <p style={{textAlign: "center", color: "#FF6B35", marginBottom: "4px", fontWeight: "bold"}}>¿Qué necesitas?</p>
         <p style={{textAlign: "center", color: "#888", marginBottom: "40px"}}>Browse by category / Buscar por categoría</p>
-        <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px", maxWidth: "1100px", margin: "0 auto"}}>
+        <div style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr)"", gap: "16px", maxWidth: "1100px", margin: "0 auto"}}>
           {[
             {icon: "🚛", label: "Hauling & Pickup", es: "Mudanza & Recogida"},
             {icon: "🔨", label: "Handyman", es: "Reparaciones"},
