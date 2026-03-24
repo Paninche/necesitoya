@@ -42,9 +42,13 @@ export default function ProviderSignup() {
         body: JSON.stringify({ ...form, type: 'provider' })
       })
       if (!res.ok) {
-        const err = await res.text()
-        alert('Error: ' + err)
-      }
+  const err = await res.text()
+  if (err.includes('23505')) {
+    alert('This email is already registered! / Este correo ya está registrado.')
+  } else {
+    alert('Something went wrong. Please try again.')
+  }
+}
     } catch(e) {
       console.log(e)
     }

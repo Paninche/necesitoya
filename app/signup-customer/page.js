@@ -13,15 +13,26 @@ export default function CustomerSignup() {
     }
     setLoading(true)
     try {
-      const { createClient } = await import('@supabase/supabase-js')
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      )
-      const { error } = await supabase.from('users').insert([{ ...form, type: 'customer' }])
-      if (error) console.log('DB error:', error.message)
+      const res = await fetch('https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ ...form, type: 'customer' })
+      })
+      if (!res.ok) {
+        const err = await res.text()
+        if (err.includes('23505')) {
+          alert('This email is already registered! / Este correo ya está registrado.')
+        } else {
+          alert('Something went wrong. Please try again.')
+        }
+      }
     } catch(e) {
-      console.log('Error:', e)
+      console.log(e)
     }
     setSubmitted(true)
     setLoading(false)
