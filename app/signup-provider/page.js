@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import { supabase } from '../../lib/supabase'
 
 export default function ProviderSignup() {
   const [form, setForm] = useState({ full_name: '', email: '', phone: '', city: '', services: '' })
@@ -26,10 +25,30 @@ export default function ProviderSignup() {
   }
 
   const handleSubmit = async () => {
+    if (!form.full_name || !form.email) {
+      alert('Please fill in your name and email')
+      return
+    }
     setLoading(true)
-    const { error } = await supabase.from('users').insert([{ ...form, type: 'provider' }])
-    if (error) alert('Error: ' + error.message)
-    else setSubmitted(true)
+    try {
+      const res = await fetch('https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDMwNDMxMiwiZXhwIjoyMDg5ODgwMzEyfQ.b03eU0TplNQgpt-XXU5-MAZMLZ-Ldi8NFLqD8A9cGdM',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDMwNDMxMiwiZXhwIjoyMDg5ODgwMzEyfQ.b03eU0TplNQgpt-XXU5-MAZMLZ-Ldi8NFLqD8A9cGdM',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ ...form, type: 'provider' })
+      })
+      if (!res.ok) {
+        const err = await res.text()
+        alert('Error: ' + err)
+      }
+    } catch(e) {
+      console.log(e)
+    }
+    setSubmitted(true)
     setLoading(false)
   }
 
@@ -54,26 +73,28 @@ export default function ProviderSignup() {
         <h1 style={{color:'#1a1a2e', marginBottom:'4px'}}>I Offer Services</h1>
         <p style={{color:'#888', marginBottom:'32px'}}>Ofrezco Servicios — Join as a provider, earn money</p>
 
-        {[
-          {label:'Full Name / Nombre Completo', key:'full_name', placeholder:'Your name'},
-          {label:'Email', key:'email', placeholder:'you@email.com', type:'email'},
-          {label:'Phone / Telefono', key:'phone', placeholder:'(863) 555-0100', type:'tel'},
-          {label:'City / Ciudad', key:'city', placeholder:'Haines City, FL'},
-        ].map(field => (
-          <div key={field.key} style={{marginBottom:'20px'}}>
-            <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>{field.label}</label>
-            <input
-              type={field.type || 'text'}
-              placeholder={field.placeholder}
-              value={form[field.key]}
-              onChange={e => setForm({...form, [field.key]: e.target.value})}
-              style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}
-            />
-          </div>
-        ))}
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Full Name / Nombre Completo</label>
+          <input type="text" placeholder="Your name" value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
+
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Email</label>
+          <input type="email" placeholder="you@email.com" value={form.email} onChange={e => setForm({...form, email: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
+
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Phone / Telefono</label>
+          <input type="tel" placeholder="(863) 555-0100" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
+
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>City / Ciudad</label>
+          <input type="text" placeholder="Haines City, FL" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
 
         <div style={{marginBottom:'24px'}}>
-          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'12px', fontSize:'14px'}}>What services do you offer?</label>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'12px', fontSize:'14px'}}>What services do you offer? / ¿Qué servicios ofreces?</label>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px'}}>
             {serviceOptions.map(s => (
               <button key={s.id} onClick={() => toggleService(s.id)} style={{padding:'10px 12px', borderRadius:'10px', border:`2px solid ${selected.includes(s.id) ? '#FF6B35' : '#F0EDE8'}`, background: selected.includes(s.id) ? '#FFF3EE' : 'white', cursor:'pointer', fontSize:'13px', textAlign:'left'}}>
@@ -84,7 +105,7 @@ export default function ProviderSignup() {
         </div>
 
         <button onClick={handleSubmit} disabled={loading} style={{width:'100%', background:'linear-gradient(135deg,#2D6A4F,#52B788)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer'}}>
-          {loading ? 'Creating account...' : 'Join as Provider — Start Earning'}
+          {loading ? 'Creating account...' : 'Join as Provider — Start Earning →'}
         </button>
         <p style={{textAlign:'center', color:'#888', fontSize:'12px', marginTop:'16px'}}>By signing up you agree to our terms of service</p>
       </div>
