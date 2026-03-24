@@ -16,7 +16,7 @@ export default function Home() {
         <div style={{fontSize: "14px", color: "#FF6B35", letterSpacing: "4px", marginBottom: "16px"}}>FLORIDA'S BILINGUAL SERVICES APP · LA APP BILINGÜE DE SERVICIOS DE FLORIDA</div>
         <h1 style={{fontSize: "52px", fontWeight: "bold", color: "white", margin: "0 0 8px 0", lineHeight: 1.1}}>NecesitoYa</h1>
         <p style={{fontSize: "20px", color: "rgba(255,255,255,0.6)", marginBottom: "8px"}}>I Need It Now &nbsp;·&nbsp; Lo Necesito Ya</p>
-        <p style={{fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "40px"}}>Connect with local service providers in Florida — in English or Spanish</p>
+        <p style={{fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "16px"}}>Connect with local service providers in Florida — in English or Spanish</p>
         <p style={{fontSize: "14px", color: "rgba(255,255,255,0.3)", marginBottom: "40px"}}>Conéctate con proveedores de servicios locales en Florida — en inglés o español</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
           <a href="/signup-customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
@@ -33,7 +33,7 @@ export default function Home() {
         <h2 style={{textAlign: "center", fontSize: "28px", color: "#1a1a2e", marginBottom: "4px"}}>What do you need?</h2>
         <p style={{textAlign: "center", color: "#FF6B35", marginBottom: "4px", fontWeight: "bold"}}>¿Qué necesitas?</p>
         <p style={{textAlign: "center", color: "#888", marginBottom: "40px"}}>Browse by category / Buscar por categoría</p>
-        <div style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr)"", gap: "16px", maxWidth: "1100px", margin: "0 auto"}}>
+        <div style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", maxWidth: "900px", margin: "0 auto"}}>
           {[
             {icon: "🚛", label: "Hauling & Pickup", es: "Mudanza & Recogida"},
             {icon: "🔨", label: "Handyman", es: "Reparaciones"},
