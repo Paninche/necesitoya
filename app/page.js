@@ -7,7 +7,7 @@ export default function Home() {
         <div style={{color: "#FF6B35", fontSize: "24px", fontWeight: "bold"}}>⚡ NecesitoYa</div>
         <div style={{display: "flex", gap: "16px"}}>
           <button style={{background: "none", border: "1px solid #FF6B35", color: "#FF6B35", padding: "8px 20px", borderRadius: "20px", cursor: "pointer"}}>En / Es</button>
-          <button style={{background: "#FF6B35", border: "none", color: "white", padding: "8px 20px", borderRadius: "20px", cursor: "pointer", fontWeight: "bold"}}>Sign Up</button>
+          <a href="/signup-customer" style={{background: "#FF6B35", border: "none", color: "white", padding: "8px 20px", borderRadius: "20px", cursor: "pointer", fontWeight: "bold", textDecoration: "none"}}>Sign Up</a>
         </div>
       </nav>
 
@@ -18,8 +18,8 @@ export default function Home() {
         <p style={{fontSize: "20px", color: "rgba(255,255,255,0.6)", marginBottom: "8px"}}>I Need It Now &nbsp;·&nbsp; Lo Necesito Ya</p>
         <p style={{fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "40px"}}>Connect with local service providers in Florida — in English or Spanish</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
-          <button style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer"}}>I Need Help →</button>
-          <button style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer"}}>I Offer Services →</button>
+          <a href="/signup-customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>I Need Help →</a>
+          <a href="/signup-provider" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>I Offer Services →</a>
         </div>
       </section>
 
@@ -38,11 +38,11 @@ export default function Home() {
             {icon: "🚗", label: "Transport", es: "Transporte"},
             {icon: "🛒", label: "Buy & Sell", es: "Compra/Venta"},
           ].map((cat) => (
-            <div key={cat.label} style={{background: "white", borderRadius: "16px", padding: "24px 16px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer"}}>
+            <a href="/signup-customer" key={cat.label} style={{background: "white", borderRadius: "16px", padding: "24px 16px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", textDecoration: "none"}}>
               <div style={{fontSize: "32px", marginBottom: "8px"}}>{cat.icon}</div>
               <div style={{fontWeight: "bold", color: "#1a1a2e", fontSize: "14px"}}>{cat.label}</div>
               <div style={{color: "#888", fontSize: "12px"}}>{cat.es}</div>
-            </div>
+            </a>
           ))}
         </div>
       </section>
@@ -72,7 +72,7 @@ export default function Home() {
         <p style={{color: "rgba(255,255,255,0.6)", marginBottom: "32px"}}>Join the waitlist · Únete a la lista de espera</p>
         <div style={{display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap"}}>
           <input type="email" placeholder="Your email / Tu correo" style={{padding: "14px 24px", borderRadius: "30px", border: "none", fontSize: "16px", width: "280px"}}/>
-          <button style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "14px 32px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer"}}>Join Waitlist →</button>
+          <a href="/waitlist" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "14px 32px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>Join Waitlist →</a>
         </div>
       </section>
 
