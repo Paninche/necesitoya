@@ -3,11 +3,15 @@ export default function Home() {
     <main style={{fontFamily: "Arial, sans-serif", margin: 0, padding: 0}}>
 
       {/* NAV */}
-      <nav style={{background: "#1a1a2e", padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+      <nav style={{background: "#1a1a2e", padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px"}}>
         <div style={{color: "#FF6B35", fontSize: "24px", fontWeight: "bold"}}>⚡ NecesitoYa</div>
-        <div style={{display: "flex", gap: "16px"}}>
-          <button style={{background: "none", border: "1px solid #FF6B35", color: "#FF6B35", padding: "8px 20px", borderRadius: "20px", cursor: "pointer"}}>En / Es</button>
-          <a href="/signup-customer" style={{background: "#FF6B35", border: "none", color: "white", padding: "8px 20px", borderRadius: "20px", cursor: "pointer", fontWeight: "bold", textDecoration: "none"}}>Sign Up / Regístrate</a>
+        <div style={{display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center"}}>
+          <a href="/jobs" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Jobs</a>
+          <a href="/post-job" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Post Job</a>
+          <a href="/customer-dashboard" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>My Jobs</a>
+          <a href="/provider-dashboard" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Provider</a>
+          <a href="/signup-provider" style={{background: "transparent", border: "1px solid #FF6B35", color: "#FF6B35", padding: "8px 16px", borderRadius: "20px", cursor: "pointer", fontSize: "13px", textDecoration: "none"}}>Offer Services</a>
+          <a href="/signup-customer" style={{background: "#FF6B35", border: "none", color: "white", padding: "8px 20px", borderRadius: "20px", cursor: "pointer", fontWeight: "bold", textDecoration: "none", fontSize: "13px"}}>Sign Up / Regístrate</a>
         </div>
       </nav>
 
@@ -57,7 +61,7 @@ export default function Home() {
             {icon: "🔧", label: "Mechanic", es: "Mecánico"},
             {icon: "🚨", label: "Roadside & Towing", es: "Grúa & Asistencia Vial"},
           ].map((cat) => (
-            <a href="/post-job" key={cat.label} style={{background: "white", borderRadius: "16px", padding: "16px 8px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", textDecoration: "none"}}>
+            <a href={`/post-job`} key={cat.label} style={{background: "white", borderRadius: "16px", padding: "16px 8px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", textDecoration: "none"}}>
               <div style={{fontSize: "28px", marginBottom: "6px"}}>{cat.icon}</div>
               <div style={{fontWeight: "bold", color: "#1a1a2e", fontSize: "11px", lineHeight: "1.3"}}>{cat.label}</div>
               <div style={{color: "#FF6B35", fontSize: "10px", marginTop: "2px", lineHeight: "1.3"}}>{cat.es}</div>
@@ -88,22 +92,88 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FOR PROVIDERS */}
+      <section style={{padding: "60px 32px", background: "#f8f6f2"}}>
+        <div style={{maxWidth: "800px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "40px", alignItems: "center"}}>
+          <div>
+            <div style={{fontSize: "13px", color: "#FF6B35", fontWeight: "bold", letterSpacing: "2px", marginBottom: "12px"}}>FOR PROVIDERS · PARA PROVEEDORES</div>
+            <h2 style={{fontSize: "28px", color: "#1a1a2e", marginBottom: "8px"}}>Turn your skills into income</h2>
+            <p style={{color: "#FF6B35", fontWeight: "bold", marginBottom: "16px"}}>Convierte tus habilidades en ingresos</p>
+            <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ Free to join — no upfront costs</p>
+            <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ Get paid directly to your bank account</p>
+            <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ Work on your own schedule</p>
+            <p style={{color: "#888", marginBottom: "24px", fontSize: "14px"}}>✅ Bilingual platform — English & Spanish</p>
+            <a href="/signup-provider" style={{display: "inline-block", background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "14px 32px", borderRadius: "24px", textDecoration: "none", fontWeight: "bold", fontSize: "15px"}}>
+              Start Earning / Empieza a Ganar →
+            </a>
+          </div>
+          <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px"}}>
+            {[
+              {icon: "💰", label: "Keep 92%", sub: "of every job"},
+              {icon: "📱", label: "Mobile ready", sub: "work anywhere"},
+              {icon: "⭐", label: "Build reviews", sub: "grow your business"},
+              {icon: "🔒", label: "Secure payouts", sub: "via Stripe"},
+            ].map(item => (
+              <div key={item.label} style={{background: "white", borderRadius: "12px", padding: "20px", textAlign: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.06)"}}>
+                <div style={{fontSize: "28px", marginBottom: "8px"}}>{item.icon}</div>
+                <div style={{fontWeight: "bold", color: "#1a1a2e", fontSize: "14px"}}>{item.label}</div>
+                <div style={{color: "#888", fontSize: "12px", marginTop: "4px"}}>{item.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* EARLY ACCESS */}
       <section style={{background: "linear-gradient(135deg, #1a1a2e, #0f3460)", padding: "60px 32px", textAlign: "center"}}>
-        <h2 style={{color: "white", fontSize: "32px", marginBottom: "4px"}}>Be the first to know</h2>
-        <p style={{color: "#FF6B35", fontWeight: "bold", marginBottom: "8px"}}>Sé el primero en saber</p>
-        <p style={{color: "rgba(255,255,255,0.6)", marginBottom: "32px"}}>Join the waitlist · Únete a la lista de espera</p>
-        <div style={{display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap"}}>
-          <input type="email" placeholder="Your email / Tu correo" style={{padding: "14px 24px", borderRadius: "30px", border: "none", fontSize: "16px", width: "280px"}}/>
-          <a href="/waitlist" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "14px 32px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
-            Join Waitlist / Únete →
+        <h2 style={{color: "white", fontSize: "32px", marginBottom: "4px"}}>Ready to get started?</h2>
+        <p style={{color: "#FF6B35", fontWeight: "bold", marginBottom: "8px"}}>¿Listo para comenzar?</p>
+        <p style={{color: "rgba(255,255,255,0.6)", marginBottom: "32px"}}>Join thousands of people connecting locally · Únete a miles de personas conectándose localmente</p>
+        <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
+          <a href="/post-job" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", textDecoration: "none"}}>
+            Post a Job / Publicar Trabajo →
+          </a>
+          <a href="/signup-provider" style={{background: "transparent", border: "2px solid white", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", textDecoration: "none"}}>
+            Become a Provider / Ser Proveedor →
           </a>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer style={{background: "#1a1a2e", padding: "24px 32px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "14px"}}>
-        © 2026 NecesitoYa.app · America's Bilingual Local Services Marketplace · Built with ⚡ in Haines City, FL
+      <footer style={{background: "#1a1a2e", padding: "32px", color: "rgba(255,255,255,0.4)", fontSize: "13px"}}>
+        <div style={{maxWidth: "900px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "24px", marginBottom: "24px"}}>
+          <div>
+            <div style={{color: "#FF6B35", fontWeight: "bold", fontSize: "16px", marginBottom: "12px"}}>⚡ NecesitoYa</div>
+            <div style={{lineHeight: "2"}}>America's Bilingual<br/>Local Services App</div>
+          </div>
+          <div>
+            <div style={{color: "white", fontWeight: "bold", marginBottom: "12px"}}>For Customers</div>
+            <div style={{lineHeight: "2.2"}}>
+              <a href="/post-job" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Post a Job</a>
+              <a href="/jobs" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Browse Jobs</a>
+              <a href="/customer-dashboard" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>My Dashboard</a>
+            </div>
+          </div>
+          <div>
+            <div style={{color: "white", fontWeight: "bold", marginBottom: "12px"}}>For Providers</div>
+            <div style={{lineHeight: "2.2"}}>
+              <a href="/signup-provider" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Sign Up</a>
+              <a href="/provider-dashboard" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>My Dashboard</a>
+              <a href="/jobs" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Find Jobs</a>
+            </div>
+          </div>
+          <div>
+            <div style={{color: "white", fontWeight: "bold", marginBottom: "12px"}}>Company</div>
+            <div style={{lineHeight: "2.2"}}>
+              <a href="/admin" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Admin</a>
+              <span style={{display: "block"}}>Haines City, FL</span>
+              <span style={{display: "block"}}>necesitoya.app</span>
+            </div>
+          </div>
+        </div>
+        <div style={{textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "24px"}}>
+          © 2026 NecesitoYa.app · Built with ⚡ in Haines City, FL · America's Bilingual Local Services Marketplace
+        </div>
       </footer>
 
     </main>
