@@ -1,0 +1,174 @@
+'use client'
+import { useState, useEffect } from 'react'
+
+export default function Messages() {
+  const [jobId, setJobId] = useState(null)
+  const [job, setJob] = useState(null)
+  const [messages, setMessages] = useState([])
+  const [newMessage, setNewMessage] = useState('')
+  const [senderName, setSenderName] = useState('')
+  const [senderEmail, setSenderEmail] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [sending, setSending] = useState(false)
+  const [identified, setIdentified] = useState(false)
+
+  const APIKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get('job')
+    if (id) {
+      setJobId(id)
+      fetchJob(id)
+      fetchMessages(id)
+    }
+  }, [])
+
+  const fetchJob = async (id) => {
+    const res = await fetch(`https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/jobs?id=eq.${id}`, {
+      headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` }
+    })
+    const data = await res.json()
+    if (data[0]) setJob(data[0])
+    setLoading(false)
+  }
+
+  const fetchMessages = async (id) => {
+    const res = await fetch(`https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/messages?job_id=eq.${id}&order=created_at.asc`, {
+      headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` }
+    })
+    const data = await res.json()
+    setMessages(data)
+  }
+
+  const sendMessage = async () => {
+    if (!newMessage.trim()) return
+    setSending(true)
+    const res = await fetch('https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': APIKEY,
+        'Authorization': `Bearer ${APIKEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        job_id: jobId,
+        sender_name: senderName,
+        sender_email: senderEmail,
+        recipient_email: job.customer_email,
+        message: newMessage
+      })
+    })
+    if (res.ok) {
+      setNewMessage('')
+      fetchMessages(jobId)
+    }
+    setSending(false)
+  }
+
+  const timeAgo = (date) => {
+    const mins = Math.floor((new Date() - new Date(date + 'Z')) / 60000)
+    if (mins < 1) return 'Just now'
+    if (mins < 60) return `${mins}m ago`
+    const hrs = Math.floor(mins / 60)
+    if (hrs < 24) return `${hrs}h ago`
+    return `${Math.floor(hrs / 24)}d ago`
+  }
+
+  if (loading) return (
+    <div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial'}}>
+      <div style={{color:'white', fontSize:'18px'}}>Loading... / Cargando...</div>
+    </div>
+  )
+
+  if (!job) return (
+    <div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial'}}>
+      <div style={{background:'white', borderRadius:'24px', padding:'48px', textAlign:'center'}}>
+        <div style={{fontSize:'40px', marginBottom:'16px'}}>❌</div>
+        <p style={{color:'#888'}}>Job not found. / Trabajo no encontrado.</p>
+        <a href="/jobs" style={{color:'#FF6B35'}}>Back to Jobs →</a>
+      </div>
+    </div>
+  )
+
+  if (!identified) return (
+    <div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial', padding:'32px'}}>
+      <div style={{background:'white', borderRadius:'24px', padding:'48px', width:'100%', maxWidth:'440px'}}>
+        <a href="/jobs" style={{color:'#888', textDecoration:'none', fontSize:'14px'}}>← Back to Jobs</a>
+        <div style={{fontSize:'40px', margin:'16px 0 8px'}}>💬</div>
+        <h2 style={{color:'#1a1a2e', marginBottom:'4px'}}>Send a Message</h2>
+        <p style={{color:'#888', marginBottom:'8px'}}>Enviar un Mensaje</p>
+        <div style={{background:'#FFF3EE', borderRadius:'12px', padding:'16px', marginBottom:'24px'}}>
+          <div style={{fontSize:'13px', fontWeight:'bold', color:'#FF6B35', marginBottom:'4px'}}>{job.category}</div>
+          <div style={{fontSize:'15px', fontWeight:'bold', color:'#1a1a2e'}}>{job.title}</div>
+          <div style={{fontSize:'13px', color:'#888'}}>📍 {job.city} · Posted by {job.customer_name}</div>
+        </div>
+
+        <div style={{marginBottom:'16px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Your Name / Tu Nombre</label>
+          <input type="text" placeholder="Your name" value={senderName} onChange={e => setSenderName(e.target.value)} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
+
+        <div style={{marginBottom:'24px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Your Email / Tu Correo</label>
+          <input type="email" placeholder="you@email.com" value={senderEmail} onChange={e => setSenderEmail(e.target.value)} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
+
+        <button onClick={() => { if (senderName && senderEmail) setIdentified(true) else alert('Please enter your name and email') }} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer'}}>
+          Continue to Chat →
+        </button>
+      </div>
+    </div>
+  )
+
+  return (
+    <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial', display:'flex', flexDirection:'column'}}>
+
+      {/* Header */}
+      <div style={{background:'linear-gradient(135deg,#1a1a2e,#0f3460)', padding:'24px 32px'}}>
+        <a href="/jobs" style={{color:'rgba(255,255,255,0.5)', textDecoration:'none', fontSize:'14px'}}>← Back to Jobs</a>
+        <h2 style={{color:'white', margin:'8px 0 4px', fontSize:'20px'}}>{job.title}</h2>
+        <p style={{color:'#FF6B35', fontSize:'13px', margin:0}}>{job.category} · 📍 {job.city}</p>
+      </div>
+
+      {/* Messages */}
+      <div style={{flex:1, padding:'24px 32px', maxWidth:'700px', margin:'0 auto', width:'100%', boxSizing:'border-box'}}>
+        {messages.length === 0 ? (
+          <div style={{textAlign:'center', padding:'40px', color:'#888'}}>
+            <div style={{fontSize:'40px', marginBottom:'16px'}}>💬</div>
+            <p>No messages yet. Start the conversation!</p>
+            <p style={{fontSize:'14px'}}>Sin mensajes todavía. ¡Inicia la conversación!</p>
+          </div>
+        ) : (
+          <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
+            {messages.map(msg => (
+              <div key={msg.id} style={{display:'flex', justifyContent: msg.sender_email === senderEmail ? 'flex-end' : 'flex-start'}}>
+                <div style={{maxWidth:'70%', background: msg.sender_email === senderEmail ? 'linear-gradient(135deg,#FF6B35,#F4A261)' : 'white', borderRadius:'16px', padding:'12px 16px', boxShadow:'0 2px 8px rgba(0,0,0,0.06)'}}>
+                  <div style={{fontSize:'11px', fontWeight:'bold', color: msg.sender_email === senderEmail ? 'rgba(255,255,255,0.8)' : '#FF6B35', marginBottom:'4px'}}>{msg.sender_name}</div>
+                  <div style={{fontSize:'15px', color: msg.sender_email === senderEmail ? 'white' : '#1a1a2e', lineHeight:'1.5'}}>{msg.message}</div>
+                  <div style={{fontSize:'11px', color: msg.sender_email === senderEmail ? 'rgba(255,255,255,0.6)' : '#aaa', marginTop:'4px', textAlign:'right'}}>{timeAgo(msg.created_at)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Message Input */}
+      <div style={{background:'white', padding:'16px 32px', borderTop:'1px solid #F0EDE8', display:'flex', gap:'12px', alignItems:'center'}}>
+        <input
+          type="text"
+          placeholder="Type a message... / Escribe un mensaje..."
+          value={newMessage}
+          onChange={e => setNewMessage(e.target.value)}
+          onKeyPress={e => e.key === 'Enter' && sendMessage()}
+          style={{flex:1, padding:'12px 16px', borderRadius:'24px', border:'2px solid #F0EDE8', fontSize:'16px', outline:'none'}}
+        />
+        <button onClick={sendMessage} disabled={sending} style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'12px 24px', borderRadius:'24px', fontWeight:'bold', cursor:'pointer', fontSize:'15px'}}>
+          {sending ? '...' : 'Send →'}
+        </button>
+      </div>
+    </main>
+  )
+}

@@ -101,9 +101,9 @@ export default function JobsBoard() {
                 <p style={{color:'#555', fontSize:'14px', lineHeight:'1.6', marginBottom:'16px'}}>{job.description}</p>
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                   <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
-                  <a href={`mailto:${job.customer_email}?subject=NecesitoYa - Interested in your job: ${job.title}&body=Hi ${job.customer_name},%0D%0A%0D%0AI found your job on NecesitoYa and I am interested in helping you.%0D%0A%0D%0AJob: ${job.title}%0D%0A%0D%0APlease let me know if you are still looking for help!`} style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', textDecoration:'none', fontWeight:'bold', fontSize:'14px'}}>
-                    I Can Help / Puedo Ayudar →
-                  </a>
+                  <a href={`/messages?job=${job.id}`} style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', textDecoration:'none', fontWeight:'bold', fontSize:'14px'}}>
+  I Can Help / Puedo Ayudar →
+</a>
                 </div>
               </div>
             ))}

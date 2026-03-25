@@ -5,6 +5,7 @@ export default function PostJob() {
   const [form, setForm] = useState({
     customer_name: '',
     customer_email: '',
+    customer_phone: '',
     category: '',
     title: '',
     description: '',
@@ -40,9 +41,7 @@ export default function PostJob() {
         body: JSON.stringify(form)
       })
       if (!res.ok) {
-        const err = await res.text()
         alert('Something went wrong. Please try again. / Algo salió mal. Por favor intente de nuevo.')
-        console.log(err)
       } else {
         setSubmitted(true)
       }
@@ -83,6 +82,11 @@ export default function PostJob() {
         <div style={{marginBottom:'20px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Email *</label>
           <input type="email" placeholder="you@email.com" value={form.customer_email} onChange={e => setForm({...form, customer_email: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
+
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Phone / Teléfono (optional — providers can contact you directly)</label>
+          <input type="tel" placeholder="(863) 555-0100" value={form.customer_phone} onChange={e => setForm({...form, customer_phone: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
 
         <div style={{marginBottom:'20px'}}>
