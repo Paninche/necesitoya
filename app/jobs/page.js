@@ -102,8 +102,8 @@ export default function JobsBoard() {
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                   <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
                   <a href={`/messages?job=${job.id}`} style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', textDecoration:'none', fontWeight:'bold', fontSize:'14px'}}>
-  I Can Help / Puedo Ayudar →
-</a>
+                    I Can Help / Puedo Ayudar →
+                  </a>
                 </div>
               </div>
             ))}
