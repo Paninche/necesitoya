@@ -1,10 +1,21 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
 
 export default function JobsBoard() {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('All')
+  const [assigning, setAssigning] = useState(null)
+  const [provider, setProvider] = useState(null)
+  const [showProviderModal, setShowProviderModal] = useState(false)
+  const [selectedJob, setSelectedJob] = useState(null)
+  const [providerEmail, setProviderEmail] = useState('')
 
   const categories = [
     'All', 'Hauling & Pickup', 'Handyman', 'Lawn & Garden', 'Cleaning',
@@ -15,22 +26,89 @@ export default function JobsBoard() {
 
   useEffect(() => {
     fetchJobs()
+    // Check if provider is logged in
+    const saved = localStorage.getItem('ny_provider')
+    if (saved) setProvider(JSON.parse(saved))
   }, [])
 
   const fetchJobs = async () => {
     try {
-      const res = await fetch('https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/jobs?order=created_at.desc', {
-        headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
-        }
-      })
-      const data = await res.json()
-      setJobs(data)
+      const { data } = await supabase
+        .from('jobs')
+        .select('*')
+        .order('created_at', { ascending: false })
+      setJobs(data || [])
     } catch(e) {
       console.log(e)
     }
     setLoading(false)
+  }
+
+  const handleICanHelp = (job) => {
+    if (job.status !== 'open') {
+      alert('This job has already been taken. / Este trabajo ya fue tomado.')
+      return
+    }
+    setSelectedJob(job)
+    if (provider) {
+      assignProvider(job, provider)
+    } else {
+      setShowProviderModal(true)
+    }
+  }
+
+  const assignProvider = async (job, providerData) => {
+    setAssigning(job.id)
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .update({
+          provider_id: providerData.id || null,
+          provider_email: providerData.email,
+          status: 'accepted',
+          accepted_at: new Date().toISOString(),
+        })
+        .eq('id', job.id)
+
+      if (error) throw error
+
+      // Update local state
+      setJobs(prev => prev.map(j =>
+        j.id === job.id
+          ? { ...j, status: 'accepted', provider_email: providerData.email }
+          : j
+      ))
+
+      // Save provider to localStorage for dashboard
+      localStorage.setItem('ny_provider', JSON.stringify(providerData))
+      setProvider(providerData)
+      setShowProviderModal(false)
+
+      // Go to messages
+      window.location.href = `/messages?job=${job.id}`
+    } catch (e) {
+      console.error(e)
+      alert('Error accepting job. Please try again. / Error al aceptar trabajo.')
+    }
+    setAssigning(null)
+  }
+
+  const handleProviderLogin = async (e) => {
+    e.preventDefault()
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', providerEmail.toLowerCase())
+      .eq('type', 'provider')
+      .single()
+
+    if (data) {
+      assignProvider(selectedJob, data)
+    } else {
+      // Allow as guest provider with just email
+      const guestProvider = { email: providerEmail.toLowerCase(), full_name: providerEmail.split('@')[0] }
+      assignProvider(selectedJob, guestProvider)
+    }
   }
 
   const filteredJobs = filter === 'All' ? jobs : jobs.filter(j => j.category === filter)
@@ -46,6 +124,34 @@ export default function JobsBoard() {
 
   return (
     <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial'}}>
+
+      {/* Provider Modal */}
+      {showProviderModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '32px', maxWidth: '400px', width: '100%' }}>
+            <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#1a1a2e', marginBottom: '8px' }}>Accept This Job</h3>
+            <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '24px' }}>
+              Enter your email to accept: <strong>{selectedJob?.title}</strong>
+            </p>
+            <form onSubmit={handleProviderLogin}>
+              <input
+                type="email"
+                value={providerEmail}
+                onChange={(e) => setProviderEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+                style={{ width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box', marginBottom: '12px' }}
+              />
+              <button type="submit" style={{ width: '100%', background: 'linear-gradient(135deg,#FF6B35,#F4A261)', color: 'white', padding: '12px', borderRadius: '8px', fontSize: '16px', fontWeight: '600', border: 'none', cursor: 'pointer', marginBottom: '8px' }}>
+                Accept Job / Aceptar Trabajo ✓
+              </button>
+              <button type="button" onClick={() => setShowProviderModal(false)} style={{ width: '100%', backgroundColor: 'white', color: '#6b7280', padding: '10px', borderRadius: '8px', fontSize: '14px', border: '1px solid #e5e7eb', cursor: 'pointer' }}>
+                Cancel / Cancelar
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div style={{background:'linear-gradient(135deg,#1a1a2e,#0f3460)', padding:'40px 32px 30px'}}>
@@ -84,10 +190,15 @@ export default function JobsBoard() {
         ) : (
           <div style={{display:'flex', flexDirection:'column', gap:'16px'}}>
             {filteredJobs.map(job => (
-              <div key={job.id} style={{background:'white', borderRadius:'20px', padding:'24px', boxShadow:'0 2px 16px rgba(0,0,0,0.06)'}}>
+              <div key={job.id} style={{background:'white', borderRadius:'20px', padding:'24px', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', opacity: job.status !== 'open' ? 0.75 : 1}}>
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'12px'}}>
                   <div>
-                    <span style={{background:'#FFF3EE', color:'#FF6B35', padding:'4px 12px', borderRadius:'20px', fontSize:'12px', fontWeight:'bold'}}>{job.category}</span>
+                    <div style={{display:'flex', gap:'8px', alignItems:'center'}}>
+                      <span style={{background:'#FFF3EE', color:'#FF6B35', padding:'4px 12px', borderRadius:'20px', fontSize:'12px', fontWeight:'bold'}}>{job.category}</span>
+                      {job.status !== 'open' && (
+                        <span style={{background:'#dcfce7', color:'#16a34a', padding:'4px 12px', borderRadius:'20px', fontSize:'12px', fontWeight:'bold'}}>✓ Taken</span>
+                      )}
+                    </div>
                     <h3 style={{color:'#1a1a2e', margin:'8px 0 4px', fontSize:'18px'}}>{job.title}</h3>
                     <p style={{color:'#888', fontSize:'13px'}}>📍 {job.city} · 🕐 {timeAgo(job.created_at)}</p>
                   </div>
@@ -101,9 +212,16 @@ export default function JobsBoard() {
                 <p style={{color:'#555', fontSize:'14px', lineHeight:'1.6', marginBottom:'16px'}}>{job.description}</p>
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                   <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
-                  <a href={`/messages?job=${job.id}`} style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', textDecoration:'none', fontWeight:'bold', fontSize:'14px'}}>
-                    I Can Help / Puedo Ayudar →
-                  </a>
+                  {job.status === 'open' ? (
+                    <button
+                      onClick={() => handleICanHelp(job)}
+                      disabled={assigning === job.id}
+                      style={{background: assigning === job.id ? '#ccc' : 'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'14px', cursor: assigning === job.id ? 'not-allowed' : 'pointer'}}>
+                      {assigning === job.id ? 'Accepting...' : 'I Can Help / Puedo Ayudar →'}
+                    </button>
+                  ) : (
+                    <span style={{fontSize:'13px', color:'#16a34a', fontWeight:'600'}}>✓ Provider assigned</span>
+                  )}
                 </div>
               </div>
             ))}
