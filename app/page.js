@@ -19,16 +19,16 @@ export default function Home() {
         <p style={{fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "16px"}}>Connect with local service providers near you — in English or Spanish</p>
         <p style={{fontSize: "14px", color: "rgba(255,255,255,0.3)", marginBottom: "40px"}}>Conéctate con proveedores de servicios locales — en inglés o español</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
-  <a href="/post-job" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
-    I Need Help / Necesito Ayuda →
-  </a>
-  <a href="/jobs" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
-    Browse Jobs / Ver Trabajos →
-  </a>
-  <a href="/signup-provider" style={{background: "transparent", border: "2px solid #FF6B35", color: "#FF6B35", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
-    I Offer Services / Ofrezco Servicios →
-  </a>
-</div>
+          <a href="/post-job" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
+            I Need Help / Necesito Ayuda →
+          </a>
+          <a href="/jobs" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
+            Browse Jobs / Ver Trabajos →
+          </a>
+          <a href="/signup-provider" style={{background: "transparent", border: "2px solid #FF6B35", color: "#FF6B35", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
+            I Offer Services / Ofrezco Servicios →
+          </a>
+        </div>
       </section>
 
       {/* CATEGORIES */}
@@ -57,7 +57,7 @@ export default function Home() {
             {icon: "🔧", label: "Mechanic", es: "Mecánico"},
             {icon: "🚨", label: "Roadside & Towing", es: "Grúa & Asistencia Vial"},
           ].map((cat) => (
-            <a href="/signup-customer" key={cat.label} style={{background: "white", borderRadius: "16px", padding: "16px 8px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", textDecoration: "none"}}>
+            <a href="/post-job" key={cat.label} style={{background: "white", borderRadius: "16px", padding: "16px 8px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", textDecoration: "none"}}>
               <div style={{fontSize: "28px", marginBottom: "6px"}}>{cat.icon}</div>
               <div style={{fontWeight: "bold", color: "#1a1a2e", fontSize: "11px", lineHeight: "1.3"}}>{cat.label}</div>
               <div style={{color: "#FF6B35", fontSize: "10px", marginTop: "2px", lineHeight: "1.3"}}>{cat.es}</div>
