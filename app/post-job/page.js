@@ -1,115 +1,125 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-export default function JobsBoard() {
-  const [jobs, setJobs] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('All')
+export default function PostJob() {
+  const [form, setForm] = useState({
+    customer_name: '',
+    customer_email: '',
+    category: '',
+    title: '',
+    description: '',
+    budget: '',
+    city: ''
+  })
+  const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const categories = [
-    'All', 'Hauling & Pickup', 'Handyman', 'Lawn & Garden', 'Cleaning',
-    'Tutoring', 'Transport', 'Home Cooking', 'Catering', 'Baker & Pastries',
-    'Pet Care', 'Beauty & Hair', 'Babysitting', 'Tech Help',
-    'Painting', 'Photography', 'Mechanic', 'Roadside & Towing'
+    "Hauling & Pickup", "Handyman", "Lawn & Garden", "Cleaning",
+    "Tutoring", "Transport", "Buy & Sell", "Home Cooking",
+    "Catering", "Baker & Pastries", "Pet Care", "Beauty & Hair",
+    "Babysitting", "Tech Help", "Painting", "Photography",
+    "Mechanic", "Roadside & Towing"
   ]
 
-  useEffect(() => {
-    fetchJobs()
-  }, [])
-
-  const fetchJobs = async () => {
+  const handleSubmit = async () => {
+    if (!form.customer_name || !form.customer_email || !form.category || !form.title || !form.description || !form.city) {
+      alert('Please fill in all required fields / Por favor complete todos los campos')
+      return
+    }
+    setLoading(true)
     try {
-      const res = await fetch('https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/jobs?order=created_at.desc', {
+      const res = await fetch('https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/jobs', {
+        method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
           'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
-        }
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(form)
       })
-      const data = await res.json()
-      setJobs(data)
+      if (!res.ok) {
+        const err = await res.text()
+        alert('Something went wrong. Please try again. / Algo salió mal. Por favor intente de nuevo.')
+        console.log(err)
+      } else {
+        setSubmitted(true)
+      }
     } catch(e) {
       console.log(e)
     }
     setLoading(false)
   }
 
-  const filteredJobs = filter === 'All' ? jobs : jobs.filter(j => j.category === filter)
-
-  const timeAgo = (date) => {
-    const mins = Math.floor((new Date() - new Date(date)) / 60000)
-    if (mins < 60) return `${mins}m ago`
-    const hrs = Math.floor(mins / 60)
-    if (hrs < 24) return `${hrs}h ago`
-    return `${Math.floor(hrs / 24)}d ago`
+  if (submitted) {
+    return (
+      <div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial'}}>
+        <div style={{background:'white', borderRadius:'24px', padding:'48px', textAlign:'center', maxWidth:'400px'}}>
+          <div style={{fontSize:'64px', marginBottom:'16px'}}>🎉</div>
+          <h2 style={{color:'#1a1a2e', marginBottom:'8px'}}>Job Posted!</h2>
+          <p style={{color:'#888', marginBottom:'4px'}}>Your job is now live and providers near you will respond soon.</p>
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'24px'}}>Tu trabajo está publicado y los proveedores cercanos responderán pronto.</p>
+          <a href="/jobs" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 32px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', marginRight:'12px'}}>See All Jobs →</a>
+          <a href="/" style={{display:'inline-block', color:'#888', padding:'12px 24px', textDecoration:'none'}}>Home</a>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial'}}>
+    <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px'}}>
+      <div style={{background:'white', borderRadius:'24px', padding:'48px', width:'100%', maxWidth:'560px'}}>
+        <a href="/" style={{color:'#888', textDecoration:'none', fontSize:'14px'}}>← Back / Regresar</a>
+        <div style={{fontSize:'40px', margin:'16px 0 8px'}}>📋</div>
+        <h1 style={{color:'#1a1a2e', marginBottom:'4px'}}>Post a Job</h1>
+        <p style={{color:'#888', marginBottom:'32px'}}>Publicar un Trabajo — Describe what you need</p>
 
-      {/* Header */}
-      <div style={{background:'linear-gradient(135deg,#1a1a2e,#0f3460)', padding:'40px 32px 30px'}}>
-        <a href="/" style={{color:'rgba(255,255,255,0.5)', textDecoration:'none', fontSize:'14px'}}>← Home</a>
-        <h1 style={{color:'white', fontSize:'32px', fontWeight:'bold', margin:'16px 0 4px'}}>Available Jobs</h1>
-        <p style={{color:'#FF6B35', fontWeight:'bold', marginBottom:'4px'}}>Trabajos Disponibles</p>
-        <p style={{color:'rgba(255,255,255,0.5)', fontSize:'14px', marginBottom:'24px'}}>{filteredJobs.length} jobs near you / trabajos cerca de ti</p>
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Your Name / Tu Nombre *</label>
+          <input type="text" placeholder="David Cruzado" value={form.customer_name} onChange={e => setForm({...form, customer_name: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
 
-        {/* Post a job button */}
-        <a href="/post-job" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 28px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', fontSize:'14px'}}>
-          + Post a Job / Publicar Trabajo
-        </a>
-      </div>
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Email *</label>
+          <input type="email" placeholder="you@email.com" value={form.customer_email} onChange={e => setForm({...form, customer_email: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
 
-      {/* Filter */}
-      <div style={{padding:'16px 32px', overflowX:'auto', whiteSpace:'nowrap', background:'white', borderBottom:'1px solid #F0EDE8'}}>
-        {categories.map(cat => (
-          <button key={cat} onClick={() => setFilter(cat)} style={{display:'inline-block', marginRight:'8px', padding:'8px 16px', borderRadius:'20px', border:`2px solid ${filter === cat ? '#FF6B35' : '#F0EDE8'}`, background: filter === cat ? '#FF6B35' : 'white', color: filter === cat ? 'white' : '#555', cursor:'pointer', fontSize:'13px', fontWeight: filter === cat ? 'bold' : 'normal', whiteSpace:'nowrap'}}>
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Jobs List */}
-      <div style={{padding:'24px 32px', maxWidth:'800px', margin:'0 auto'}}>
-        {loading ? (
-          <div style={{textAlign:'center', padding:'60px', color:'#888'}}>
-            <div style={{fontSize:'40px', marginBottom:'16px'}}>⏳</div>
-            <p>Loading jobs... / Cargando trabajos...</p>
-          </div>
-        ) : filteredJobs.length === 0 ? (
-          <div style={{textAlign:'center', padding:'60px', color:'#888'}}>
-            <div style={{fontSize:'40px', marginBottom:'16px'}}>📋</div>
-            <p style={{marginBottom:'4px'}}>No jobs posted yet in this category.</p>
-            <p style={{fontSize:'14px', marginBottom:'24px'}}>No hay trabajos en esta categoría todavía.</p>
-            <a href="/post-job" style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 28px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold'}}>Post the first job →</a>
-          </div>
-        ) : (
-          <div style={{display:'flex', flexDirection:'column', gap:'16px'}}>
-            {filteredJobs.map(job => (
-              <div key={job.id} style={{background:'white', borderRadius:'20px', padding:'24px', boxShadow:'0 2px 16px rgba(0,0,0,0.06)'}}>
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'12px'}}>
-                  <div>
-                    <span style={{background:'#FFF3EE', color:'#FF6B35', padding:'4px 12px', borderRadius:'20px', fontSize:'12px', fontWeight:'bold'}}>{job.category}</span>
-                    <h3 style={{color:'#1a1a2e', margin:'8px 0 4px', fontSize:'18px'}}>{job.title}</h3>
-                    <p style={{color:'#888', fontSize:'13px'}}>📍 {job.city} · 🕐 {timeAgo(job.created_at)}</p>
-                  </div>
-                  {job.budget && (
-                    <div style={{textAlign:'right', flexShrink:0, marginLeft:'16px'}}>
-                      <div style={{fontSize:'18px', fontWeight:'bold', color:'#2D6A4F'}}>{job.budget}</div>
-                      <div style={{fontSize:'11px', color:'#888'}}>budget</div>
-                    </div>
-                  )}
-                </div>
-                <p style={{color:'#555', fontSize:'14px', lineHeight:'1.6', marginBottom:'16px'}}>{job.description}</p>
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                  <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
-                  <a href={`mailto:${job.customer_email}?subject=NecesitoYa - Interested in your job: ${job.title}&body=Hi ${job.customer_name},%0D%0A%0D%0AI found your job on NecesitoYa and I am interested in helping you.%0D%0A%0D%0AJob: ${job.title}%0D%0A%0D%0APlease let me know if you are still looking for help!`} style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', textDecoration:'none', fontWeight:'bold', fontSize:'14px'}}>
-                    I Can Help / Puedo Ayudar →
-                  </a>
-                </div>
-              </div>
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'8px', fontSize:'14px'}}>Category / Categoría *</label>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px'}}>
+            {categories.map(cat => (
+              <button key={cat} onClick={() => setForm({...form, category: cat})} style={{padding:'10px 12px', borderRadius:'10px', border:`2px solid ${form.category === cat ? '#FF6B35' : '#F0EDE8'}`, background: form.category === cat ? '#FFF3EE' : 'white', cursor:'pointer', fontSize:'12px', textAlign:'left', color: form.category === cat ? '#FF6B35' : '#333', fontWeight: form.category === cat ? 'bold' : 'normal'}}>
+                {cat}
+              </button>
             ))}
           </div>
-        )}
+        </div>
+
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Job Title / Título del Trabajo *</label>
+          <input type="text" placeholder="e.g. Need lawn mowed / Necesito cortar el césped" value={form.title} onChange={e => setForm({...form, title: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
+
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Description / Descripción *</label>
+          <textarea placeholder="Describe the job in detail / Describe el trabajo en detalle" value={form.description} onChange={e => setForm({...form, description: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none', resize:'none', height:'100px', fontFamily:'Arial'}}/>
+        </div>
+
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Budget / Presupuesto (optional)</label>
+          <input type="text" placeholder="e.g. $50 - $100" value={form.budget} onChange={e => setForm({...form, budget: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
+
+        <div style={{marginBottom:'32px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>City / Ciudad *</label>
+          <input type="text" placeholder="Haines City, FL" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
+
+        <button onClick={handleSubmit} disabled={loading} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer'}}>
+          {loading ? 'Posting... / Publicando...' : 'Post Job — Find Help Now / Publicar Trabajo →'}
+        </button>
+        <p style={{textAlign:'center', color:'#888', fontSize:'12px', marginTop:'16px'}}>Free to post · Gratis publicar</p>
       </div>
     </main>
   )
