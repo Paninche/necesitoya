@@ -231,10 +231,25 @@ function CustomerDashboardContent() {
                       </div>
                       <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>{job.description}</div>
                       {job.provider_email && (
-                        <div style={{ fontSize: '13px', color: '#6b7280', backgroundColor: '#f0f9ff', padding: '8px 12px', borderRadius: '6px' }}>
-                          Provider assigned: {job.provider_email}
-                        </div>
-                      )}
+  <div style={{ fontSize: '13px', color: '#6b7280', backgroundColor: '#f0f9ff', padding: '8px 12px', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <span>Provider: {job.provider_email}</span>
+    {job.status === 'accepted' && (
+      <button
+        onClick={() => {
+          const amount = job.budget ? job.budget.replace(/[^0-9.]/g, '') : '0'
+          const providerName = job.provider_email.split('@')[0]
+          window.location.href = `/checkout?jobId=${job.id}&amount=${amount}&providerId=${job.provider_id || job.provider_email}&providerName=${encodeURIComponent(providerName)}`
+        }}
+        style={{ backgroundColor: '#16a34a', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap', marginLeft: '12px' }}
+      >
+        💳 Pay Now
+      </button>
+    )}
+    {job.status === 'paid' && (
+      <span style={{ color: '#16a34a', fontWeight: '600', fontSize: '13px' }}>✅ Paid</span>
+    )}
+  </div>
+)}
                       <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '8px' }}>
                         Posted {new Date(job.created_at).toLocaleDateString()}
                       </div>
