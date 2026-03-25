@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -8,6 +8,7 @@ const supabase = createClient(
 );
 
 export async function POST(request) {
+  const stripe = getStripe();
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
 
@@ -24,25 +25,21 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  // Handle payment success
   if (event.type === 'payment_intent.succeeded') {
     const paymentIntent = event.data.object;
     const { jobId } = paymentIntent.metadata;
 
-    // Update payment status in Supabase
     await supabase
       .from('payments')
       .update({ status: 'succeeded', paid_at: new Date().toISOString() })
       .eq('stripe_payment_intent_id', paymentIntent.id);
 
-    // Update job status to paid
     await supabase
       .from('jobs')
       .update({ status: 'paid' })
       .eq('id', jobId);
   }
 
-  // Handle payment failure
   if (event.type === 'payment_intent.payment_failed') {
     const paymentIntent = event.data.object;
 

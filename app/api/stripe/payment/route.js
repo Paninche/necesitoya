@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { stripe, calculateSplit } from '@/lib/stripe';
+import { getStripe, calculateSplit } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -8,14 +8,13 @@ const supabase = createClient(
 );
 
 export async function POST(request) {
+  const stripe = getStripe();
   try {
     const { jobId, amount, customerId, providerId } = await request.json();
 
-    // Amount comes in dollars, convert to cents
     const totalCents = Math.round(amount * 100);
     const { commission, providerAmount } = calculateSplit(totalCents);
 
-    // Get provider's Stripe account ID
     const { data: provider } = await supabase
       .from('users')
       .select('stripe_account_id')
@@ -29,7 +28,6 @@ export async function POST(request) {
       );
     }
 
-    // Create payment intent with automatic transfer to provider
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalCents,
       currency: 'usd',
@@ -37,16 +35,9 @@ export async function POST(request) {
         destination: provider.stripe_account_id,
         amount: providerAmount,
       },
-      metadata: {
-        jobId,
-        customerId,
-        providerId,
-        commission,
-        providerAmount,
-      },
+      metadata: { jobId, customerId, providerId, commission, providerAmount },
     });
 
-    // Save payment record to Supabase
     await supabase.from('payments').insert({
       job_id: jobId,
       customer_id: customerId,

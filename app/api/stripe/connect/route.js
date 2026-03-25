@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -8,10 +8,10 @@ const supabase = createClient(
 );
 
 export async function POST(request) {
+  const stripe = getStripe();
   try {
     const { userId, email } = await request.json();
 
-    // Create a Stripe Connect Express account for the provider
     const account = await stripe.accounts.create({
       type: 'express',
       email: email,
@@ -20,13 +20,11 @@ export async function POST(request) {
       },
     });
 
-    // Save the Stripe account ID to Supabase
     await supabase
       .from('users')
       .update({ stripe_account_id: account.id })
       .eq('id', userId);
 
-    // Create onboarding link
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
       refresh_url: `${process.env.NEXT_PUBLIC_APP_URL}/provider-dashboard?stripe=refresh`,
