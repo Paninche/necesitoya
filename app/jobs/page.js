@@ -36,7 +36,8 @@ export default function JobsBoard() {
   const filteredJobs = filter === 'All' ? jobs : jobs.filter(j => j.category === filter)
 
   const timeAgo = (date) => {
-    const mins = Math.floor((new Date() - new Date(date)) / 60000)
+    const mins = Math.floor((new Date() - new Date(date + 'Z')) / 60000)
+    if (mins < 1) return 'Just now / Ahora mismo'
     if (mins < 60) return `${mins}m ago`
     const hrs = Math.floor(mins / 60)
     if (hrs < 24) return `${hrs}h ago`
