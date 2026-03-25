@@ -72,6 +72,20 @@ export default function JobsBoard() {
 
       if (error) throw error
 
+      // Send email to customer
+      await fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'provider_accepted',
+          job,
+          providerName: providerData.full_name || providerData.email,
+          providerEmail: providerData.email,
+          customerEmail: job.customer_email,
+          customerName: job.customer_name,
+        }),
+      })
+
       // Update local state
       setJobs(prev => prev.map(j =>
         j.id === job.id
@@ -79,12 +93,10 @@ export default function JobsBoard() {
           : j
       ))
 
-      // Save provider to localStorage for dashboard
       localStorage.setItem('ny_provider', JSON.stringify(providerData))
       setProvider(providerData)
       setShowProviderModal(false)
 
-      // Go to messages
       window.location.href = `/messages?job=${job.id}`
     } catch (e) {
       console.error(e)

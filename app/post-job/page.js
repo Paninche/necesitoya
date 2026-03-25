@@ -1,5 +1,11 @@
 'use client'
 import { useState } from 'react'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
 
 export default function PostJob() {
   const [form, setForm] = useState({
@@ -30,23 +36,44 @@ export default function PostJob() {
     }
     setLoading(true)
     try {
-      const res = await fetch('https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/jobs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(form)
-      })
-      if (!res.ok) {
-        alert('Something went wrong. Please try again. / Algo salió mal. Por favor intente de nuevo.')
-      } else {
-        setSubmitted(true)
+      // Post job to Supabase
+      const { data: job, error } = await supabase
+        .from('jobs')
+        .insert(form)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // Find providers in the same category and notify them
+      const { data: providers } = await supabase
+        .from('users')
+        .select('email, full_name, services')
+        .eq('type', 'provider')
+
+      // Filter providers whose services match the category
+      const matchingProviders = (providers || []).filter(p =>
+        p.services && p.services.toLowerCase().includes(form.category.toLowerCase())
+      )
+
+      // Send email to each matching provider
+      for (const provider of matchingProviders) {
+        await fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'job_posted',
+            job,
+            providerName: provider.full_name,
+            providerEmail: provider.email,
+          }),
+        })
       }
+
+      setSubmitted(true)
     } catch(e) {
       console.log(e)
+      alert('Something went wrong. Please try again. / Algo salió mal.')
     }
     setLoading(false)
   }
@@ -85,7 +112,7 @@ export default function PostJob() {
         </div>
 
         <div style={{marginBottom:'20px'}}>
-          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Phone / Teléfono (optional — providers can contact you directly)</label>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Phone / Teléfono (optional)</label>
           <input type="tel" placeholder="(863) 555-0100" value={form.customer_phone} onChange={e => setForm({...form, customer_phone: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
 
