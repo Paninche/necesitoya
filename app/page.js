@@ -13,11 +13,11 @@ export default function Home() {
 
       {/* HERO */}
       <section style={{background: "linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%)", padding: "80px 32px", textAlign: "center"}}>
-        <div style={{fontSize: "14px", color: "#FF6B35", letterSpacing: "4px", marginBottom: "16px"}}>FLORIDA'S BILINGUAL SERVICES APP · LA APP BILINGÜE DE SERVICIOS DE FLORIDA</div>
+        <div style={{fontSize: "14px", color: "#FF6B35", letterSpacing: "4px", marginBottom: "16px"}}>AMERICA'S BILINGUAL LOCAL SERVICES APP · LA APP BILINGÜE DE SERVICIOS LOCALES DE AMÉRICA</div>
         <h1 style={{fontSize: "52px", fontWeight: "bold", color: "white", margin: "0 0 8px 0", lineHeight: 1.1}}>NecesitoYa</h1>
         <p style={{fontSize: "20px", color: "rgba(255,255,255,0.6)", marginBottom: "8px"}}>I Need It Now &nbsp;·&nbsp; Lo Necesito Ya</p>
-        <p style={{fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "16px"}}>Connect with local service providers in Florida — in English or Spanish</p>
-        <p style={{fontSize: "14px", color: "rgba(255,255,255,0.3)", marginBottom: "40px"}}>Conéctate con proveedores de servicios locales en Florida — en inglés o español</p>
+        <p style={{fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "16px"}}>Connect with local service providers near you — in English or Spanish</p>
+        <p style={{fontSize: "14px", color: "rgba(255,255,255,0.3)", marginBottom: "40px"}}>Conéctate con proveedores de servicios locales — en inglés o español</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
           <a href="/signup-customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
             I Need Help / Necesito Ayuda →
@@ -100,7 +100,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer style={{background: "#1a1a2e", padding: "24px 32px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "14px"}}>
-        © 2026 NecesitoYa.app · Florida's Bilingual Local Services Marketplace · Built with ⚡ in Haines City, FL
+        © 2026 NecesitoYa.app · America's Bilingual Local Services Marketplace · Built with ⚡ in Haines City, FL
       </footer>
 
     </main>
