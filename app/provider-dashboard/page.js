@@ -210,6 +210,14 @@ function ProviderDashboardContent() {
                     <div style={{ fontSize: '13px', color: '#9ca3af' }}>
                       Customer: {job.customer_name} · {job.customer_email} · {job.customer_phone}
                     </div>
+                    {(job.status === 'accepted' || job.status === 'paid') && (
+                      <button
+                        onClick={() => window.location.href = `/messages?job=${job.id}`}
+                        style={{ marginTop: '10px', backgroundColor: '#1a1a2e', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
+                      >
+                        💬 View Chat / Ver Chat
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
