@@ -44,7 +44,7 @@ export default function JobsBoard() {
   }
 
   const handleICanHelp = (job) => {
-    if (job.status !== 'open') {
+    if (job.status === 'paid' || job.status === 'completed') {
       alert('This job has already been taken. / Este trabajo ya fue tomado.')
       return
     }
@@ -64,7 +64,7 @@ export default function JobsBoard() {
         .update({
           provider_id: providerData.id || null,
           provider_email: providerData.email,
-          status: 'accepted',
+          status: 'pending',
           accepted_at: new Date().toISOString(),
         })
         .eq('id', job.id)

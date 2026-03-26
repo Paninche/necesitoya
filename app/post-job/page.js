@@ -66,7 +66,7 @@ export default function PostJob() {
 
       const { data: job, error } = await supabase
         .from('jobs')
-        .insert({ ...form, image_url })
+        .insert({ ...form, image_url, status: 'open' })
         .select()
         .single()
 
