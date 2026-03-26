@@ -61,8 +61,9 @@ export default function BuySell() {
         }
       }
 
+      const { condition, ...formWithoutCondition } = form
       const { error } = await supabase.from('jobs').insert({
-        ...form,
+        ...formWithoutCondition,
         title: `${listingType === 'selling' ? '🏷️ FOR SALE:' : '🔍 WANTED:'} ${form.title}`,
         description: `Condition: ${form.condition}\n\n${form.description}`,
         image_url: imageUrls[0] || null,
