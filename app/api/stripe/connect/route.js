@@ -19,6 +19,9 @@ const stripe = getStripe();
       capabilities: {
         transfers: { requested: true },
       },
+      business_profile: {
+        url: 'https://necesitoya.app',
+      },
     });
 
     await supabase
