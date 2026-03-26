@@ -40,8 +40,8 @@ export async function POST(request) {
 
     await supabase.from('payments').insert({
       job_id: jobId,
-      customer_id: customerId,
-      provider_id: providerId,
+      customer_id: null,
+      provider_id: providerId || null,
       stripe_payment_intent_id: paymentIntent.id,
       amount_total: totalCents,
       amount_commission: commission,
