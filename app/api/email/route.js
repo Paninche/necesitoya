@@ -10,7 +10,7 @@ export async function POST(request) {
     if (type === 'provider_accepted') {
       // Email to customer: provider accepted their job
       await resend.emails.send({
-        from: 'NecesitoYa <onboarding@resend.dev>',
+        from: 'NecesitoYa <hello@necesitoya.app>',
         to: customerEmail,
         subject: `✅ Someone wants to help with "${job.title}"!`,
         html: `
@@ -53,7 +53,7 @@ export async function POST(request) {
     if (type === 'job_posted') {
       // Email to provider: new job in their category
       await resend.emails.send({
-        from: 'NecesitoYa <onboarding@resend.dev>',
+        from: 'NecesitoYa <hello@necesitoya.app>',
         to: providerEmail,
         subject: `🔔 New job in your area: "${job.title}"`,
         html: `
