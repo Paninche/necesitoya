@@ -260,6 +260,21 @@ function CustomerDashboardContent() {
         </button>
       </div>
     )}
+    {job.status === 'accepted' || job.status === 'pending' ? (
+      <button
+        onClick={async () => {
+          if (confirm('Cancel this provider and reopen the job? / ¿Cancelar este proveedor y reabrir el trabajo?')) {
+            const { createClient } = await import('@supabase/supabase-js')
+            const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+            await supabase.from('jobs').update({ status: 'open', provider_id: null, provider_email: null }).eq('id', job.id)
+            window.location.reload()
+          }
+        }}
+        style={{ backgroundColor: '#ef4444', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', fontSize: '12px', fontWeight: '600', cursor: 'pointer', marginLeft: '8px' }}
+      >
+        ❌ Cancel Provider / Cancelar
+      </button>
+    ) : null}
     {job.status === 'paid' && (
       <span style={{ color: '#16a34a', fontWeight: '600', fontSize: '13px' }}>✅ Paid</span>
     )}
