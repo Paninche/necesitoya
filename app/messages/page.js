@@ -22,6 +22,20 @@ export default function Messages() {
       fetchJob(id)
       fetchMessages(id)
     }
+    // Auto-identify from localStorage
+    const savedProvider = localStorage.getItem('ny_provider')
+    const savedCustomer = localStorage.getItem('ny_customer')
+    if (savedProvider) {
+      const p = JSON.parse(savedProvider)
+      setSenderName(p.full_name || p.email)
+      setSenderEmail(p.email)
+      setIdentified(true)
+    } else if (savedCustomer) {
+      const c = JSON.parse(savedCustomer)
+      setSenderName(c.full_name || c.customer_name || c.email)
+      setSenderEmail(c.email)
+      setIdentified(true)
+    }
   }, [])
 
   const fetchJob = async (id) => {
