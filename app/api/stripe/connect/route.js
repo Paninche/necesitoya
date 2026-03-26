@@ -8,7 +8,8 @@ const supabase = createClient(
 );
 
 export async function POST(request) {
-  const stripe = getStripe();
+  console.log('Stripe key starts with:', process.env.STRIPE_SECRET_KEY?.substring(0, 10));
+const stripe = getStripe();
   try {
     const { userId, email } = await request.json();
 
