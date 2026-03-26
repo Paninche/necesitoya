@@ -6,34 +6,33 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-function CheckoutForm({ jobId, amount, providerId }) {
+function CheckoutForm({ jobId, amount }) {
   const stripe = useStripe();
   const elements = useElements();
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   async function handlePayment(e) {
-  e.preventDefault();
-  if (!stripe || !elements) return;
-  setLoading(true);
-  setError('');
-  try {
-    const { error: confirmError } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/payment-success?jobId=${jobId}`,
-      },
-    });
-    if (confirmError) {
-      setError(confirmError.message);
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setLoading(true);
+    setError('');
+    try {
+      const { error: confirmError } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/payment-success?jobId=${jobId}`,
+        },
+      });
+      if (confirmError) {
+        setError(confirmError.message);
+        setLoading(false);
+      }
+    } catch (err) {
+      setError('Payment failed. Please try again.');
       setLoading(false);
     }
-  } catch (err) {
-    setError('Payment failed. Please try again.');
-    setLoading(false);
   }
-}
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
@@ -83,6 +82,7 @@ function CheckoutWrapper() {
   const amount = searchParams.get('amount');
   const providerId = searchParams.get('providerId');
   const [clientSecret, setClientSecret] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!jobId || !amount || !providerId) return;
@@ -92,14 +92,23 @@ function CheckoutWrapper() {
       body: JSON.stringify({
         jobId,
         amount: parseFloat(amount),
+        customerId: 'guest',
         providerId,
       }),
     })
       .then(r => r.json())
       .then(data => {
         if (data.clientSecret) setClientSecret(data.clientSecret);
-      });
+        else setError(data.error || 'Failed to load payment');
+      })
+      .catch(() => setError('Failed to load payment'));
   }, [jobId, amount, providerId]);
+
+  if (error) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'red' }}>{error}</p>
+    </div>
+  );
 
   if (!clientSecret) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -109,7 +118,7 @@ function CheckoutWrapper() {
 
   return (
     <Elements stripe={stripePromise} options={{ clientSecret }}>
-      <CheckoutForm jobId={jobId} amount={amount} providerId={providerId} />
+      <CheckoutForm jobId={jobId} amount={amount} />
     </Elements>
   );
 }
