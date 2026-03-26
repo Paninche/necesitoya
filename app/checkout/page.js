@@ -1,108 +1,123 @@
 'use client';
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-function CheckoutForm() {
-  const searchParams = useSearchParams();
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+
+function CheckoutForm({ jobId, amount, providerId }) {
+  const stripe = useStripe();
+  const elements = useElements();
   const router = useRouter();
-  const jobId = searchParams.get('jobId');
-  const amount = searchParams.get('amount');
-  const providerId = searchParams.get('providerId');
-  const providerName = searchParams.get('providerName');
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvc, setCvc] = useState('');
-  const [name, setName] = useState('');
 
   async function handlePayment(e) {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const res = await fetch('/api/stripe/payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jobId,
-          amount: parseFloat(amount),
-          customerId: 'guest',
-          providerId,
-        }),
-      });
-      const data = await res.json();
-      if (data.error) {
-        setError(data.error);
-        setLoading(false);
-        return;
-      }
-      router.push(`/payment-success?jobId=${jobId}`);
-    } catch (err) {
-      setError('Payment failed. Please try again.');
+  e.preventDefault();
+  if (!stripe || !elements) return;
+  setLoading(true);
+  setError('');
+  try {
+    const { error: confirmError } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/payment-success?jobId=${jobId}`,
+      },
+    });
+    if (confirmError) {
+      setError(confirmError.message);
       setLoading(false);
     }
+  } catch (err) {
+    setError('Payment failed. Please try again.');
+    setLoading(false);
   }
+}
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
       <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '40px', maxWidth: '480px', width: '100%', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ fontSize: '28px', fontWeight: '800', color: '#1a1a2e', marginBottom: '4px' }}>NecesitoYa</div>
-          <div style={{ color: '#6b7280', fontSize: '14px' }}>Secure Payment / Pago Seguro</div>
+        <h1 style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '24px', marginBottom: '4px' }}>NecesitoYa</h1>
+        <p style={{ textAlign: 'center', color: '#666', marginBottom: '24px', fontSize: '14px' }}>Secure Payment / Pago Seguro</p>
+
+        <div style={{ background: '#f8f6f2', borderRadius: '10px', padding: '16px', marginBottom: '24px' }}>
+          <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Order Summary / Resumen</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px' }}>
+            <span>Service Fee / Tarifa</span>
+            <span>${parseFloat(amount).toFixed(2)}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px' }}>
+            <span>Platform Fee / Plataforma</span>
+            <span style={{ color: 'green' }}>FREE ✓</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', borderTop: '1px solid #ddd', paddingTop: '8px', marginTop: '8px' }}>
+            <span>Total</span>
+            <span>${parseFloat(amount).toFixed(2)}</span>
+          </div>
         </div>
-        <div style={{ backgroundColor: '#f0f9ff', borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
-          <div style={{ fontWeight: '600', marginBottom: '8px', color: '#1a1a2e' }}>Order Summary / Resumen</div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '14px', color: '#4b5563' }}>
-            <span>Provider / Proveedor</span><span>{providerName || 'Provider'}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '14px', color: '#4b5563' }}>
-            <span>Service Fee / Tarifa</span><span>${parseFloat(amount || 0).toFixed(2)}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '14px', color: '#4b5563' }}>
-            <span>Platform Fee / Plataforma</span><span>FREE ✓</span>
-          </div>
-          <div style={{ borderTop: '1px solid #bae6fd', marginTop: '8px', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', fontWeight: '700', color: '#1a1a2e' }}>
-            <span>Total</span><span>${parseFloat(amount || 0).toFixed(2)}</span>
-          </div>
-        </div>
+
         <form onSubmit={handlePayment}>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '6px' }}>Your Name / Tu Nombre</label>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="John Smith" required style={{ width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box' }} />
-          </div>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '6px' }}>Card Number / Número de Tarjeta</label>
-            <input type="text" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} placeholder="4242 4242 4242 4242" required maxLength={19} style={{ width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box' }} />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '6px' }}>Expiry / Vence</label>
-              <input type="text" value={expiry} onChange={(e) => setExpiry(e.target.value)} placeholder="MM/YY" required maxLength={5} style={{ width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '6px' }}>CVC</label>
-              <input type="text" value={cvc} onChange={(e) => setCvc(e.target.value)} placeholder="123" required maxLength={3} style={{ width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box' }} />
-            </div>
-          </div>
-          {error && (
-            <div style={{ backgroundColor: '#fee2e2', color: '#dc2626', padding: '12px', borderRadius: '8px', fontSize: '14px', marginBottom: '16px' }}>{error}</div>
-          )}
-          <button type="submit" disabled={loading} style={{ width: '100%', backgroundColor: loading ? '#9ca3af' : '#2563eb', color: 'white', padding: '14px', borderRadius: '8px', fontSize: '16px', fontWeight: '600', border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}>
-            {loading ? 'Processing...' : `Pay $${parseFloat(amount || 0).toFixed(2)}`}
+          <PaymentElement />
+          {error && <p style={{ color: 'red', fontSize: '13px', marginTop: '12px' }}>{error}</p>}
+          <button
+            type="submit"
+            disabled={loading || !stripe}
+            style={{ width: '100%', backgroundColor: '#2563eb', color: 'white', padding: '14px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: loading ? 'not-allowed' : 'pointer', marginTop: '20px', opacity: loading ? 0.7 : 1 }}
+          >
+            {loading ? 'Processing...' : `Pay $${parseFloat(amount).toFixed(2)}`}
           </button>
-          <p style={{ textAlign: 'center', fontSize: '12px', color: '#9ca3af', marginTop: '16px' }}>🔒 Secured by Stripe · No platform fees for customers</p>
         </form>
+
+        <p style={{ textAlign: 'center', fontSize: '12px', color: '#999', marginTop: '16px' }}>
+          🔒 Secured by Stripe · No platform fees for customers
+        </p>
       </div>
     </div>
   );
 }
 
-export default function Checkout() {
+function CheckoutWrapper() {
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get('jobId');
+  const amount = searchParams.get('amount');
+  const providerId = searchParams.get('providerId');
+  const [clientSecret, setClientSecret] = useState('');
+
+  useEffect(() => {
+    if (!jobId || !amount || !providerId) return;
+    fetch('/api/stripe/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jobId,
+        amount: parseFloat(amount),
+        providerId,
+      }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.clientSecret) setClientSecret(data.clientSecret);
+      });
+  }, [jobId, amount, providerId]);
+
+  if (!clientSecret) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p>Loading payment... / Cargando pago...</p>
+    </div>
+  );
+
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>}>
-      <CheckoutForm />
+    <Elements stripe={stripePromise} options={{ clientSecret }}>
+      <CheckoutForm jobId={jobId} amount={amount} providerId={providerId} />
+    </Elements>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutWrapper />
     </Suspense>
   );
 }
