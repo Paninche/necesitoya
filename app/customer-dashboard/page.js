@@ -234,16 +234,31 @@ function CustomerDashboardContent() {
   <div style={{ fontSize: '13px', color: '#6b7280', backgroundColor: '#f0f9ff', padding: '8px 12px', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
     <span>Provider: {job.provider_email}</span>
     {job.status === 'accepted' && (
-      <button
-        onClick={() => {
-          const amount = job.budget ? job.budget.replace(/[^0-9.]/g, '') : '0'
-          const providerName = job.provider_email.split('@')[0]
-          window.location.href = `/checkout?jobId=${job.id}&amount=${amount}&providerId=${job.provider_id || job.provider_email}&providerName=${encodeURIComponent(providerName)}`
-        }}
-        style={{ backgroundColor: '#16a34a', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap', marginLeft: '12px' }}
-      >
-        💳 Pay Now
-      </button>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginLeft: '12px' }}>
+        {(!job.budget || job.budget === '0' || job.budget === '$0') && (
+          <input
+            type="number"
+            placeholder="Enter amount $"
+            id={`amount-${job.id}`}
+            style={{ width: '120px', padding: '6px 10px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }}
+          />
+        )}
+        <button
+          onClick={() => {
+            const inputAmount = document.getElementById(`amount-${job.id}`)?.value
+            const amount = inputAmount || (job.budget ? job.budget.replace(/[^0-9.]/g, '') : '0')
+            if (!amount || amount === '0') {
+              alert('Please enter the agreed amount / Por favor ingresa el monto acordado')
+              return
+            }
+            const providerName = job.provider_email.split('@')[0]
+            window.location.href = `/checkout?jobId=${job.id}&amount=${amount}&providerId=${job.provider_id || job.provider_email}&providerName=${encodeURIComponent(providerName)}`
+          }}
+          style={{ backgroundColor: '#16a34a', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap' }}
+        >
+          💳 Pay Now
+        </button>
+      </div>
     )}
     {job.status === 'paid' && (
       <span style={{ color: '#16a34a', fontWeight: '600', fontSize: '13px' }}>✅ Paid</span>
