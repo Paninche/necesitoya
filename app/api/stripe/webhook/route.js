@@ -30,9 +30,9 @@ export async function POST(request) {
     const { jobId } = paymentIntent.metadata;
 
     await supabase
-      .from('payments')
-      .update({ status: 'succeeded', paid_at: new Date().toISOString() })
-      .eq('stripe_payment_intent_id', paymentIntent.id);
+  .from('payments')
+  .update({ status: 'succeeded' })
+  .eq('stripe_payment_intent_id', paymentIntent.id);
 
     await supabase
       .from('jobs')
