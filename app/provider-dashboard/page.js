@@ -210,12 +210,28 @@ function ProviderDashboardContent() {
                     <div style={{ fontSize: '13px', color: '#9ca3af' }}>
                       Customer: {job.customer_name} · {job.customer_email} · {job.customer_phone}
                     </div>
-                    {(job.status === 'accepted' || job.status === 'paid') && (
+                    {(job.status === 'accepted' || job.status === 'paid' || job.status === 'pending') && (
                       <button
                         onClick={() => window.location.href = `/messages?job=${job.id}`}
-                        style={{ marginTop: '10px', backgroundColor: '#1a1a2e', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
+                        style={{ marginTop: '10px', backgroundColor: '#1a1a2e', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer', marginRight: '8px' }}
                       >
                         💬 View Chat / Ver Chat
+                      </button>
+                    )}
+                    {(job.status === 'pending' || job.status === 'accepted') && (
+                      <button
+                        onClick={async () => {
+                          if (confirm('Release this job? It will become available to other providers. / ¿Liberar este trabajo?')) {
+                            await supabase
+                              .from('jobs')
+                              .update({ status: 'open', provider_id: null, provider_email: null })
+                              .eq('id', job.id)
+                            window.location.reload()
+                          }
+                        }}
+                        style={{ marginTop: '10px', backgroundColor: '#ef4444', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
+                      >
+                        ❌ Release Job / Liberar
                       </button>
                     )}
                   </div>
