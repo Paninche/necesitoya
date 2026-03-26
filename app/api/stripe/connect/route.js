@@ -22,9 +22,9 @@ const stripe = getStripe();
     });
 
     await supabase
-      .from('users')
-      .update({ stripe_account_id: account.id })
-      .eq('id', userId);
+  .from('users')
+  .update({ stripe_account_id: account.id, stripe_onboarding_complete: true })
+  .eq('id', userId);
 
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
