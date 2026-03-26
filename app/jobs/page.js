@@ -235,7 +235,7 @@ export default function JobsBoard() {
                       onClick={() => handleICanHelp(job)}
                       disabled={assigning === job.id}
                       style={{background: assigning === job.id ? '#ccc' : 'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'14px', cursor: assigning === job.id ? 'not-allowed' : 'pointer'}}>
-                      {assigning === job.id ? 'Accepting...' : '{job.category === 'Buy & Sell' ? 'I\'m Interested / Me Interesa →' : 'I Can Help / Puedo Ayudar →'}'}
+                      {assigning === job.id ? 'Accepting...' : '{job.category === 'Buy & Sell' ? "I'm Interested / Me Interesa →" : "I Can Help / Puedo Ayudar →"}'}
                     </button>
                   ) : (
                     <span style={{fontSize:'13px', color:'#16a34a', fontWeight:'600'}}>✓ Provider assigned</span>
