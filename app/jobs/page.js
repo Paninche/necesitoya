@@ -19,14 +19,13 @@ export default function JobsBoard() {
 
   const categories = [
     'All', 'Hauling & Pickup', 'Handyman', 'Lawn & Garden', 'Cleaning',
-    'Tutoring', 'Transport', 'Home Cooking', 'Catering', 'Baker & Pastries',
-    'Pet Care', 'Beauty & Hair', 'Babysitting', 'Tech Help',
-    'Painting', 'Photography', 'Mechanic', 'Roadside & Towing'
+    'Tutoring', 'Transport', 'Buy & Sell', 'Home Cooking', 'Catering',
+    'Baker & Pastries', 'Pet Care', 'Beauty & Hair', 'Babysitting',
+    'Tech Help', 'Painting', 'Photography', 'Mechanic', 'Roadside & Towing'
   ]
 
   useEffect(() => {
     fetchJobs()
-    // Check if provider is logged in
     const saved = localStorage.getItem('ny_provider')
     if (saved) setProvider(JSON.parse(saved))
   }, [])
@@ -86,7 +85,6 @@ export default function JobsBoard() {
         }),
       })
 
-      // Update local state
       setJobs(prev => prev.map(j =>
         j.id === job.id
           ? { ...j, status: 'accepted', provider_email: providerData.email }
@@ -96,7 +94,6 @@ export default function JobsBoard() {
       localStorage.setItem('ny_provider', JSON.stringify(providerData))
       setProvider(providerData)
       setShowProviderModal(false)
-
       window.location.href = `/messages?job=${job.id}`
     } catch (e) {
       console.error(e)
@@ -117,7 +114,6 @@ export default function JobsBoard() {
     if (data) {
       assignProvider(selectedJob, data)
     } else {
-      // Allow as guest provider with just email
       const guestProvider = { email: providerEmail.toLowerCase(), full_name: providerEmail.split('@')[0] }
       assignProvider(selectedJob, guestProvider)
     }
@@ -222,6 +218,14 @@ export default function JobsBoard() {
                   )}
                 </div>
                 <p style={{color:'#555', fontSize:'14px', lineHeight:'1.6', marginBottom:'16px'}}>{job.description}</p>
+
+                {/* Job Photo */}
+                {job.image_url && (
+                  <div style={{marginBottom:'16px'}}>
+                    <img src={job.image_url} alt="Job photo" style={{width:'100%', borderRadius:'12px', maxHeight:'200px', objectFit:'cover'}}/>
+                  </div>
+                )}
+
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                   <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
                   {job.status === 'open' ? (
