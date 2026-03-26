@@ -208,7 +208,7 @@ function ProviderDashboardContent() {
                     </div>
                     <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>{job.description}</div>
                     <div style={{ fontSize: '13px', color: '#9ca3af' }}>
-                      Customer: {job.customer_name} · {job.customer_email} · {job.customer_phone}
+                      Customer: {job.customer_name} · {job.customer_email} · {job.status === 'paid' || job.status === 'completed' ? job.customer_phone : '📵 Phone hidden until payment / Teléfono oculto hasta el pago'}
                     </div>
                     {(job.status === 'accepted' || job.status === 'paid' || job.status === 'pending') && (
                       <button
