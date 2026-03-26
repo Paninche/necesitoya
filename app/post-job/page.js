@@ -20,6 +20,8 @@ export default function PostJob() {
   })
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
 
   const categories = [
     "Hauling & Pickup", "Handyman", "Lawn & Garden", "Cleaning",
@@ -29,6 +31,14 @@ export default function PostJob() {
     "Mechanic", "Roadside & Towing"
   ]
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setImageFile(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+  }
+
   const handleSubmit = async () => {
     if (!form.customer_name || !form.customer_email || !form.category || !form.title || !form.description || !form.city) {
       alert('Please fill in all required fields / Por favor complete todos los campos')
@@ -36,27 +46,41 @@ export default function PostJob() {
     }
     setLoading(true)
     try {
-      // Post job to Supabase
+      let image_url = null
+
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop()
+        const fileName = `${Date.now()}.${fileExt}`
+        const { data: uploadData, error: uploadError } = await supabase
+          .storage
+          .from('job-images')
+          .upload(fileName, imageFile)
+
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage
+            .from('job-images')
+            .getPublicUrl(fileName)
+          image_url = urlData.publicUrl
+        }
+      }
+
       const { data: job, error } = await supabase
         .from('jobs')
-        .insert(form)
+        .insert({ ...form, image_url })
         .select()
         .single()
 
       if (error) throw error
 
-      // Find providers in the same category and notify them
       const { data: providers } = await supabase
         .from('users')
         .select('email, full_name, services')
         .eq('type', 'provider')
 
-      // Filter providers whose services match the category
       const matchingProviders = (providers || []).filter(p =>
         p.services && p.services.toLowerCase().includes(form.category.toLowerCase())
       )
 
-      // Send email to each matching provider
       for (const provider of matchingProviders) {
         await fetch('/api/email', {
           method: 'POST',
@@ -142,9 +166,29 @@ export default function PostJob() {
           <input type="text" placeholder="e.g. $50 - $100" value={form.budget} onChange={e => setForm({...form, budget: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
 
-        <div style={{marginBottom:'32px'}}>
+        <div style={{marginBottom:'20px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>City / Ciudad *</label>
           <input type="text" placeholder="Haines City, FL" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
+
+        {/* Photo Upload */}
+        <div style={{marginBottom:'32px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>
+            📷 Add a Photo (optional) / Agregar Foto
+          </label>
+          <p style={{color:'#888', fontSize:'12px', marginBottom:'10px'}}>Help providers understand the job better / Ayuda a los proveedores a entender mejor el trabajo</p>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            style={{width:'100%', padding:'12px', borderRadius:'12px', border:'2px dashed #F0EDE8', fontSize:'14px', boxSizing:'border-box', cursor:'pointer'}}
+          />
+          {imagePreview && (
+            <div style={{marginTop:'12px', position:'relative'}}>
+              <img src={imagePreview} alt="Preview" style={{width:'100%', borderRadius:'12px', maxHeight:'200px', objectFit:'cover'}}/>
+              <button onClick={() => { setImageFile(null); setImagePreview(null) }} style={{position:'absolute', top:'8px', right:'8px', background:'rgba(0,0,0,0.5)', color:'white', border:'none', borderRadius:'50%', width:'28px', height:'28px', cursor:'pointer', fontSize:'16px'}}>×</button>
+            </div>
+          )}
         </div>
 
         <button onClick={handleSubmit} disabled={loading} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer'}}>
