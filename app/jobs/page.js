@@ -119,7 +119,9 @@ export default function JobsBoard() {
     }
   }
 
-  const filteredJobs = filter === 'All' ? jobs : jobs.filter(j => j.category === filter)
+  const filteredJobs = jobs
+  .filter(j => j.status !== 'paid' && j.status !== 'completed')
+  .filter(j => filter === 'All' || j.category === filter)
 
   const timeAgo = (date) => {
     const mins = Math.floor((new Date() - new Date(date + 'Z')) / 60000)
