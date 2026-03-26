@@ -40,7 +40,7 @@ export default function Home() {
         <h2 style={{textAlign: "center", fontSize: "28px", color: "#1a1a2e", marginBottom: "4px"}}>What do you need?</h2>
         <p style={{textAlign: "center", color: "#FF6B35", marginBottom: "4px", fontWeight: "bold"}}>¿Qué necesitas?</p>
         <p style={{textAlign: "center", color: "#888", marginBottom: "40px"}}>Browse by category / Buscar por categoría</p>
-        <div style={{display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "12px", maxWidth: "700px", margin: "0 auto", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))"}}>
+        <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "12px", maxWidth: "700px", margin: "0 auto"}}>
           {[
             {icon: "🚛", label: "Hauling & Pickup", es: "Mudanza & Recogida"},
             {icon: "🔨", label: "Handyman", es: "Reparaciones"},
@@ -61,7 +61,7 @@ export default function Home() {
             {icon: "🔧", label: "Mechanic", es: "Mecánico"},
             {icon: "🚨", label: "Roadside & Towing", es: "Grúa & Asistencia Vial"},
           ].map((cat) => (
-            <a href={`/post-job`} key={cat.label} style={{background: "white", borderRadius: "16px", padding: "16px 8px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", textDecoration: "none"}}>
+            <a href={cat.label === 'Buy & Sell' ? '/buy-sell' : '/post-job'} key={cat.label} style={{background: "white", borderRadius: "16px", padding: "16px 8px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", textDecoration: "none"}}>
               <div style={{fontSize: "28px", marginBottom: "6px"}}>{cat.icon}</div>
               <div style={{fontWeight: "bold", color: "#1a1a2e", fontSize: "11px", lineHeight: "1.3"}}>{cat.label}</div>
               <div style={{color: "#FF6B35", fontSize: "10px", marginTop: "2px", lineHeight: "1.3"}}>{cat.es}</div>
@@ -150,6 +150,7 @@ export default function Home() {
             <div style={{color: "white", fontWeight: "bold", marginBottom: "12px"}}>For Customers</div>
             <div style={{lineHeight: "2.2"}}>
               <a href="/post-job" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Post a Job</a>
+              <a href="/buy-sell" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Buy & Sell</a>
               <a href="/jobs" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Browse Jobs</a>
               <a href="/customer-dashboard" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>My Dashboard</a>
             </div>
