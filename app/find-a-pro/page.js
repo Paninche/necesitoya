@@ -169,7 +169,7 @@ export default function FindAPro() {
                 )}
 
                 
-                  href={`mailto:${pro.email || ''}?subject=NecesitoYa - I need your services`}
+                  href={`mailto:${pro.email || ''}?subject=NecesitoYa%20-%20I%20need%20your%20services`}
                   style={{ display: 'block', background: 'linear-gradient(135deg,#FF6B35,#F4A261)', color: 'white', padding: '10px 20px', borderRadius: '12px', textDecoration: 'none', fontWeight: 'bold', fontSize: '14px', textAlign: 'center' }}
                 >
                   {'Contact / Contactar →'}
