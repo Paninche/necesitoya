@@ -167,6 +167,8 @@ export default function Home() {
             <div style={{color: "white", fontWeight: "bold", marginBottom: "12px"}}>Company</div>
             <div style={{lineHeight: "2.2"}}>
               <a href="/admin" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Admin</a>
+              <a href="/privacy" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Privacy Policy</a>
+              <a href="/terms" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Terms of Service</a>
               <span style={{display: "block"}}>Haines City, FL</span>
               <span style={{display: "block"}}>necesitoya.app</span>
             </div>
