@@ -7,6 +7,7 @@ export default function Home() {
         <div style={{color: "#FF6B35", fontSize: "24px", fontWeight: "bold"}}>⚡ NecesitoYa</div>
         <div style={{display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center"}}>
           <a href="/jobs" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Jobs</a>
+          <a href="/find-a-pro" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Find a Pro</a>
           <a href="/post-job" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Post Job</a>
           <a href="/customer-dashboard" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>My Jobs</a>
           <a href="/provider-dashboard" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Provider</a>
@@ -26,8 +27,8 @@ export default function Home() {
           <a href="/post-job" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
             I Need Help / Necesito Ayuda →
           </a>
-          <a href="/jobs" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
-            Browse Jobs / Ver Trabajos →
+          <a href="/find-a-pro" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
+            Find a Pro / Encuentra un Pro →
           </a>
           <a href="/signup-provider" style={{background: "transparent", border: "2px solid #FF6B35", color: "#FF6B35", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
             I Offer Services / Ofrezco Servicios →
@@ -133,7 +134,10 @@ export default function Home() {
           <a href="/post-job" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", textDecoration: "none"}}>
             Post a Job / Publicar Trabajo →
           </a>
-          <a href="/signup-provider" style={{background: "transparent", border: "2px solid white", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", textDecoration: "none"}}>
+          <a href="/find-a-pro" style={{background: "transparent", border: "2px solid white", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", textDecoration: "none"}}>
+            Find a Pro / Encuentra un Pro →
+          </a>
+          <a href="/signup-provider" style={{background: "transparent", border: "2px solid #FF6B35", color: "#FF6B35", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", textDecoration: "none"}}>
             Become a Provider / Ser Proveedor →
           </a>
         </div>
@@ -150,6 +154,7 @@ export default function Home() {
             <div style={{color: "white", fontWeight: "bold", marginBottom: "12px"}}>For Customers</div>
             <div style={{lineHeight: "2.2"}}>
               <a href="/post-job" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Post a Job</a>
+              <a href="/find-a-pro" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Find a Pro</a>
               <a href="/buy-sell" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Buy & Sell</a>
               <a href="/jobs" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Browse Jobs</a>
               <a href="/customer-dashboard" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>My Dashboard</a>
@@ -169,8 +174,8 @@ export default function Home() {
               <a href="/admin" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Admin</a>
               <a href="/privacy" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Privacy Policy</a>
               <a href="/terms" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Terms of Service</a>
+              <a href="/support" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Support</a>
               <span style={{display: "block"}}>Haines City, FL</span>
-              <span style={{display: "block"}}>necesitoya.app</span>
             </div>
           </div>
         </div>
