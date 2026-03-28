@@ -16,6 +16,8 @@ export default function JobsBoard() {
   const [showProviderModal, setShowProviderModal] = useState(false)
   const [selectedJob, setSelectedJob] = useState(null)
   const [providerEmail, setProviderEmail] = useState('')
+  const [stateFilter, setStateFilter] = useState('All')
+  const [cityFilter, setCityFilter] = useState('All')
 
   const categories = [
     'All', 'Hauling & Pickup', 'Handyman', 'Lawn & Garden', 'Cleaning',
@@ -71,7 +73,6 @@ export default function JobsBoard() {
 
       if (error) throw error
 
-      // Send email to customer
       await fetch('/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -119,9 +120,20 @@ export default function JobsBoard() {
     }
   }
 
+  // Get unique states and cities from jobs
+  const availableStates = ['All', ...new Set(jobs.map(j => j.state).filter(Boolean))]
+  const availableCities = ['All', ...new Set(
+    jobs
+      .filter(j => stateFilter === 'All' || j.state === stateFilter)
+      .map(j => j.city)
+      .filter(Boolean)
+  )]
+
   const filteredJobs = jobs
-  .filter(j => j.status !== 'paid' && j.status !== 'completed')
-  .filter(j => filter === 'All' || j.category === filter)
+    .filter(j => j.status !== 'paid' && j.status !== 'completed')
+    .filter(j => filter === 'All' || j.category === filter)
+    .filter(j => stateFilter === 'All' || j.state === stateFilter)
+    .filter(j => cityFilter === 'All' || j.city === cityFilter)
 
   const timeAgo = (date) => {
     const mins = Math.floor((new Date() - new Date(date + 'Z')) / 60000)
@@ -169,18 +181,51 @@ export default function JobsBoard() {
         <h1 style={{color:'white', fontSize:'32px', fontWeight:'bold', margin:'16px 0 4px'}}>Available Jobs</h1>
         <p style={{color:'#FF6B35', fontWeight:'bold', marginBottom:'4px'}}>Trabajos Disponibles</p>
         <p style={{color:'rgba(255,255,255,0.5)', fontSize:'14px', marginBottom:'24px'}}>{filteredJobs.length} jobs near you / trabajos cerca de ti</p>
-        <a href="/post-job" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 28px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', fontSize:'14px'}}>
-          + Post a Job / Publicar Trabajo
-        </a>
+        {!provider && (
+          <a href="/post-job" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 28px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', fontSize:'14px'}}>
+            + Post a Job / Publicar Trabajo
+          </a>
+        )}
       </div>
 
-      {/* Filter */}
+      {/* Category Filter */}
       <div style={{padding:'16px 32px', overflowX:'auto', whiteSpace:'nowrap', background:'white', borderBottom:'1px solid #F0EDE8'}}>
         {categories.map(cat => (
           <button key={cat} onClick={() => setFilter(cat)} style={{display:'inline-block', marginRight:'8px', padding:'8px 16px', borderRadius:'20px', border:`2px solid ${filter === cat ? '#FF6B35' : '#F0EDE8'}`, background: filter === cat ? '#FF6B35' : 'white', color: filter === cat ? 'white' : '#555', cursor:'pointer', fontSize:'13px', fontWeight: filter === cat ? 'bold' : 'normal', whiteSpace:'nowrap'}}>
             {cat}
           </button>
         ))}
+      </div>
+
+      {/* Location Filter */}
+      <div style={{padding:'12px 32px', background:'white', borderBottom:'1px solid #F0EDE8', display:'flex', gap:'12px', alignItems:'center', flexWrap:'wrap'}}>
+        <span style={{fontSize:'13px', color:'#888', fontWeight:'600'}}>📍 Filter by location:</span>
+        <select
+          value={stateFilter}
+          onChange={(e) => { setStateFilter(e.target.value); setCityFilter('All') }}
+          style={{padding:'6px 12px', borderRadius:'8px', border:'1px solid #e5e7eb', fontSize:'13px', color:'#333', cursor:'pointer', background:'white'}}
+        >
+          {availableStates.map(s => (
+            <option key={s} value={s}>{s === 'All' ? 'All States' : s}</option>
+          ))}
+        </select>
+        <select
+          value={cityFilter}
+          onChange={(e) => setCityFilter(e.target.value)}
+          style={{padding:'6px 12px', borderRadius:'8px', border:'1px solid #e5e7eb', fontSize:'13px', color:'#333', cursor:'pointer', background:'white'}}
+        >
+          {availableCities.map(c => (
+            <option key={c} value={c}>{c === 'All' ? 'All Cities' : c}</option>
+          ))}
+        </select>
+        {(stateFilter !== 'All' || cityFilter !== 'All') && (
+          <button
+            onClick={() => { setStateFilter('All'); setCityFilter('All') }}
+            style={{padding:'6px 12px', borderRadius:'8px', border:'1px solid #FF6B35', fontSize:'13px', color:'#FF6B35', cursor:'pointer', background:'white', fontWeight:'600'}}
+          >
+            Clear / Limpiar ✕
+          </button>
+        )}
       </div>
 
       {/* Jobs List */}
@@ -195,7 +240,9 @@ export default function JobsBoard() {
             <div style={{fontSize:'40px', marginBottom:'16px'}}>📋</div>
             <p style={{marginBottom:'4px'}}>No jobs posted yet in this category.</p>
             <p style={{fontSize:'14px', marginBottom:'24px'}}>No hay trabajos en esta categoría todavía.</p>
-            <a href="/post-job" style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 28px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold'}}>Post the first job →</a>
+            {!provider && (
+              <a href="/post-job" style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 28px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold'}}>Post the first job →</a>
+            )}
           </div>
         ) : (
           <div style={{display:'flex', flexDirection:'column', gap:'16px'}}>
@@ -210,18 +257,17 @@ export default function JobsBoard() {
                       )}
                     </div>
                     <h3 style={{color:'#1a1a2e', margin:'8px 0 4px', fontSize:'18px'}}>{job.title}</h3>
-                    <p style={{color:'#888', fontSize:'13px'}}>📍 {job.city} · 🕐 {timeAgo(job.created_at)}</p>
+                    <p style={{color:'#888', fontSize:'13px'}}>📍 {job.city}{job.state ? `, ${job.state}` : ''} · 🕐 {timeAgo(job.created_at)}</p>
                   </div>
                   {job.budget && (
                     <div style={{textAlign:'right', flexShrink:0, marginLeft:'16px'}}>
                       <div style={{fontSize:'18px', fontWeight:'bold', color:'#2D6A4F'}}>{job.budget}</div>
-                      <div style={{fontSize:'11px', color:'#888'}}>budget</div>
+                      <div style={{fontSize:'11px', color:'#888'}}>{job.category === 'Buy & Sell' ? 'price' : 'budget'}</div>
                     </div>
                   )}
                 </div>
                 <p style={{color:'#555', fontSize:'14px', lineHeight:'1.6', marginBottom:'16px'}}>{job.description}</p>
 
-                {/* Job Photo */}
                 {job.image_url && (
                   <div style={{marginBottom:'16px'}}>
                     <img src={job.image_url} alt="Job photo" style={{width:'100%', borderRadius:'12px', maxHeight:'200px', objectFit:'cover'}}/>

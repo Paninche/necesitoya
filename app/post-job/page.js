@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -16,12 +16,19 @@ export default function PostJob() {
     title: '',
     description: '',
     budget: '',
-    city: ''
+    city: '',
+    state: ''
   })
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
+  const [isProvider, setIsProvider] = useState(false)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('ny_provider')
+    if (saved) setIsProvider(true)
+  }, [])
 
   const categories = [
     "Hauling & Pickup", "Handyman", "Lawn & Garden", "Cleaning",
@@ -102,6 +109,30 @@ export default function PostJob() {
     setLoading(false)
   }
 
+  // Block providers from posting jobs
+  if (isProvider) {
+    return (
+      <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px'}}>
+        <div style={{background:'white', borderRadius:'24px', padding:'48px', width:'100%', maxWidth:'480px', textAlign:'center'}}>
+          <div style={{fontSize:'64px', marginBottom:'16px'}}>🔧</div>
+          <h2 style={{color:'#1a1a2e', marginBottom:'8px'}}>You're a Provider!</h2>
+          <p style={{color:'#FF6B35', fontWeight:'bold', marginBottom:'16px'}}>Eres un Proveedor</p>
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'8px'}}>
+            As a service provider, you browse and respond to jobs posted by customers.
+          </p>
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'32px'}}>
+            Como proveedor de servicios, navegas y respondes a trabajos publicados por clientes.
+          </p>
+          <a href="/jobs" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'14px 32px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', fontSize:'16px', marginBottom:'12px'}}>
+            Browse Jobs / Ver Trabajos →
+          </a>
+          <br/>
+          <a href="/" style={{display:'inline-block', color:'#888', padding:'12px 24px', textDecoration:'none', fontSize:'14px'}}>← Home</a>
+        </div>
+      </main>
+    )
+  }
+
   if (submitted) {
     return (
       <div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial'}}>
@@ -162,13 +193,21 @@ export default function PostJob() {
         </div>
 
         <div style={{marginBottom:'20px'}}>
-          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Budget / Presupuesto (optional)</label>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>
+            {form.category === 'Buy & Sell' ? 'Price / Precio (optional)' : 'Budget / Presupuesto (optional)'}
+          </label>
           <input type="text" placeholder="e.g. $50 - $100" value={form.budget} onChange={e => setForm({...form, budget: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
 
-        <div style={{marginBottom:'20px'}}>
-          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>City / Ciudad *</label>
-          <input type="text" placeholder="Haines City, FL" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px', marginBottom:'20px'}}>
+          <div>
+            <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>City / Ciudad *</label>
+            <input type="text" placeholder="Haines City" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+          </div>
+          <div>
+            <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>State / Estado *</label>
+            <input type="text" placeholder="FL" value={form.state} onChange={e => setForm({...form, state: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+          </div>
         </div>
 
         {/* Photo Upload */}
