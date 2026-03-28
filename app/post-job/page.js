@@ -8,6 +8,7 @@ const supabase = createClient(
 )
 
 export default function PostJob() {
+  const [userType, setUserType] = useState(null)
   const [form, setForm] = useState({
     customer_name: '',
     customer_email: '',
@@ -109,7 +110,7 @@ export default function PostJob() {
     setLoading(false)
   }
 
-  // Block providers from posting jobs
+  // Block logged-in providers
   if (isProvider) {
     return (
       <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px'}}>
@@ -117,17 +118,54 @@ export default function PostJob() {
           <div style={{fontSize:'64px', marginBottom:'16px'}}>🔧</div>
           <h2 style={{color:'#1a1a2e', marginBottom:'8px'}}>You're a Provider!</h2>
           <p style={{color:'#FF6B35', fontWeight:'bold', marginBottom:'16px'}}>Eres un Proveedor</p>
-          <p style={{color:'#888', fontSize:'14px', marginBottom:'8px'}}>
-            As a service provider, you browse and respond to jobs posted by customers.
-          </p>
-          <p style={{color:'#888', fontSize:'14px', marginBottom:'32px'}}>
-            Como proveedor de servicios, navegas y respondes a trabajos publicados por clientes.
-          </p>
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'8px'}}>As a service provider, you browse and respond to jobs posted by customers.</p>
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'32px'}}>Como proveedor de servicios, navegas y respondes a trabajos publicados por clientes.</p>
           <a href="/jobs" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'14px 32px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', fontSize:'16px', marginBottom:'12px'}}>
             Browse Jobs / Ver Trabajos →
           </a>
           <br/>
           <a href="/" style={{display:'inline-block', color:'#888', padding:'12px 24px', textDecoration:'none', fontSize:'14px'}}>← Home</a>
+        </div>
+      </main>
+    )
+  }
+
+  // User type selection screen
+  if (!userType) {
+    return (
+      <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px'}}>
+        <div style={{background:'white', borderRadius:'24px', padding:'48px', width:'100%', maxWidth:'520px', textAlign:'center'}}>
+          <a href="/" style={{color:'#888', textDecoration:'none', fontSize:'14px', display:'block', textAlign:'left', marginBottom:'24px'}}>← Back / Regresar</a>
+          <div style={{fontSize:'40px', marginBottom:'16px'}}>👋</div>
+          <h2 style={{color:'#1a1a2e', marginBottom:'8px', fontSize:'24px'}}>Before we start...</h2>
+          <p style={{color:'#FF6B35', fontWeight:'bold', marginBottom:'8px'}}>Antes de comenzar...</p>
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'32px'}}>Are you looking for help or offering services? / ¿Buscas ayuda o ofreces servicios?</p>
+
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'16px', marginBottom:'24px'}}>
+            <button
+              onClick={() => setUserType('customer')}
+              style={{padding:'24px 16px', borderRadius:'16px', border:'2px solid #F0EDE8', background:'white', cursor:'pointer', textAlign:'center', transition:'all 0.2s'}}
+              onMouseOver={e => e.currentTarget.style.borderColor = '#FF6B35'}
+              onMouseOut={e => e.currentTarget.style.borderColor = '#F0EDE8'}
+            >
+              <div style={{fontSize:'40px', marginBottom:'12px'}}>🙋</div>
+              <div style={{fontWeight:'bold', color:'#1a1a2e', fontSize:'16px', marginBottom:'4px'}}>I Need Help</div>
+              <div style={{color:'#FF6B35', fontSize:'13px', fontWeight:'600', marginBottom:'8px'}}>Necesito Ayuda</div>
+              <div style={{color:'#888', fontSize:'12px'}}>I want to post a job and find a local provider</div>
+            </button>
+
+            <button
+              onClick={() => window.location.href = '/signup-provider'}
+              style={{padding:'24px 16px', borderRadius:'16px', border:'2px solid #F0EDE8', background:'white', cursor:'pointer', textAlign:'center', transition:'all 0.2s'}}
+              onMouseOver={e => e.currentTarget.style.borderColor = '#FF6B35'}
+              onMouseOut={e => e.currentTarget.style.borderColor = '#F0EDE8'}
+            >
+              <div style={{fontSize:'40px', marginBottom:'12px'}}>🔧</div>
+              <div style={{fontWeight:'bold', color:'#1a1a2e', fontSize:'16px', marginBottom:'4px'}}>I Offer Services</div>
+              <div style={{color:'#FF6B35', fontSize:'13px', fontWeight:'600', marginBottom:'8px'}}>Ofrezco Servicios</div>
+              <div style={{color:'#888', fontSize:'12px'}}>I want to find jobs and earn money</div>
+            </button>
+          </div>
         </div>
       </main>
     )
@@ -151,8 +189,8 @@ export default function PostJob() {
   return (
     <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px'}}>
       <div style={{background:'white', borderRadius:'24px', padding:'48px', width:'100%', maxWidth:'560px'}}>
-        <a href="/" style={{color:'#888', textDecoration:'none', fontSize:'14px'}}>← Back / Regresar</a>
-        <div style={{fontSize:'40px', margin:'16px 0 8px'}}>📋</div>
+        <button onClick={() => setUserType(null)} style={{color:'#888', textDecoration:'none', fontSize:'14px', background:'none', border:'none', cursor:'pointer', padding:0, marginBottom:'16px'}}>← Back / Regresar</button>
+        <div style={{fontSize:'40px', margin:'0 0 8px'}}>📋</div>
         <h1 style={{color:'#1a1a2e', marginBottom:'4px'}}>Post a Job</h1>
         <p style={{color:'#888', marginBottom:'32px'}}>Publicar un Trabajo — Describe what you need</p>
 
@@ -210,18 +248,12 @@ export default function PostJob() {
           </div>
         </div>
 
-        {/* Photo Upload */}
         <div style={{marginBottom:'32px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>
             📷 Add a Photo (optional) / Agregar Foto
           </label>
           <p style={{color:'#888', fontSize:'12px', marginBottom:'10px'}}>Help providers understand the job better / Ayuda a los proveedores a entender mejor el trabajo</p>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            style={{width:'100%', padding:'12px', borderRadius:'12px', border:'2px dashed #F0EDE8', fontSize:'14px', boxSizing:'border-box', cursor:'pointer'}}
-          />
+          <input type="file" accept="image/*" onChange={handleImageChange} style={{width:'100%', padding:'12px', borderRadius:'12px', border:'2px dashed #F0EDE8', fontSize:'14px', boxSizing:'border-box', cursor:'pointer'}}/>
           {imagePreview && (
             <div style={{marginTop:'12px', position:'relative'}}>
               <img src={imagePreview} alt="Preview" style={{width:'100%', borderRadius:'12px', maxHeight:'200px', objectFit:'cover'}}/>
