@@ -2,6 +2,13 @@ import "./globals.css";
 
 export const metadata = {
   title: "NecesitoYa — America's Bilingual Local Services App",
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: { url: '/favicon-180x180.png', sizes: '180x180' },
+  },
   description: "Connect with trusted local service providers near you — in English and Spanish. Post a job or offer your services free. I Need It Now · Lo Necesito Ya",
   keywords: "local services, bilingual, español, handyman, cleaning, lawn care, Florida, NecesitoYa",
   openGraph: {
