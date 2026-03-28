@@ -43,7 +43,7 @@ export default function SupportPage() {
           <p style={{ color: "#ccc", marginBottom: "16px" }}>
             For any questions, account issues, or feedback — email us directly:
           </p>
-          <a href="mailto:hello@necesitoya.app" style={{
+          <a href="mailto:32and8@gmail.com" style={{
             display: "inline-block",
             backgroundColor: "#FF6B35",
             color: "#fff",
@@ -53,7 +53,7 @@ export default function SupportPage() {
             textDecoration: "none",
             fontSize: "16px",
           }}>
-            hello@necesitoya.app
+            32and8@gmail.com
           </a>
           <p style={{ color: "#888", marginTop: "16px", fontSize: "14px" }}>
             We typically respond within 24 hours.
@@ -93,7 +93,7 @@ export default function SupportPage() {
             },
             {
               q: "How do I delete my account?",
-              a: "Email us at hello@necesitoya.app with your account email and we will delete your account and all associated data within 7 business days."
+              a: "Email us at 32and8@gmail.com with your account email and we will delete your account and all associated data within 7 business days."
             },
           ].map((item, i) => (
             <div key={i} style={{
@@ -109,7 +109,7 @@ export default function SupportPage() {
 
         {/* Footer note */}
         <p style={{ color: "#666", fontSize: "14px", textAlign: "center" }}>
-          NecesitoYa · America's Bilingual Local Services App · hello@necesitoya.app
+          NecesitoYa · America's Bilingual Local Services App · 32and8@gmail.com
         </p>
       </div>
     </div>
