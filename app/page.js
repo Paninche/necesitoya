@@ -27,6 +27,9 @@ export default function Home() {
           <a href="/post-job" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
             I Need Help / Necesito Ayuda →
           </a>
+          <a href="/jobs" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
+            Browse Jobs / Ver Trabajos →
+          </a>
           <a href="/find-a-pro" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
             Find a Pro / Encuentra un Pro →
           </a>
@@ -133,6 +136,9 @@ export default function Home() {
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
           <a href="/post-job" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", textDecoration: "none"}}>
             Post a Job / Publicar Trabajo →
+          </a>
+          <a href="/jobs" style={{background: "transparent", border: "2px solid white", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", textDecoration: "none"}}>
+            Browse Jobs / Ver Trabajos →
           </a>
           <a href="/find-a-pro" style={{background: "transparent", border: "2px solid white", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", textDecoration: "none"}}>
             Find a Pro / Encuentra un Pro →
