@@ -17,6 +17,7 @@ export default function AdminDashboard() {
   const [jobs, setJobs] = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [togglingId, setTogglingId] = useState(null);
 
   useEffect(() => {
     if (localStorage.getItem('ny_admin') === 'true') {
@@ -40,6 +41,21 @@ export default function AdminDashboard() {
     setLoading(false);
   }
 
+  async function toggleFeatured(user) {
+    setTogglingId(user.id);
+    const newValue = !user.featured;
+    const { error } = await supabase
+      .from('users')
+      .update({ featured: newValue })
+      .eq('id', user.id);
+    if (!error) {
+      setUsers(prev => prev.map(u => u.id === user.id ? { ...u, featured: newValue } : u));
+    } else {
+      alert('Error updating featured status');
+    }
+    setTogglingId(null);
+  }
+
   function handleLogin(e) {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
@@ -61,6 +77,7 @@ export default function AdminDashboard() {
   const providers = users.filter(u => u.type === 'provider');
   const customers = users.filter(u => u.type === 'customer');
   const openJobs = jobs.filter(j => j.status === 'open');
+  const featuredProviders = providers.filter(p => p.featured);
 
   if (!authed) {
     return (
@@ -120,6 +137,7 @@ export default function AdminDashboard() {
             { label: 'NecesitoYa Revenue', value: `$${(totalRevenue / 100).toFixed(2)}`, color: '#16a34a', icon: '💰' },
             { label: 'Total Volume', value: `$${(totalVolume / 100).toFixed(2)}`, color: '#2563eb', icon: '📊' },
             { label: 'Total Providers', value: providers.length, color: '#7c3aed', icon: '🔧' },
+            { label: 'Featured Providers', value: featuredProviders.length, color: '#FF6B35', icon: '⭐' },
             { label: 'Total Customers', value: customers.length, color: '#0891b2', icon: '👥' },
             { label: 'Total Jobs', value: jobs.length, color: '#f59e0b', icon: '📋' },
             { label: 'Open Jobs', value: openJobs.length, color: '#ef4444', icon: '🔓' },
@@ -133,10 +151,10 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '4px', backgroundColor: '#1e293b', borderRadius: '10px', padding: '4px', marginBottom: '20px', width: 'fit-content', border: '1px solid #334155' }}>
-          {['overview', 'users', 'jobs', 'payments'].map(tab => (
+        <div style={{ display: 'flex', gap: '4px', backgroundColor: '#1e293b', borderRadius: '10px', padding: '4px', marginBottom: '20px', width: 'fit-content', border: '1px solid #334155', flexWrap: 'wrap' }}>
+          {['overview', 'providers', 'users', 'jobs', 'payments'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: '500', backgroundColor: activeTab === tab ? '#2563eb' : 'transparent', color: activeTab === tab ? 'white' : '#64748b' }}>
-              {tab === 'overview' ? '📊 Overview' : tab === 'users' ? '👥 Users' : tab === 'jobs' ? '📋 Jobs' : '💰 Payments'}
+              {tab === 'overview' ? '📊 Overview' : tab === 'providers' ? '⭐ Providers' : tab === 'users' ? '👥 Users' : tab === 'jobs' ? '📋 Jobs' : '💰 Payments'}
             </button>
           ))}
         </div>
@@ -148,7 +166,6 @@ export default function AdminDashboard() {
             {/* Overview Tab */}
             {activeTab === 'overview' && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                {/* Recent Jobs */}
                 <div style={{ backgroundColor: '#1e293b', borderRadius: '10px', padding: '20px', border: '1px solid #334155' }}>
                   <div style={{ fontWeight: '600', color: 'white', marginBottom: '16px', fontSize: '15px' }}>🕐 Recent Jobs</div>
                   {jobs.slice(0, 5).map(job => (
@@ -166,8 +183,6 @@ export default function AdminDashboard() {
                     </div>
                   ))}
                 </div>
-
-                {/* Recent Users */}
                 <div style={{ backgroundColor: '#1e293b', borderRadius: '10px', padding: '20px', border: '1px solid #334155' }}>
                   <div style={{ fontWeight: '600', color: 'white', marginBottom: '16px', fontSize: '15px' }}>👤 Recent Users</div>
                   {users.slice(0, 5).map(user => (
@@ -182,6 +197,41 @@ export default function AdminDashboard() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Providers Tab */}
+            {activeTab === 'providers' && (
+              <div style={{ backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155', overflow: 'hidden' }}>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: '600', color: 'white' }}>All Providers ({providers.length})</span>
+                  <span style={{ fontSize: '13px', color: '#FF6B35' }}>⭐ {featuredProviders.length} featured</span>
+                </div>
+                {providers.length === 0 ? (
+                  <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No providers yet</div>
+                ) : providers.map(user => (
+                  <div key={user.id} style={{ padding: '16px 20px', borderBottom: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: user.featured ? 'rgba(255,107,53,0.05)' : '#1e293b' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '15px', fontWeight: '500', color: '#e2e8f0' }}>{user.full_name}</div>
+                        {user.featured && <span style={{ backgroundColor: '#FF6B35', color: 'white', padding: '2px 8px', borderRadius: '20px', fontSize: '11px', fontWeight: 'bold' }}>⭐ Featured</span>}
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#64748b' }}>{user.email} · {user.city || 'no city'}{user.state ? ', ' + user.state : ''}</div>
+                      {user.services && <div style={{ fontSize: '12px', color: '#475569', marginTop: '2px' }}>Services: {user.services}</div>}
+                      <div style={{ fontSize: '12px', color: '#475569', marginTop: '2px' }}>
+                        Jobs done: {user.jobs_completed || 0} · Rating: {user.rating ? user.rating.toFixed(1) : 'New'}
+                        {user.stripe_onboarding_complete && <span style={{ color: '#16a34a', marginLeft: '8px' }}>✅ Stripe</span>}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => toggleFeatured(user)}
+                      disabled={togglingId === user.id}
+                      style={{ backgroundColor: user.featured ? '#FF6B35' : '#334155', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', minWidth: '120px', opacity: togglingId === user.id ? 0.6 : 1 }}
+                    >
+                      {togglingId === user.id ? 'Saving...' : user.featured ? '⭐ Unfeature' : '☆ Feature'}
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
 
