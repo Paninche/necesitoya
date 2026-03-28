@@ -56,12 +56,15 @@ export default function FindAPro() {
     return '★'.repeat(stars) + '☆'.repeat(5 - stars)
   }
 
+  const getMailto = (email) => {
+    return 'mailto:' + (email || '') + '?subject=NecesitoYa'
+  }
+
   return (
     <main style={{ minHeight: '100vh', background: '#f8f6f2', fontFamily: 'Arial' }}>
 
-      {/* Header */}
       <div style={{ background: 'linear-gradient(135deg,#1a1a2e,#0f3460)', padding: '40px 32px 30px' }}>
-        <a href="/" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '14px' }}>{'← Home'}</a>
+        <a href="/" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '14px' }}>Home</a>
         <h1 style={{ color: 'white', fontSize: '32px', fontWeight: 'bold', margin: '16px 0 4px' }}>Find a Pro</h1>
         <p style={{ color: '#FF6B35', fontWeight: 'bold', marginBottom: '4px' }}>Encuentra un Profesional</p>
         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '24px' }}>
@@ -69,14 +72,13 @@ export default function FindAPro() {
         </p>
         <input
           type="text"
-          placeholder="Search by name, service, or city... / Buscar por nombre, servicio o ciudad..."
+          placeholder="Search by name, service, or city..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ width: '100%', padding: '14px 20px', borderRadius: '12px', border: 'none', fontSize: '15px', boxSizing: 'border-box', outline: 'none' }}
         />
       </div>
 
-      {/* Category Filter */}
       <div style={{ padding: '16px 32px', overflowX: 'auto', whiteSpace: 'nowrap', background: 'white', borderBottom: '1px solid #F0EDE8' }}>
         {categories.map(cat => (
           <button key={cat} onClick={() => setFilter(cat)} style={{ display: 'inline-block', marginRight: '8px', padding: '8px 16px', borderRadius: '20px', border: `2px solid ${filter === cat ? '#FF6B35' : '#F0EDE8'}`, background: filter === cat ? '#FF6B35' : 'white', color: filter === cat ? 'white' : '#555', cursor: 'pointer', fontSize: '13px', fontWeight: filter === cat ? 'bold' : 'normal', whiteSpace: 'nowrap' }}>
@@ -85,37 +87,28 @@ export default function FindAPro() {
         ))}
       </div>
 
-      {/* State Filter */}
       <div style={{ padding: '12px 32px', background: 'white', borderBottom: '1px solid #F0EDE8', display: 'flex', gap: '12px', alignItems: 'center' }}>
-        <span style={{ fontSize: '13px', color: '#888', fontWeight: '600' }}>📍 State:</span>
-        <select
-          value={stateFilter}
-          onChange={e => setStateFilter(e.target.value)}
-          style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px', color: '#333', cursor: 'pointer', background: 'white' }}
-        >
+        <span style={{ fontSize: '13px', color: '#888', fontWeight: '600' }}>State:</span>
+        <select value={stateFilter} onChange={e => setStateFilter(e.target.value)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px', color: '#333', cursor: 'pointer', background: 'white' }}>
           {availableStates.map(s => (
             <option key={s} value={s}>{s === 'All' ? 'All States' : s}</option>
           ))}
         </select>
         {stateFilter !== 'All' && (
-          <button onClick={() => setStateFilter('All')} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #FF6B35', fontSize: '13px', color: '#FF6B35', cursor: 'pointer', background: 'white', fontWeight: '600' }}>
-            {'Clear ✕'}
-          </button>
+          <button onClick={() => setStateFilter('All')} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #FF6B35', fontSize: '13px', color: '#FF6B35', cursor: 'pointer', background: 'white', fontWeight: '600' }}>Clear</button>
         )}
       </div>
 
-      {/* Providers Grid */}
       <div style={{ padding: '24px 32px', maxWidth: '1000px', margin: '0 auto' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>
             <div style={{ fontSize: '40px', marginBottom: '16px' }}>⏳</div>
-            <p>Loading providers... / Cargando proveedores...</p>
+            <p>Loading providers...</p>
           </div>
         ) : filteredProviders.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>
             <div style={{ fontSize: '40px', marginBottom: '16px' }}>🔍</div>
-            <p style={{ marginBottom: '4px' }}>No providers found.</p>
-            <p style={{ fontSize: '14px' }}>No se encontraron proveedores.</p>
+            <p>No providers found. / No se encontraron proveedores.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
@@ -123,9 +116,7 @@ export default function FindAPro() {
               <div key={pro.id} style={{ background: 'white', borderRadius: '20px', padding: '24px', boxShadow: '0 2px 16px rgba(0,0,0,0.06)', border: pro.featured ? '2px solid #FF6B35' : '2px solid transparent', position: 'relative' }}>
 
                 {pro.featured && (
-                  <div style={{ position: 'absolute', top: '16px', right: '16px', background: 'linear-gradient(135deg,#FF6B35,#F4A261)', color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 'bold' }}>
-                    {'⭐ Featured'}
-                  </div>
+                  <div style={{ position: 'absolute', top: '16px', right: '16px', background: 'linear-gradient(135deg,#FF6B35,#F4A261)', color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 'bold' }}>Featured</div>
                 )}
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
@@ -138,7 +129,7 @@ export default function FindAPro() {
                   </div>
                   <div>
                     <h3 style={{ color: '#1a1a2e', margin: '0 0 2px', fontSize: '17px', fontWeight: '700' }}>{pro.full_name || 'Provider'}</h3>
-                    <p style={{ color: '#888', fontSize: '13px', margin: 0 }}>📍 {pro.city}{pro.state ? `, ${pro.state}` : ''}</p>
+                    <p style={{ color: '#888', fontSize: '13px', margin: 0 }}>{pro.city}{pro.state ? ', ' + pro.state : ''}</p>
                   </div>
                 </div>
 
@@ -147,9 +138,7 @@ export default function FindAPro() {
                     <span style={{ color: '#FF6B35', fontSize: '16px' }}>{renderStars(pro.rating)}</span>
                     <span style={{ color: '#888', fontSize: '12px', marginLeft: '6px' }}>{pro.rating ? pro.rating.toFixed(1) : 'New'}</span>
                   </div>
-                  <div style={{ color: '#888', fontSize: '13px' }}>
-                    {'✅'} {pro.jobs_completed || 0} jobs done
-                  </div>
+                  <div style={{ color: '#888', fontSize: '13px' }}>{pro.jobs_completed || 0} jobs done</div>
                 </div>
 
                 {pro.bio && (
@@ -157,23 +146,14 @@ export default function FindAPro() {
                 )}
 
                 {pro.services && (
-                  <div style={{ marginBottom: '16px' }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                      {pro.services.split(',').slice(0, 4).map((s, i) => (
-                        <span key={i} style={{ background: '#FFF3EE', color: '#FF6B35', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 'bold' }}>
-                          {s.trim()}
-                        </span>
-                      ))}
-                    </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
+                    {pro.services.split(',').slice(0, 4).map((s, i) => (
+                      <span key={i} style={{ background: '#FFF3EE', color: '#FF6B35', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 'bold' }}>{s.trim()}</span>
+                    ))}
                   </div>
                 )}
 
-                
-                  href={`mailto:${pro.email || ''}?subject=NecesitoYa%20-%20I%20need%20your%20services`}
-                  style={{ display: 'block', background: 'linear-gradient(135deg,#FF6B35,#F4A261)', color: 'white', padding: '10px 20px', borderRadius: '12px', textDecoration: 'none', fontWeight: 'bold', fontSize: '14px', textAlign: 'center' }}
-                >
-                  {'Contact / Contactar →'}
-                </a>
+                <a href={getMailto(pro.email)} style={{ display: 'block', background: 'linear-gradient(135deg,#FF6B35,#F4A261)', color: 'white', padding: '10px 20px', borderRadius: '12px', textDecoration: 'none', fontWeight: 'bold', fontSize: '14px', textAlign: 'center' }}>Contact / Contactar</a>
 
               </div>
             ))}
