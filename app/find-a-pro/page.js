@@ -56,6 +56,11 @@ export default function FindAPro() {
     return '★'.repeat(stars) + '☆'.repeat(5 - stars)
   }
 
+  const titleCase = (str) => {
+    if (!str) return ''
+    return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+  }
+
   const getMailto = (email) => {
     return 'mailto:' + (email || '') + '?subject=NecesitoYa'
   }
@@ -63,8 +68,9 @@ export default function FindAPro() {
   return (
     <main style={{ minHeight: '100vh', background: '#f8f6f2', fontFamily: 'Arial' }}>
 
-      <div style={{ background: 'linear-gradient(135deg,#1a1a2e,#0f3460)', padding: '40px 32px 30px' }}>
-        <a href="/" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '14px' }}>Home</a>
+      {/* Header */}
+      <div style={{ background: 'linear-gradient(135deg,#1a1a2e,#0f3460)', padding: '40px 32px 40px' }}>
+        <a href="/" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '14px' }}>← Home</a>
         <h1 style={{ color: 'white', fontSize: '32px', fontWeight: 'bold', margin: '16px 0 4px' }}>Find a Pro</h1>
         <p style={{ color: '#FF6B35', fontWeight: 'bold', marginBottom: '4px' }}>Encuentra un Profesional</p>
         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '24px' }}>
@@ -72,13 +78,14 @@ export default function FindAPro() {
         </p>
         <input
           type="text"
-          placeholder="Search by name, service, or city..."
+          placeholder="Search by name, service, or city... / Buscar..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: '100%', padding: '14px 20px', borderRadius: '12px', border: 'none', fontSize: '15px', boxSizing: 'border-box', outline: 'none' }}
+          style={{ width: '100%', padding: '14px 20px', borderRadius: '12px', border: '2px solid rgba(255,255,255,0.2)', fontSize: '15px', boxSizing: 'border-box', outline: 'none', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white' }}
         />
       </div>
 
+      {/* Category Filter */}
       <div style={{ padding: '16px 32px', overflowX: 'auto', whiteSpace: 'nowrap', background: 'white', borderBottom: '1px solid #F0EDE8' }}>
         {categories.map(cat => (
           <button key={cat} onClick={() => setFilter(cat)} style={{ display: 'inline-block', marginRight: '8px', padding: '8px 16px', borderRadius: '20px', border: `2px solid ${filter === cat ? '#FF6B35' : '#F0EDE8'}`, background: filter === cat ? '#FF6B35' : 'white', color: filter === cat ? 'white' : '#555', cursor: 'pointer', fontSize: '13px', fontWeight: filter === cat ? 'bold' : 'normal', whiteSpace: 'nowrap' }}>
@@ -87,8 +94,9 @@ export default function FindAPro() {
         ))}
       </div>
 
+      {/* State Filter */}
       <div style={{ padding: '12px 32px', background: 'white', borderBottom: '1px solid #F0EDE8', display: 'flex', gap: '12px', alignItems: 'center' }}>
-        <span style={{ fontSize: '13px', color: '#888', fontWeight: '600' }}>State:</span>
+        <span style={{ fontSize: '13px', color: '#888', fontWeight: '600' }}>📍 State:</span>
         <select value={stateFilter} onChange={e => setStateFilter(e.target.value)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px', color: '#333', cursor: 'pointer', background: 'white' }}>
           {availableStates.map(s => (
             <option key={s} value={s}>{s === 'All' ? 'All States' : s}</option>
@@ -99,6 +107,7 @@ export default function FindAPro() {
         )}
       </div>
 
+      {/* Providers Grid */}
       <div style={{ padding: '24px 32px', maxWidth: '1000px', margin: '0 auto' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>
@@ -129,7 +138,7 @@ export default function FindAPro() {
                   </div>
                   <div>
                     <h3 style={{ color: '#1a1a2e', margin: '0 0 2px', fontSize: '17px', fontWeight: '700' }}>{pro.full_name || 'Provider'}</h3>
-                    <p style={{ color: '#888', fontSize: '13px', margin: 0 }}>{pro.city}{pro.state ? ', ' + pro.state : ''}</p>
+                    <p style={{ color: '#888', fontSize: '13px', margin: 0 }}>{titleCase(pro.city)}{pro.state ? ', ' + pro.state : ''}</p>
                   </div>
                 </div>
 
