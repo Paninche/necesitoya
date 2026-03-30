@@ -22,6 +22,29 @@ function ProviderDashboardContent() {
       const p = JSON.parse(saved);
       setProvider(p);
       fetchData(p.id, p.email);
+      return;
+    }
+    // Check new password auth
+    const token = localStorage.getItem('sb_token');
+    const userId = localStorage.getItem('sb_user_id');
+    if (token && userId) {
+      fetch(`https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/users?id=eq.${userId}&select=*`, {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(r => r.json())
+      .then(users => {
+        if (users && users.length > 0) {
+          localStorage.setItem('ny_provider', JSON.stringify(users[0]));
+          setProvider(users[0]);
+          fetchData(users[0].id, users[0].email);
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch(() => setLoading(false));
     } else {
       setLoading(false);
     }
