@@ -2,10 +2,15 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
+
+const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y';
+
 function ProviderDashboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -16,6 +21,7 @@ function ProviderDashboardContent() {
   const [activeTab, setActiveTab] = useState('jobs');
   const [email, setEmail] = useState('');
   const stripeStatus = searchParams.get('stripe');
+
   useEffect(() => {
     const saved = localStorage.getItem('ny_provider');
     if (saved) {
@@ -24,14 +30,12 @@ function ProviderDashboardContent() {
       fetchData(p.id, p.email);
       return;
     }
-    // Check new password auth
-    const token = localStorage.getItem('sb_token');
-    const userId = localStorage.getItem('sb_user_id');
-    if (token && userId) {
-      fetch(`https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/users?id=eq.${userId}&select=*`, {
+    const sbEmail = localStorage.getItem('sb_email');
+    if (sbEmail) {
+      fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(sbEmail)}&type=eq.provider&select=*`, {
         headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
-          'Authorization': `Bearer ${token}`
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
         }
       })
       .then(r => r.json())
@@ -49,6 +53,7 @@ function ProviderDashboardContent() {
       setLoading(false);
     }
   }, []);
+
   useEffect(() => {
     if (stripeStatus === 'success' && provider) {
       supabase
@@ -62,6 +67,7 @@ function ProviderDashboardContent() {
         });
     }
   }, [stripeStatus, provider?.id]);
+
   async function fetchData(providerId, providerEmail) {
     setLoading(true);
     const { data: jobsData } = await supabase
@@ -78,6 +84,7 @@ function ProviderDashboardContent() {
     setPayments(paymentsData || []);
     setLoading(false);
   }
+
   async function handleLogin(e) {
     e.preventDefault();
     const { data } = await supabase
@@ -94,6 +101,7 @@ function ProviderDashboardContent() {
       alert('Provider not found. Please check your email. / Proveedor no encontrado.');
     }
   }
+
   async function connectStripe() {
     const res = await fetch('/api/stripe/connect', {
       method: 'POST',
@@ -104,15 +112,21 @@ function ProviderDashboardContent() {
     if (data.url) window.location.href = data.url;
     else alert('Error connecting to Stripe. Please try again.');
   }
+
   function handleLogout() {
     localStorage.removeItem('ny_provider');
+    localStorage.removeItem('sb_token');
+    localStorage.removeItem('sb_user_id');
+    localStorage.removeItem('sb_email');
     setProvider(null);
     setJobs([]);
     setPayments([]);
   }
+
   const totalEarned = payments.filter(p => p.status === 'succeeded').reduce((sum, p) => sum + (p.amount_provider || 0), 0);
   const pendingAmount = payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + (p.amount_provider || 0), 0);
   const activeJobs = jobs.filter(j => j.status === 'accepted' || j.status === 'in_progress').length;
+
   if (!provider) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
@@ -140,13 +154,17 @@ function ProviderDashboardContent() {
               Access Dashboard / Acceder
             </button>
           </form>
-          <p style={{ textAlign: 'center', fontSize: '12px', color: '#9ca3af', marginTop: '16px' }}>
+          <div style={{ marginTop: '16px', textAlign: 'center' }}>
+            <a href="/login" style={{ color: '#FF6B35', fontWeight: '600', fontSize: '14px' }}>Sign In with Password →</a>
+          </div>
+          <p style={{ textAlign: 'center', fontSize: '12px', color: '#9ca3af', marginTop: '12px' }}>
             Not a provider yet? <a href="/signup-provider" style={{ color: '#2563eb' }}>Sign up here</a>
           </p>
         </div>
       </div>
     );
   }
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
       <div style={{ backgroundColor: '#1a1a2e', color: 'white', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -161,11 +179,13 @@ function ProviderDashboardContent() {
           </button>
         </div>
       </div>
+
       {stripeStatus === 'success' && (
         <div style={{ backgroundColor: '#dcfce7', color: '#16a34a', padding: '12px 24px', fontSize: '14px', fontWeight: '500' }}>
           ✅ Bank account connected successfully! You can now receive payments. / ¡Cuenta bancaria conectada exitosamente!
         </div>
       )}
+
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '24px 16px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
           <div style={{ backgroundColor: 'white', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
@@ -185,6 +205,7 @@ function ProviderDashboardContent() {
             <div style={{ fontSize: '28px', fontWeight: '700', color: '#1a1a2e' }}>{jobs.length}</div>
           </div>
         </div>
+
         {!provider.stripe_onboarding_complete && (
           <div style={{ backgroundColor: '#fef3c7', border: '1px solid #fcd34d', borderRadius: '10px', padding: '16px 20px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
@@ -196,6 +217,7 @@ function ProviderDashboardContent() {
             </button>
           </div>
         )}
+
         <div style={{ display: 'flex', gap: '4px', backgroundColor: 'white', borderRadius: '10px', padding: '4px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', width: 'fit-content' }}>
           {['jobs', 'payments', 'profile'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: '500', backgroundColor: activeTab === tab ? '#2563eb' : 'transparent', color: activeTab === tab ? 'white' : '#6b7280' }}>
@@ -203,6 +225,7 @@ function ProviderDashboardContent() {
             </button>
           ))}
         </div>
+
         {activeTab === 'jobs' && (
           <div>
             {loading ? (
@@ -231,13 +254,10 @@ function ProviderDashboardContent() {
                     </div>
                     <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>{job.description}</div>
                     <div style={{ fontSize: '13px', color: '#9ca3af' }}>
-                      Customer: {job.customer_name} · {job.customer_email} · {job.status === 'paid' || job.status === 'completed' ? job.customer_phone : '📵 Phone hidden until payment / Teléfono oculto hasta el pago'}
+                      Customer: {job.customer_name} · {job.customer_email} · {job.status === 'paid' || job.status === 'completed' ? job.customer_phone : '🔵 Phone hidden until payment / Teléfono oculto hasta el pago'}
                     </div>
                     {(job.status === 'accepted' || job.status === 'paid' || job.status === 'pending') && (
-                      <button
-                        onClick={() => window.location.href = `/messages?job=${job.id}`}
-                        style={{ marginTop: '10px', backgroundColor: '#1a1a2e', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer', marginRight: '8px' }}
-                      >
+                      <button onClick={() => window.location.href = `/messages?job=${job.id}`} style={{ marginTop: '10px', backgroundColor: '#1a1a2e', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer', marginRight: '8px' }}>
                         💬 View Chat / Ver Chat
                       </button>
                     )}
@@ -245,10 +265,7 @@ function ProviderDashboardContent() {
                       <button
                         onClick={async () => {
                           if (confirm('Release this job? It will become available to other providers. / ¿Liberar este trabajo?')) {
-                            await supabase
-                              .from('jobs')
-                              .update({ status: 'open', provider_id: null, provider_email: null })
-                              .eq('id', job.id)
+                            await supabase.from('jobs').update({ status: 'open', provider_id: null, provider_email: null }).eq('id', job.id)
                             window.location.reload()
                           }
                         }}
@@ -263,6 +280,7 @@ function ProviderDashboardContent() {
             )}
           </div>
         )}
+
         {activeTab === 'payments' && (
           <div>
             {payments.length === 0 ? (
@@ -292,6 +310,7 @@ function ProviderDashboardContent() {
             )}
           </div>
         )}
+
         {activeTab === 'profile' && (
           <div style={{ backgroundColor: 'white', borderRadius: '10px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
             <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1a1a2e', marginBottom: '20px' }}>Your Profile / Tu Perfil</h3>
@@ -322,6 +341,7 @@ function ProviderDashboardContent() {
     </div>
   );
 }
+
 export default function ProviderDashboard() {
   return (
     <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>}>
