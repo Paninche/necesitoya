@@ -1,4 +1,6 @@
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
+import Script from "next/script";
 
 export const metadata = {
   title: "NecesitoYa — America's Bilingual Local Services App",
@@ -37,7 +39,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body style={{margin: 0, padding: 0}}>{children}</body>
+      <body style={{margin: 0, padding: 0}}>
+        {children}
+        <Analytics />
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-LBBGNFP1BE" strategy="afterInteractive"/>
+        <Script id="google-analytics" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-LBBGNFP1BE');
+        `}</Script>
+      </body>
     </html>
   );
 }
