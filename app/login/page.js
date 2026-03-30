@@ -31,19 +31,34 @@ export default function Login() {
         setLoading(false)
         return
       }
+
+      const userEmail = data.user.email
+
+      // Save all session data including email
       localStorage.setItem('sb_token', data.access_token)
       localStorage.setItem('sb_user_id', data.user.id)
-      const userRes = await fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(form.email)}&select=type`, {
+      localStorage.setItem('sb_email', userEmail)
+
+      // Look up user in users table by email
+      const userRes = await fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(userEmail)}&select=*`, {
         headers: {
           'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${data.access_token}`
+          'Authorization': `Bearer ${SUPABASE_KEY}`
         }
       })
       const users = await userRes.json()
-      if (users && users.length > 0 && users[0].type === 'provider') {
-        window.location.href = '/provider-dashboard'
+
+      if (users && users.length > 0) {
+        const user = users[0]
+        if (user.type === 'provider') {
+          localStorage.setItem('ny_provider', JSON.stringify(user))
+          window.location.href = '/provider-dashboard'
+        } else {
+          localStorage.setItem('ny_customer', JSON.stringify(user))
+          window.location.href = '/customer-dashboard'
+        }
       } else {
-        window.location.href = '/customer-dashboard'
+        setError('Account not found. Please sign up first. / Cuenta no encontrada. Por favor regístrate.')
       }
     } catch (e) {
       setError('Something went wrong. Please try again. / Algo salió mal. Inténtalo de nuevo.')
@@ -58,22 +73,44 @@ export default function Login() {
         <div style={{fontSize:'40px', margin:'16px 0 8px'}}>⚡</div>
         <h1 style={{color:'#1a1a2e', marginBottom:'4px'}}>Welcome Back</h1>
         <p style={{color:'#888', marginBottom:'32px'}}>Bienvenido de nuevo — sign in to your account</p>
+
         {error && (
           <div style={{background:'#FFF3F3', border:'2px solid #FFD0D0', borderRadius:'12px', padding:'12px 16px', marginBottom:'20px', color:'#CC0000', fontSize:'14px'}}>
             {error}
           </div>
         )}
+
         <div style={{marginBottom:'20px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Email</label>
-          <input type="email" placeholder="you@email.com" value={form.email} onChange={e => setForm({...form, email: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+          <input
+            type="email"
+            placeholder="you@email.com"
+            value={form.email}
+            onChange={e => setForm({...form, email: e.target.value})}
+            style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}
+          />
         </div>
+
         <div style={{marginBottom:'28px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Password / Contraseña</label>
-          <input type="password" placeholder="••••••••" value={form.password} onChange={e => setForm({...form, password: e.target.value})} onKeyDown={e => e.key === 'Enter' && handleLogin()} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={form.password}
+            onChange={e => setForm({...form, password: e.target.value})}
+            onKeyDown={e => e.key === 'Enter' && handleLogin()}
+            style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}
+          />
         </div>
-        <button onClick={handleLogin} disabled={loading} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer', marginBottom:'16px'}}>
+
+        <button
+          onClick={handleLogin}
+          disabled={loading}
+          style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer', marginBottom:'16px'}}
+        >
           {loading ? 'Signing in...' : 'Sign In / Iniciar Sesión →'}
         </button>
+
         <div style={{textAlign:'center', borderTop:'1px solid #F0EDE8', paddingTop:'20px', marginTop:'8px'}}>
           <p style={{color:'#888', fontSize:'14px', marginBottom:'12px'}}>Don't have an account? / ¿No tienes cuenta?</p>
           <div style={{display:'flex', gap:'12px', justifyContent:'center'}}>
