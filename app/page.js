@@ -8,7 +8,7 @@ export default function Home() {
         <div style={{display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center"}}>
           <a href="/jobs" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Jobs</a>
           <a href="/find-a-pro" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Find a Pro</a>
-          <a href="/post-job" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Post Job</a>
+          <a href="/post-job?type=customer" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Post Job</a>
           <a href="/customer-dashboard" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>My Jobs</a>
           <a href="/provider-dashboard" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Provider</a>
           <a href="/signup-provider" style={{background: "transparent", border: "1px solid #FF6B35", color: "#FF6B35", padding: "8px 16px", borderRadius: "20px", cursor: "pointer", fontSize: "13px", textDecoration: "none"}}>Offer Services</a>
@@ -24,7 +24,7 @@ export default function Home() {
         <p style={{fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "16px"}}>Connect with local service providers near you — in English or Spanish</p>
         <p style={{fontSize: "14px", color: "rgba(255,255,255,0.3)", marginBottom: "40px"}}>Conéctate con proveedores de servicios locales — en inglés o español</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
-          <a href="/post-job" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
+          <a href="/post-job?type=customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
             I Need Help / Necesito Ayuda →
           </a>
           <a href="/jobs" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
@@ -65,7 +65,7 @@ export default function Home() {
             {icon: "🔧", label: "Mechanic", es: "Mecánico"},
             {icon: "🚨", label: "Roadside & Towing", es: "Grúa & Asistencia Vial"},
           ].map((cat) => (
-            <a href={cat.label === 'Buy & Sell' ? '/buy-sell' : '/post-job'} key={cat.label} style={{background: "white", borderRadius: "16px", padding: "16px 8px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", textDecoration: "none"}}>
+            <a href={cat.label === 'Buy & Sell' ? '/buy-sell' : '/post-job?type=customer'} key={cat.label} style={{background: "white", borderRadius: "16px", padding: "16px 8px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", cursor: "pointer", textDecoration: "none"}}>
               <div style={{fontSize: "28px", marginBottom: "6px"}}>{cat.icon}</div>
               <div style={{fontWeight: "bold", color: "#1a1a2e", fontSize: "11px", lineHeight: "1.3"}}>{cat.label}</div>
               <div style={{color: "#FF6B35", fontSize: "10px", marginTop: "2px", lineHeight: "1.3"}}>{cat.es}</div>
@@ -134,7 +134,7 @@ export default function Home() {
         <p style={{color: "#FF6B35", fontWeight: "bold", marginBottom: "8px"}}>¿Listo para comenzar?</p>
         <p style={{color: "rgba(255,255,255,0.6)", marginBottom: "32px"}}>Join thousands of people connecting locally · Únete a miles de personas conectándose localmente</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
-          <a href="/post-job" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", textDecoration: "none"}}>
+          <a href="/post-job?type=customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", textDecoration: "none"}}>
             Post a Job / Publicar Trabajo →
           </a>
           <a href="/jobs" style={{background: "transparent", border: "2px solid white", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", textDecoration: "none"}}>
@@ -159,7 +159,7 @@ export default function Home() {
           <div>
             <div style={{color: "white", fontWeight: "bold", marginBottom: "12px"}}>For Customers</div>
             <div style={{lineHeight: "2.2"}}>
-              <a href="/post-job" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Post a Job</a>
+              <a href="/post-job?type=customer" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Post a Job</a>
               <a href="/find-a-pro" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Find a Pro</a>
               <a href="/buy-sell" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Buy & Sell</a>
               <a href="/jobs" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Browse Jobs</a>

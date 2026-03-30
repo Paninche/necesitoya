@@ -29,6 +29,8 @@ export default function PostJob() {
   useEffect(() => {
     const saved = localStorage.getItem('ny_provider')
     if (saved) setIsProvider(true)
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('type') === 'customer') setUserType('customer')
   }, [])
 
   const categories = [
@@ -55,19 +57,13 @@ export default function PostJob() {
     setLoading(true)
     try {
       let image_url = null
-
       if (imageFile) {
         const fileExt = imageFile.name.split('.').pop()
         const fileName = `${Date.now()}.${fileExt}`
         const { data: uploadData, error: uploadError } = await supabase
-          .storage
-          .from('job-images')
-          .upload(fileName, imageFile)
-
+          .storage.from('job-images').upload(fileName, imageFile)
         if (!uploadError) {
-          const { data: urlData } = supabase.storage
-            .from('job-images')
-            .getPublicUrl(fileName)
+          const { data: urlData } = supabase.storage.from('job-images').getPublicUrl(fileName)
           image_url = urlData.publicUrl
         }
       }
@@ -130,7 +126,7 @@ export default function PostJob() {
     )
   }
 
-  // User type selection screen
+  // User type selector — only shows when coming from "Post Job" nav link
   if (!userType) {
     return (
       <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px'}}>
@@ -141,12 +137,10 @@ export default function PostJob() {
           <p style={{color:'#FF6B35', fontWeight:'bold', marginBottom:'8px'}}>Antes de comenzar...</p>
           <p style={{color:'#888', fontSize:'14px', marginBottom:'32px'}}>Are you looking for help or offering services? / ¿Buscas ayuda o ofreces servicios?</p>
 
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'16px', marginBottom:'24px'}}>
+          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))', gap:'16px', marginBottom:'24px'}}>
             <button
               onClick={() => setUserType('customer')}
-              style={{padding:'24px 16px', borderRadius:'16px', border:'2px solid #F0EDE8', background:'white', cursor:'pointer', textAlign:'center', transition:'all 0.2s'}}
-              onMouseOver={e => e.currentTarget.style.borderColor = '#FF6B35'}
-              onMouseOut={e => e.currentTarget.style.borderColor = '#F0EDE8'}
+              style={{padding:'24px 16px', borderRadius:'16px', border:'2px solid #F0EDE8', background:'white', cursor:'pointer', textAlign:'center'}}
             >
               <div style={{fontSize:'40px', marginBottom:'12px'}}>🙋</div>
               <div style={{fontWeight:'bold', color:'#1a1a2e', fontSize:'16px', marginBottom:'4px'}}>I Need Help</div>
@@ -156,9 +150,7 @@ export default function PostJob() {
 
             <button
               onClick={() => window.location.href = '/signup-provider'}
-              style={{padding:'24px 16px', borderRadius:'16px', border:'2px solid #F0EDE8', background:'white', cursor:'pointer', textAlign:'center', transition:'all 0.2s'}}
-              onMouseOver={e => e.currentTarget.style.borderColor = '#FF6B35'}
-              onMouseOut={e => e.currentTarget.style.borderColor = '#F0EDE8'}
+              style={{padding:'24px 16px', borderRadius:'16px', border:'2px solid #F0EDE8', background:'white', cursor:'pointer', textAlign:'center'}}
             >
               <div style={{fontSize:'40px', marginBottom:'12px'}}>🔧</div>
               <div style={{fontWeight:'bold', color:'#1a1a2e', fontSize:'16px', marginBottom:'4px'}}>I Offer Services</div>
@@ -252,7 +244,7 @@ export default function PostJob() {
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>
             📷 Add a Photo (optional) / Agregar Foto
           </label>
-          <p style={{color:'#888', fontSize:'12px', marginBottom:'10px'}}>Help providers understand the job better / Ayuda a los proveedores a entender mejor el trabajo</p>
+          <p style={{color:'#888', fontSize:'12px', marginBottom:'10px'}}>Help providers understand the job better</p>
           <input type="file" accept="image/*" onChange={handleImageChange} style={{width:'100%', padding:'12px', borderRadius:'12px', border:'2px dashed #F0EDE8', fontSize:'14px', boxSizing:'border-box', cursor:'pointer'}}/>
           {imagePreview && (
             <div style={{marginTop:'12px', position:'relative'}}>
