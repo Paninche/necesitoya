@@ -1,8 +1,11 @@
 'use client'
 import { useState } from 'react'
 
+const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
+
 export default function ProviderSignup() {
-  const [form, setForm] = useState({ full_name: '', email: '', phone: '', city: '', state: '', services: '' })
+  const [form, setForm] = useState({ full_name: '', email: '', password: '', phone: '', city: '', state: '', services: '' })
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState([])
@@ -35,25 +38,27 @@ export default function ProviderSignup() {
   }
 
   const handleSubmit = async () => {
-    if (!form.full_name || !form.email) {
-      alert('Please fill in your name and email')
+    if (!form.full_name || !form.email || !form.password) {
+      alert('Please fill in your name, email and password / Por favor completa tu nombre, correo y contraseña')
+      return
+    }
+    if (form.password.length < 6) {
+      alert('Password must be at least 6 characters / La contraseña debe tener al menos 6 caracteres')
       return
     }
     setLoading(true)
     try {
-      const res = await fetch('https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/users', {
+      const authRes = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y',
-          'Prefer': 'return=minimal'
+          'apikey': SUPABASE_KEY,
         },
-        body: JSON.stringify({ ...form, type: 'provider' })
+        body: JSON.stringify({ email: form.email, password: form.password })
       })
-      if (!res.ok) {
-        const err = await res.text()
-        if (err.includes('23505')) {
+      const authData = await authRes.json()
+      if (!authRes.ok) {
+        if (authData.msg && authData.msg.includes('already registered')) {
           alert('This email is already registered! / Este correo ya está registrado.')
         } else {
           alert('Something went wrong. Please try again.')
@@ -61,6 +66,25 @@ export default function ProviderSignup() {
         setLoading(false)
         return
       }
+      const token = authData.access_token || SUPABASE_KEY
+      await fetch(`${SUPABASE_URL}/rest/v1/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${token}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          full_name: form.full_name,
+          email: form.email,
+          phone: form.phone,
+          city: form.city,
+          state: form.state,
+          services: form.services,
+          type: 'provider'
+        })
+      })
       setSubmitted(true)
     } catch(e) {
       console.log(e)
@@ -76,13 +100,10 @@ export default function ProviderSignup() {
           <div style={{fontSize:'64px', marginBottom:'16px'}}>🎉</div>
           <h2 style={{color:'#1a1a2e', marginBottom:'8px'}}>Welcome to NecesitoYa!</h2>
           <p style={{color:'#FF6B35', fontWeight:'bold', marginBottom:'16px'}}>¡Bienvenido a NecesitoYa!</p>
-          <p style={{color:'#888', fontSize:'14px', marginBottom:'8px'}}>You are now a provider. Start browsing available jobs and respond to ones you can help with!</p>
-          <p style={{color:'#888', fontSize:'13px', marginBottom:'32px'}}>Ya eres proveedor. ¡Empieza a ver los trabajos disponibles y responde a los que puedas ayudar!</p>
-          <a href="/jobs" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'14px 32px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', fontSize:'16px', marginBottom:'12px'}}>
-            Browse Available Jobs / Ver Trabajos →
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'24px'}}>Your provider account is ready. Sign in to start browsing jobs!</p>
+          <a href="/login" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'14px 32px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', fontSize:'16px'}}>
+            Sign In → Start Earning
           </a>
-          <br/>
-          <a href="/" style={{display:'inline-block', color:'#888', padding:'12px 24px', textDecoration:'none', fontSize:'14px'}}>← Home</a>
         </div>
       </div>
     )
@@ -95,22 +116,22 @@ export default function ProviderSignup() {
         <div style={{fontSize:'40px', margin:'16px 0 8px'}}>💼</div>
         <h1 style={{color:'#1a1a2e', marginBottom:'4px'}}>I Offer Services</h1>
         <p style={{color:'#888', marginBottom:'32px'}}>Ofrezco Servicios — Join as a provider, earn money</p>
-
         <div style={{marginBottom:'20px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Full Name / Nombre Completo *</label>
           <input type="text" placeholder="Your name" value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
-
         <div style={{marginBottom:'20px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Email *</label>
           <input type="email" placeholder="you@email.com" value={form.email} onChange={e => setForm({...form, email: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
-
+        <div style={{marginBottom:'20px'}}>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Password / Contraseña *</label>
+          <input type="password" placeholder="At least 6 characters / Mínimo 6 caracteres" value={form.password} onChange={e => setForm({...form, password: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
+        </div>
         <div style={{marginBottom:'20px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Phone / Teléfono</label>
           <input type="tel" placeholder="(863) 555-0100" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
-
         <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px', marginBottom:'20px'}}>
           <div>
             <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>City / Ciudad</label>
@@ -121,7 +142,6 @@ export default function ProviderSignup() {
             <input type="text" placeholder="FL" value={form.state} onChange={e => setForm({...form, state: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
           </div>
         </div>
-
         <div style={{marginBottom:'24px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'12px', fontSize:'14px'}}>What services do you offer? / ¿Qué servicios ofreces?</label>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px'}}>
@@ -132,11 +152,13 @@ export default function ProviderSignup() {
             ))}
           </div>
         </div>
-
         <button onClick={handleSubmit} disabled={loading} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer'}}>
           {loading ? 'Creating account...' : 'Join as Provider — Start Earning →'}
         </button>
-        <p style={{textAlign:'center', color:'#888', fontSize:'12px', marginTop:'16px'}}>By signing up you agree to our <a href="/terms" style={{color:'#FF6B35'}}>terms of service</a></p>
+        <p style={{textAlign:'center', color:'#888', fontSize:'12px', marginTop:'16px'}}>
+          Already have an account? <a href="/login" style={{color:'#FF6B35', fontWeight:'bold'}}>Sign In →</a>
+        </p>
+        <p style={{textAlign:'center', color:'#888', fontSize:'12px', marginTop:'8px'}}>By signing up you agree to our <a href="/terms" style={{color:'#FF6B35'}}>terms of service</a></p>
       </div>
     </main>
   )
