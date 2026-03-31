@@ -36,7 +36,7 @@ export default function BuySell() {
   useEffect(() => { fetchListings() }, [])
 
   const fetchListings = async () => {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/jobs?category=eq.Buy %26 Sell&order=created_at.desc&select=*`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/jobs?category=eq.Buy %26 Sell&order=created_at.desc&select=*&limit=20`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     })
     const data = await res.json()
@@ -341,7 +341,7 @@ export default function BuySell() {
                   >
                     {photos.length > 0 ? (
                       <div style={{position:'relative'}}>
-                        <img src={photos[0]} alt={listing.title} style={{width:'100%', height:'180px', objectFit:'cover'}}/>
+                        <img src={photos[0]} alt={listing.title} loading="lazy" style={{width:'100%', height:'180px', objectFit:'cover'}}/>
                         {photos.length > 1 && (
                           <div style={{position:'absolute', top:'8px', right:'8px', backgroundColor:'rgba(0,0,0,0.6)', color:'white', fontSize:'11px', fontWeight:'bold', padding:'3px 8px', borderRadius:'20px'}}>
                             📷 {photos.length}
