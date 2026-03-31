@@ -14,16 +14,12 @@ export default function BuySell() {
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [selectedListing, setSelectedListing] = useState(null)
+  const [showDetail, setShowDetail] = useState(false)
+  const [activePhoto, setActivePhoto] = useState(0)
   const [form, setForm] = useState({
-    customer_name: '',
-    customer_email: '',
-    customer_phone: '',
-    title: '',
-    description: '',
-    budget: '',
-    city: '',
-    condition: '',
-    category: 'Buy & Sell',
+    customer_name: '', customer_email: '', customer_phone: '',
+    title: '', description: '', budget: '', city: '', condition: '', category: 'Buy & Sell',
   })
   const [submitted, setSubmitted] = useState(false)
   const [posting, setPosting] = useState(false)
@@ -31,18 +27,14 @@ export default function BuySell() {
   const [imagePreviews, setImagePreviews] = useState([])
   const [listingType, setListingType] = useState('selling')
   const [showInterestModal, setShowInterestModal] = useState(false)
-  const [selectedListing, setSelectedListing] = useState(null)
   const [interestedEmail, setInterestedEmail] = useState('')
+  const [interestSent, setInterestSent] = useState(false)
 
-  useEffect(() => {
-    fetchListings()
-  }, [])
+  useEffect(() => { fetchListings() }, [])
 
   const fetchListings = async () => {
     const { data } = await supabase
-      .from('jobs')
-      .select('*')
-      .eq('category', 'Buy & Sell')
+      .from('jobs').select('*').eq('category', 'Buy & Sell')
       .order('created_at', { ascending: false })
     setListings(data || [])
     setLoading(false)
@@ -55,6 +47,15 @@ export default function BuySell() {
     const hrs = Math.floor(mins / 60)
     if (hrs < 24) return `${hrs}h ago`
     return `${Math.floor(hrs / 24)}d ago`
+  }
+
+  const getPhotos = (listing) => {
+    const photos = []
+    if (listing.image_url) photos.push(listing.image_url)
+    if (listing.image_url2) photos.push(listing.image_url2)
+    if (listing.image_url3) photos.push(listing.image_url3)
+    if (listing.image_url4) photos.push(listing.image_url4)
+    return photos
   }
 
   const filteredListings = listings.filter(l => {
@@ -110,6 +111,9 @@ export default function BuySell() {
         city: form.city,
         category: 'Buy & Sell',
         image_url: imageUrls[0] || null,
+        image_url2: imageUrls[1] || null,
+        image_url3: imageUrls[2] || null,
+        image_url4: imageUrls[3] || null,
         status: 'open',
       })
 
@@ -123,9 +127,11 @@ export default function BuySell() {
     setPosting(false)
   }
 
-  const handleInterest = (listing) => {
+  const openDetail = (listing) => {
     setSelectedListing(listing)
-    setShowInterestModal(true)
+    setActivePhoto(0)
+    setShowDetail(true)
+    setInterestSent(false)
   }
 
   const sendInterest = async () => {
@@ -144,7 +150,7 @@ export default function BuySell() {
     })
     setShowInterestModal(false)
     setInterestedEmail('')
-    alert('Your interest has been sent! / ¡Tu interés fue enviado!')
+    setInterestSent(true)
   }
 
   if (submitted) {
@@ -168,30 +174,93 @@ export default function BuySell() {
   return (
     <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial'}}>
 
-      {/* Interest Modal */}
-      {showInterestModal && (
-        <div style={{position:'fixed', inset:0, backgroundColor:'rgba(0,0,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:'20px'}}>
-          <div style={{backgroundColor:'white', borderRadius:'16px', padding:'32px', maxWidth:'400px', width:'100%'}}>
-            <h3 style={{fontSize:'20px', fontWeight:'700', color:'#1a1a2e', marginBottom:'8px'}}>{'{"I\'m Interested!"}'}</h3>
-            <p style={{color:'#6b7280', fontSize:'14px', marginBottom:'16px'}}>
-              Interested in: <strong>{selectedListing?.title}</strong>
-            </p>
-            <p style={{color:'#6b7280', fontSize:'13px', marginBottom:'16px'}}>
-              Posted by {selectedListing?.customer_name} · {selectedListing?.city}
-            </p>
-            <input
-              type="email"
-              value={interestedEmail}
-              onChange={(e) => setInterestedEmail(e.target.value)}
-              placeholder="your@email.com"
-              style={{width:'100%', padding:'10px 14px', border:'1px solid #d1d5db', borderRadius:'8px', fontSize:'14px', boxSizing:'border-box', marginBottom:'12px'}}
-            />
-            <button onClick={sendInterest} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px', borderRadius:'8px', fontSize:'16px', fontWeight:'600', border:'none', cursor:'pointer', marginBottom:'8px'}}>
-              Send Interest / Enviar Interés
-            </button>
-            <button onClick={() => setShowInterestModal(false)} style={{width:'100%', backgroundColor:'white', color:'#6b7280', padding:'10px', borderRadius:'8px', fontSize:'14px', border:'1px solid #e5e7eb', cursor:'pointer'}}>
-              Cancel / Cancelar
-            </button>
+      {/* Detail Page Modal */}
+      {showDetail && selectedListing && (
+        <div style={{position:'fixed', inset:0, backgroundColor:'rgba(0,0,0,0.8)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:'20px', overflowY:'auto'}}>
+          <div style={{backgroundColor:'white', borderRadius:'20px', maxWidth:'560px', width:'100%', overflow:'hidden', maxHeight:'90vh', overflowY:'auto'}}>
+
+            {/* Photo Gallery */}
+            {(() => {
+              const photos = getPhotos(selectedListing)
+              return photos.length > 0 ? (
+                <div>
+                  <div style={{position:'relative'}}>
+                    <img src={photos[activePhoto]} alt={selectedListing.title} style={{width:'100%', height:'280px', objectFit:'cover'}}/>
+                    <button onClick={() => setShowDetail(false)} style={{position:'absolute', top:'12px', right:'12px', background:'rgba(0,0,0,0.6)', color:'white', border:'none', borderRadius:'50%', width:'36px', height:'36px', cursor:'pointer', fontSize:'18px', display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
+                    {photos.length > 1 && (
+                      <div style={{position:'absolute', bottom:'12px', left:'50%', transform:'translateX(-50%)', display:'flex', gap:'6px'}}>
+                        {photos.map((_, i) => (
+                          <button key={i} onClick={() => setActivePhoto(i)} style={{width:'8px', height:'8px', borderRadius:'50%', border:'none', cursor:'pointer', backgroundColor: i === activePhoto ? 'white' : 'rgba(255,255,255,0.5)'}}/>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {photos.length > 1 && (
+                    <div style={{display:'flex', gap:'8px', padding:'12px', overflowX:'auto'}}>
+                      {photos.map((photo, i) => (
+                        <img key={i} src={photo} alt={`Photo ${i+1}`} onClick={() => setActivePhoto(i)}
+                          style={{width:'72px', height:'72px', objectFit:'cover', borderRadius:'8px', cursor:'pointer', border: i === activePhoto ? '3px solid #FF6B35' : '3px solid transparent', flexShrink:0}}/>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{position:'relative'}}>
+                  <div style={{width:'100%', height:'200px', background:'#f8f6f2', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'64px'}}>🛒</div>
+                  <button onClick={() => setShowDetail(false)} style={{position:'absolute', top:'12px', right:'12px', background:'rgba(0,0,0,0.6)', color:'white', border:'none', borderRadius:'50%', width:'36px', height:'36px', cursor:'pointer', fontSize:'18px'}}>×</button>
+                </div>
+              )
+            })()}
+
+            {/* Listing Details */}
+            <div style={{padding:'24px'}}>
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'12px'}}>
+                <h2 style={{color:'#1a1a2e', fontSize:'20px', fontWeight:'700', margin:0, flex:1, marginRight:'12px'}}>{selectedListing.title}</h2>
+                {selectedListing.budget && (
+                  <div style={{fontSize:'24px', fontWeight:'bold', color:'#2D6A4F', flexShrink:0}}>{selectedListing.budget}</div>
+                )}
+              </div>
+
+              <div style={{display:'flex', gap:'12px', marginBottom:'16px', flexWrap:'wrap'}}>
+                <span style={{fontSize:'13px', color:'#888'}}>📍 {selectedListing.city}</span>
+                <span style={{fontSize:'13px', color:'#888'}}>🕐 {timeAgo(selectedListing.created_at)}</span>
+                <span style={{fontSize:'13px', color:'#888'}}>👤 {selectedListing.customer_name}</span>
+              </div>
+
+              <div style={{backgroundColor:'#f8f6f2', borderRadius:'12px', padding:'16px', marginBottom:'20px'}}>
+                <p style={{color:'#333', fontSize:'14px', lineHeight:'1.7', margin:0, whiteSpace:'pre-wrap'}}>{selectedListing.description}</p>
+              </div>
+
+              {interestSent ? (
+                <div style={{backgroundColor:'#dcfce7', borderRadius:'12px', padding:'16px', textAlign:'center'}}>
+                  <div style={{fontSize:'32px', marginBottom:'8px'}}>✅</div>
+                  <p style={{color:'#16a34a', fontWeight:'600', margin:0}}>Interest sent! The seller will contact you.</p>
+                  <p style={{color:'#16a34a', fontSize:'13px', margin:'4px 0 0'}}>¡Interés enviado! El vendedor te contactará.</p>
+                </div>
+              ) : showInterestModal ? (
+                <div style={{backgroundColor:'#f8f6f2', borderRadius:'12px', padding:'20px'}}>
+                  <h3 style={{color:'#1a1a2e', fontSize:'16px', fontWeight:'700', marginBottom:'8px'}}>I'm Interested!</h3>
+                  <p style={{color:'#6b7280', fontSize:'13px', marginBottom:'16px'}}>Enter your email and the seller will contact you directly.</p>
+                  <input
+                    type="email"
+                    value={interestedEmail}
+                    onChange={(e) => setInterestedEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    style={{width:'100%', padding:'10px 14px', border:'1px solid #d1d5db', borderRadius:'8px', fontSize:'14px', boxSizing:'border-box', marginBottom:'12px'}}
+                  />
+                  <button onClick={sendInterest} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px', borderRadius:'8px', fontSize:'16px', fontWeight:'600', border:'none', cursor:'pointer', marginBottom:'8px'}}>
+                    Send Interest / Enviar Interés
+                  </button>
+                  <button onClick={() => setShowInterestModal(false)} style={{width:'100%', backgroundColor:'white', color:'#6b7280', padding:'10px', borderRadius:'8px', fontSize:'14px', border:'1px solid #e5e7eb', cursor:'pointer'}}>
+                    Cancel / Cancelar
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => setShowInterestModal(true)} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'16px', borderRadius:'12px', fontSize:'16px', fontWeight:'bold', border:'none', cursor:'pointer'}}>
+                  I'm Interested → / Me Interesa →
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -202,15 +271,8 @@ export default function BuySell() {
         <h1 style={{color:'white', fontSize:'32px', fontWeight:'bold', margin:'16px 0 4px'}}>Buy & Sell</h1>
         <p style={{color:'#FF6B35', fontWeight:'bold', marginBottom:'4px'}}>Compra y Vende</p>
         <p style={{color:'rgba(255,255,255,0.5)', fontSize:'14px', marginBottom:'24px'}}>{filteredListings.length} listings available / anuncios disponibles</p>
-
-        {/* Search */}
-        <input
-          type="text"
-          placeholder="Search listings... / Buscar anuncios..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{width:'100%', padding:'14px 20px', borderRadius:'12px', border:'none', fontSize:'15px', boxSizing:'border-box', outline:'none', backgroundColor:'rgba(255,255,255,0.1)', color:'white'}}
-        />
+        <input type="text" placeholder="Search listings... / Buscar anuncios..." value={search} onChange={e => setSearch(e.target.value)}
+          style={{width:'100%', padding:'14px 20px', borderRadius:'12px', border:'none', fontSize:'15px', boxSizing:'border-box', outline:'none', backgroundColor:'rgba(255,255,255,0.1)', color:'white'}}/>
       </div>
 
       {/* Tab Switcher */}
@@ -242,35 +304,48 @@ export default function BuySell() {
             </div>
           ) : (
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(260px, 1fr))', gap:'20px'}}>
-              {filteredListings.map(listing => (
-                <div key={listing.id} style={{background:'white', borderRadius:'20px', overflow:'hidden', boxShadow:'0 2px 16px rgba(0,0,0,0.06)'}}>
-                  {listing.image_url ? (
-                    <img src={listing.image_url} alt={listing.title} style={{width:'100%', height:'180px', objectFit:'cover'}}/>
-                  ) : (
-                    <div style={{width:'100%', height:'180px', background:'#f8f6f2', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'48px'}}>🛒</div>
-                  )}
-                  <div style={{padding:'16px'}}>
-                    <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'8px'}}>
-                      <h3 style={{color:'#1a1a2e', fontSize:'15px', fontWeight:'700', margin:0, flex:1, marginRight:'8px'}}>{listing.title}</h3>
-                      {listing.budget && (
-                        <div style={{fontSize:'18px', fontWeight:'bold', color:'#2D6A4F', flexShrink:0}}>{listing.budget}</div>
-                      )}
-                    </div>
-                    <p style={{color:'#888', fontSize:'12px', marginBottom:'8px'}}>📍 {listing.city} · 🕐 {timeAgo(listing.created_at)}</p>
-                    <p style={{color:'#555', fontSize:'13px', lineHeight:'1.5', marginBottom:'12px'}}>{listing.description?.substring(0, 80)}...</p>
-                    <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                      <span style={{fontSize:'12px', color:'#888'}}>By {listing.customer_name}</span>
-                      {listing.status === 'open' ? (
-                        <button onClick={() => handleInterest(listing)} style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'8px 16px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'13px', cursor:'pointer'}}>
-                          {"I'm Interested →"}
-                        </button>
-                      ) : (
-                        <span style={{fontSize:'12px', color:'#16a34a', fontWeight:'600'}}>✓ Sold</span>
-                      )}
+              {filteredListings.map(listing => {
+                const photos = getPhotos(listing)
+                return (
+                  <div key={listing.id} onClick={() => openDetail(listing)} style={{background:'white', borderRadius:'20px', overflow:'hidden', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', cursor:'pointer', transition:'transform 0.2s'}}
+                    onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'}
+                    onMouseLeave={e => e.currentTarget.style.transform='translateY(0)'}
+                  >
+                    {photos.length > 0 ? (
+                      <div style={{position:'relative'}}>
+                        <img src={photos[0]} alt={listing.title} style={{width:'100%', height:'180px', objectFit:'cover'}}/>
+                        {photos.length > 1 && (
+                          <div style={{position:'absolute', top:'8px', right:'8px', backgroundColor:'rgba(0,0,0,0.6)', color:'white', fontSize:'11px', fontWeight:'bold', padding:'3px 8px', borderRadius:'20px'}}>
+                            📷 {photos.length}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div style={{width:'100%', height:'180px', background:'#f8f6f2', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'48px'}}>🛒</div>
+                    )}
+                    <div style={{padding:'16px'}}>
+                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'8px'}}>
+                        <h3 style={{color:'#1a1a2e', fontSize:'15px', fontWeight:'700', margin:0, flex:1, marginRight:'8px'}}>{listing.title}</h3>
+                        {listing.budget && (
+                          <div style={{fontSize:'18px', fontWeight:'bold', color:'#2D6A4F', flexShrink:0}}>{listing.budget}</div>
+                        )}
+                      </div>
+                      <p style={{color:'#888', fontSize:'12px', marginBottom:'8px'}}>📍 {listing.city} · 🕐 {timeAgo(listing.created_at)}</p>
+                      <p style={{color:'#555', fontSize:'13px', lineHeight:'1.5', marginBottom:'12px'}}>{listing.description?.substring(0, 80)}...</p>
+                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                        <span style={{fontSize:'12px', color:'#888'}}>By {listing.customer_name}</span>
+                        {listing.status === 'open' ? (
+                          <span style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'6px 14px', borderRadius:'12px', fontWeight:'bold', fontSize:'12px'}}>
+                            View Details →
+                          </span>
+                        ) : (
+                          <span style={{fontSize:'12px', color:'#16a34a', fontWeight:'600'}}>✓ Sold</span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
@@ -280,7 +355,6 @@ export default function BuySell() {
       {view === 'post' && (
         <div style={{padding:'32px', display:'flex', justifyContent:'center'}}>
           <div style={{background:'white', borderRadius:'24px', padding:'40px', width:'100%', maxWidth:'560px'}}>
-
             <div style={{marginBottom:'24px'}}>
               <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'8px', fontSize:'14px'}}>I want to... / Quiero...</label>
               <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
