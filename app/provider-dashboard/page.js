@@ -19,7 +19,6 @@ function ProviderDashboardContent() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('jobs');
-  const [email, setEmail] = useState('');
   const stripeStatus = searchParams.get('stripe');
 
   useEffect(() => {
@@ -33,10 +32,7 @@ function ProviderDashboardContent() {
     const sbEmail = localStorage.getItem('sb_email');
     if (sbEmail) {
       fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(sbEmail)}&type=eq.provider&select=*`, {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
       })
       .then(r => r.json())
       .then(users => {
@@ -45,12 +41,12 @@ function ProviderDashboardContent() {
           setProvider(users[0]);
           fetchData(users[0].id, users[0].email);
         } else {
-          setLoading(false);
+          window.location.href = '/login';
         }
       })
-      .catch(() => setLoading(false));
+      .catch(() => { window.location.href = '/login'; });
     } else {
-      setLoading(false);
+      window.location.href = '/login';
     }
   }, []);
 
@@ -85,23 +81,6 @@ function ProviderDashboardContent() {
     setLoading(false);
   }
 
-  async function handleLogin(e) {
-    e.preventDefault();
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email.toLowerCase())
-      .eq('type', 'provider')
-      .single();
-    if (data) {
-      localStorage.setItem('ny_provider', JSON.stringify(data));
-      setProvider(data);
-      fetchData(data.id, data.email);
-    } else {
-      alert('Provider not found. Please check your email. / Proveedor no encontrado.');
-    }
-  }
-
   async function connectStripe() {
     const res = await fetch('/api/stripe/connect', {
       method: 'POST',
@@ -121,6 +100,7 @@ function ProviderDashboardContent() {
     setProvider(null);
     setJobs([]);
     setPayments([]);
+    window.location.href = '/login';
   }
 
   const totalEarned = payments.filter(p => p.status === 'succeeded').reduce((sum, p) => sum + (p.amount_provider || 0), 0);
@@ -129,38 +109,8 @@ function ProviderDashboardContent() {
 
   if (!provider) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '40px', maxWidth: '420px', width: '100%', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{ fontSize: '28px', fontWeight: '800', color: '#1a1a2e' }}>NecesitoYa</div>
-            <div style={{ fontSize: '18px', fontWeight: '600', color: '#4b5563', marginTop: '8px' }}>Provider Dashboard</div>
-            <div style={{ fontSize: '14px', color: '#9ca3af' }}>Panel del Proveedor</div>
-          </div>
-          <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '6px' }}>
-                Email Address / Correo Electrónico
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
-                style={{ width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box' }}
-              />
-            </div>
-            <button type="submit" style={{ width: '100%', backgroundColor: '#2563eb', color: 'white', padding: '12px', borderRadius: '8px', fontSize: '16px', fontWeight: '600', border: 'none', cursor: 'pointer' }}>
-              Access Dashboard / Acceder
-            </button>
-          </form>
-          <div style={{ marginTop: '16px', textAlign: 'center' }}>
-            <a href="/login" style={{ color: '#FF6B35', fontWeight: '600', fontSize: '14px' }}>Sign In with Password →</a>
-          </div>
-          <p style={{ textAlign: 'center', fontSize: '12px', color: '#9ca3af', marginTop: '12px' }}>
-            Not a provider yet? <a href="/signup-provider" style={{ color: '#2563eb' }}>Sign up here</a>
-          </p>
-        </div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: '18px', color: '#6b7280' }}>Loading...</div>
       </div>
     );
   }
@@ -182,7 +132,7 @@ function ProviderDashboardContent() {
 
       {stripeStatus === 'success' && (
         <div style={{ backgroundColor: '#dcfce7', color: '#16a34a', padding: '12px 24px', fontSize: '14px', fontWeight: '500' }}>
-          ✅ Bank account connected successfully! You can now receive payments. / ¡Cuenta bancaria conectada exitosamente!
+          ✅ Bank account connected successfully! / ¡Cuenta bancaria conectada exitosamente!
         </div>
       )}
 
@@ -254,7 +204,7 @@ function ProviderDashboardContent() {
                     </div>
                     <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>{job.description}</div>
                     <div style={{ fontSize: '13px', color: '#9ca3af' }}>
-                      Customer: {job.customer_name} · {job.customer_email} · {job.status === 'paid' || job.status === 'completed' ? job.customer_phone : '🔵 Phone hidden until payment / Teléfono oculto hasta el pago'}
+                      Customer: {job.customer_name} · {job.customer_email} · {job.status === 'paid' || job.status === 'completed' ? job.customer_phone : '🔵 Phone hidden until payment'}
                     </div>
                     {(job.status === 'accepted' || job.status === 'paid' || job.status === 'pending') && (
                       <button onClick={() => window.location.href = `/messages?job=${job.id}`} style={{ marginTop: '10px', backgroundColor: '#1a1a2e', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer', marginRight: '8px' }}>
@@ -264,9 +214,9 @@ function ProviderDashboardContent() {
                     {(job.status === 'pending' || job.status === 'accepted') && (
                       <button
                         onClick={async () => {
-                          if (confirm('Release this job? It will become available to other providers. / ¿Liberar este trabajo?')) {
-                            await supabase.from('jobs').update({ status: 'open', provider_id: null, provider_email: null }).eq('id', job.id)
-                            window.location.reload()
+                          if (confirm('Release this job? / ¿Liberar este trabajo?')) {
+                            await supabase.from('jobs').update({ status: 'open', provider_id: null, provider_email: null }).eq('id', job.id);
+                            window.location.reload();
                           }
                         }}
                         style={{ marginTop: '10px', backgroundColor: '#ef4444', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
@@ -318,7 +268,7 @@ function ProviderDashboardContent() {
               {[
                 { label: 'Full Name / Nombre', value: provider.full_name },
                 { label: 'Email', value: provider.email },
-                { label: 'Phone / Teléfono', value: provider.phone || 'Not set' },
+                { label: 'Phone / Telefono', value: provider.phone || 'Not set' },
                 { label: 'City / Ciudad', value: provider.city || 'Not set' },
                 { label: 'Services / Servicios', value: provider.services || 'Not set' },
                 { label: 'Language / Idioma', value: provider.language || 'en' },

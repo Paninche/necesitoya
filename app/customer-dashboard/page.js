@@ -18,7 +18,6 @@ function CustomerDashboardContent() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('jobs');
-  const [email, setEmail] = useState('');
 
   useEffect(() => {
     const saved = localStorage.getItem('ny_customer');
@@ -31,10 +30,7 @@ function CustomerDashboardContent() {
     const sbEmail = localStorage.getItem('sb_email');
     if (sbEmail) {
       fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(sbEmail)}&type=eq.customer&select=*`, {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
       })
       .then(r => r.json())
       .then(users => {
@@ -43,12 +39,12 @@ function CustomerDashboardContent() {
           setCustomer(users[0]);
           fetchData(users[0].email);
         } else {
-          setLoading(false);
+          window.location.href = '/login';
         }
       })
-      .catch(() => setLoading(false));
+      .catch(() => { window.location.href = '/login'; });
     } else {
-      setLoading(false);
+      window.location.href = '/login';
     }
   }, []);
 
@@ -71,43 +67,6 @@ function CustomerDashboardContent() {
     setLoading(false);
   }
 
-  async function handleLogin(e) {
-    e.preventDefault();
-    const { data: userData } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email.toLowerCase())
-      .eq('type', 'customer')
-      .single();
-
-    if (userData) {
-      localStorage.setItem('ny_customer', JSON.stringify(userData));
-      setCustomer(userData);
-      fetchData(userData.email);
-      return;
-    }
-
-    const { data: jobData } = await supabase
-      .from('jobs')
-      .select('customer_name, customer_email')
-      .eq('customer_email', email.toLowerCase())
-      .limit(1)
-      .single();
-
-    if (jobData) {
-      const guestCustomer = {
-        full_name: jobData.customer_name,
-        email: jobData.customer_email,
-        type: 'customer'
-      };
-      localStorage.setItem('ny_customer', JSON.stringify(guestCustomer));
-      setCustomer(guestCustomer);
-      fetchData(guestCustomer.email);
-    } else {
-      alert('No account found with that email. / No se encontró cuenta con ese correo.');
-    }
-  }
-
   function handleLogout() {
     localStorage.removeItem('ny_customer');
     localStorage.removeItem('sb_token');
@@ -116,6 +75,7 @@ function CustomerDashboardContent() {
     setCustomer(null);
     setJobs([]);
     setPayments([]);
+    window.location.href = '/login';
   }
 
   const totalSpent = payments.filter(p => p.status === 'succeeded').reduce((sum, p) => sum + (p.amount_total || 0), 0);
@@ -135,40 +95,8 @@ function CustomerDashboardContent() {
 
   if (!customer) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '40px', maxWidth: '420px', width: '100%', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{ fontSize: '28px', fontWeight: '800', color: '#1a1a2e' }}>NecesitoYa</div>
-            <div style={{ fontSize: '18px', fontWeight: '600', color: '#4b5563', marginTop: '8px' }}>Customer Dashboard</div>
-            <div style={{ fontSize: '14px', color: '#9ca3af' }}>Panel del Cliente</div>
-          </div>
-          <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '6px' }}>
-                Email Address / Correo Electrónico
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
-                style={{ width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box' }}
-              />
-            </div>
-            <button type="submit" style={{ width: '100%', backgroundColor: '#2563eb', color: 'white', padding: '12px', borderRadius: '8px', fontSize: '16px', fontWeight: '600', border: 'none', cursor: 'pointer' }}>
-              Access Dashboard / Acceder
-            </button>
-          </form>
-          <div style={{ marginTop: '16px', textAlign: 'center' }}>
-            <a href="/login" style={{ color: '#FF6B35', fontWeight: '600', fontSize: '14px' }}>Sign In with Password →</a>
-          </div>
-          <div style={{ marginTop: '12px', display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <a href="/post-job" style={{ color: '#2563eb', fontSize: '13px' }}>Post a Job</a>
-            <span style={{ color: '#d1d5db' }}>·</span>
-            <a href="/signup-customer" style={{ color: '#2563eb', fontSize: '13px' }}>Sign up</a>
-          </div>
-        </div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: '18px', color: '#6b7280' }}>Loading...</div>
       </div>
     );
   }
@@ -260,11 +188,11 @@ function CustomerDashboardContent() {
                               )}
                               <button
                                 onClick={() => {
-                                  const inputAmount = document.getElementById(`amount-${job.id}`)?.value
-                                  const amount = inputAmount || (job.budget ? job.budget.replace(/[^0-9.]/g, '') : '0')
+                                  const inputAmount = document.getElementById(`amount-${job.id}`)?.value;
+                                  const amount = inputAmount || (job.budget ? job.budget.replace(/[^0-9.]/g, '') : '0');
                                   if (!amount || amount === '0') { alert('Please enter the agreed amount / Por favor ingresa el monto acordado'); return; }
-                                  const providerName = job.provider_email.split('@')[0]
-                                  window.location.href = `/checkout?jobId=${job.id}&amount=${amount}&providerId=${job.provider_id || job.provider_email}&providerName=${encodeURIComponent(providerName)}`
+                                  const providerName = job.provider_email.split('@')[0];
+                                  window.location.href = `/checkout?jobId=${job.id}&amount=${amount}&providerId=${job.provider_id || job.provider_email}&providerName=${encodeURIComponent(providerName)}`;
                                 }}
                                 style={{ backgroundColor: '#16a34a', color: 'white', padding: '8px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap' }}
                               >
@@ -276,10 +204,10 @@ function CustomerDashboardContent() {
                             <button
                               onClick={async () => {
                                 if (confirm('Cancel this provider and reopen the job? / ¿Cancelar este proveedor y reabrir el trabajo?')) {
-                                  const { createClient } = await import('@supabase/supabase-js')
-                                  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-                                  await sb.from('jobs').update({ status: 'open', provider_id: null, provider_email: null }).eq('id', job.id)
-                                  window.location.reload()
+                                  const { createClient } = await import('@supabase/supabase-js');
+                                  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+                                  await sb.from('jobs').update({ status: 'open', provider_id: null, provider_email: null }).eq('id', job.id);
+                                  window.location.reload();
                                 }
                               }}
                               style={{ backgroundColor: '#ef4444', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', fontSize: '12px', fontWeight: '600', cursor: 'pointer', marginLeft: '8px' }}
