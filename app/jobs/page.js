@@ -21,7 +21,7 @@ export default function JobsBoard() {
 
   const categories = [
     'All', 'Hauling & Pickup', 'Handyman', 'Lawn & Garden', 'Cleaning',
-    'Tutoring', 'Transport', 'Buy & Sell', 'Home Cooking', 'Catering',
+    'Tutoring', 'Transport', 'Home Cooking', 'Catering',
     'Baker & Pastries', 'Pet Care', 'Beauty & Hair', 'Babysitting',
     'Tech Help', 'Painting', 'Photography', 'Mechanic', 'Roadside & Towing'
   ]
@@ -37,6 +37,7 @@ export default function JobsBoard() {
       const { data } = await supabase
         .from('jobs')
         .select('*')
+        .neq('category', 'Buy & Sell')
         .order('created_at', { ascending: false })
       setJobs(data || [])
     } catch(e) {
@@ -120,7 +121,6 @@ export default function JobsBoard() {
     }
   }
 
-  // Get unique states and cities from jobs
   const availableStates = ['All', ...new Set(jobs.map(j => j.state).filter(Boolean))]
   const availableCities = ['All', ...new Set(
     jobs
@@ -149,10 +149,10 @@ export default function JobsBoard() {
 
       {/* Provider Modal */}
       {showProviderModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '32px', maxWidth: '400px', width: '100%' }}>
-            <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#1a1a2e', marginBottom: '8px' }}>Accept This Job</h3>
-            <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '24px' }}>
+        <div style={{position:'fixed', inset:0, backgroundColor:'rgba(0,0,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:'20px'}}>
+          <div style={{backgroundColor:'white', borderRadius:'16px', padding:'32px', maxWidth:'400px', width:'100%'}}>
+            <h3 style={{fontSize:'20px', fontWeight:'700', color:'#1a1a2e', marginBottom:'8px'}}>Accept This Job</h3>
+            <p style={{color:'#6b7280', fontSize:'14px', marginBottom:'24px'}}>
               Enter your email to accept: <strong>{selectedJob?.title}</strong>
             </p>
             <form onSubmit={handleProviderLogin}>
@@ -162,12 +162,12 @@ export default function JobsBoard() {
                 onChange={(e) => setProviderEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                style={{ width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box', marginBottom: '12px' }}
+                style={{width:'100%', padding:'10px 14px', border:'1px solid #d1d5db', borderRadius:'8px', fontSize:'14px', boxSizing:'border-box', marginBottom:'12px'}}
               />
-              <button type="submit" style={{ width: '100%', background: 'linear-gradient(135deg,#FF6B35,#F4A261)', color: 'white', padding: '12px', borderRadius: '8px', fontSize: '16px', fontWeight: '600', border: 'none', cursor: 'pointer', marginBottom: '8px' }}>
+              <button type="submit" style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px', borderRadius:'8px', fontSize:'16px', fontWeight:'600', border:'none', cursor:'pointer', marginBottom:'8px'}}>
                 Accept Job / Aceptar Trabajo ✓
               </button>
-              <button type="button" onClick={() => setShowProviderModal(false)} style={{ width: '100%', backgroundColor: 'white', color: '#6b7280', padding: '10px', borderRadius: '8px', fontSize: '14px', border: '1px solid #e5e7eb', cursor: 'pointer' }}>
+              <button type="button" onClick={() => setShowProviderModal(false)} style={{width:'100%', backgroundColor:'white', color:'#6b7280', padding:'10px', borderRadius:'8px', fontSize:'14px', border:'1px solid #e5e7eb', cursor:'pointer'}}>
                 Cancel / Cancelar
               </button>
             </form>
@@ -200,30 +200,18 @@ export default function JobsBoard() {
       {/* Location Filter */}
       <div style={{padding:'12px 32px', background:'white', borderBottom:'1px solid #F0EDE8', display:'flex', gap:'12px', alignItems:'center', flexWrap:'wrap'}}>
         <span style={{fontSize:'13px', color:'#888', fontWeight:'600'}}>📍 Filter by location:</span>
-        <select
-          value={stateFilter}
-          onChange={(e) => { setStateFilter(e.target.value); setCityFilter('All') }}
-          style={{padding:'6px 12px', borderRadius:'8px', border:'1px solid #e5e7eb', fontSize:'13px', color:'#333', cursor:'pointer', background:'white'}}
-        >
-          {availableStates.map(s => (
-            <option key={s} value={s}>{s === 'All' ? 'All States' : s}</option>
-          ))}
+        <select value={stateFilter} onChange={(e) => { setStateFilter(e.target.value); setCityFilter('All') }}
+          style={{padding:'6px 12px', borderRadius:'8px', border:'1px solid #e5e7eb', fontSize:'13px', color:'#333', cursor:'pointer', background:'white'}}>
+          {availableStates.map(s => <option key={s} value={s}>{s === 'All' ? 'All States' : s}</option>)}
         </select>
-        <select
-          value={cityFilter}
-          onChange={(e) => setCityFilter(e.target.value)}
-          style={{padding:'6px 12px', borderRadius:'8px', border:'1px solid #e5e7eb', fontSize:'13px', color:'#333', cursor:'pointer', background:'white'}}
-        >
-          {availableCities.map(c => (
-            <option key={c} value={c}>{c === 'All' ? 'All Cities' : c}</option>
-          ))}
+        <select value={cityFilter} onChange={(e) => setCityFilter(e.target.value)}
+          style={{padding:'6px 12px', borderRadius:'8px', border:'1px solid #e5e7eb', fontSize:'13px', color:'#333', cursor:'pointer', background:'white'}}>
+          {availableCities.map(c => <option key={c} value={c}>{c === 'All' ? 'All Cities' : c}</option>)}
         </select>
         {(stateFilter !== 'All' || cityFilter !== 'All') && (
-          <button
-            onClick={() => { setStateFilter('All'); setCityFilter('All') }}
-            style={{padding:'6px 12px', borderRadius:'8px', border:'1px solid #FF6B35', fontSize:'13px', color:'#FF6B35', cursor:'pointer', background:'white', fontWeight:'600'}}
-          >
-            Clear / Limpiar ✕
+          <button onClick={() => { setStateFilter('All'); setCityFilter('All') }}
+            style={{padding:'6px 12px', borderRadius:'8px', border:'1px solid #FF6B35', fontSize:'13px', color:'#FF6B35', cursor:'pointer', background:'white', fontWeight:'600'}}>
+            Clear ✕
           </button>
         )}
       </div>
@@ -262,26 +250,22 @@ export default function JobsBoard() {
                   {job.budget && (
                     <div style={{textAlign:'right', flexShrink:0, marginLeft:'16px'}}>
                       <div style={{fontSize:'18px', fontWeight:'bold', color:'#2D6A4F'}}>{job.budget}</div>
-                      <div style={{fontSize:'11px', color:'#888'}}>{job.category === 'Buy & Sell' ? 'price' : 'budget'}</div>
+                      <div style={{fontSize:'11px', color:'#888'}}>budget</div>
                     </div>
                   )}
                 </div>
                 <p style={{color:'#555', fontSize:'14px', lineHeight:'1.6', marginBottom:'16px'}}>{job.description}</p>
-
                 {job.image_url && (
                   <div style={{marginBottom:'16px'}}>
                     <img src={job.image_url} alt="Job photo" style={{width:'100%', borderRadius:'12px', maxHeight:'200px', objectFit:'cover'}}/>
                   </div>
                 )}
-
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                   <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
                   {job.status === 'open' ? (
-                    <button
-                      onClick={() => handleICanHelp(job)}
-                      disabled={assigning === job.id}
+                    <button onClick={() => handleICanHelp(job)} disabled={assigning === job.id}
                       style={{background: assigning === job.id ? '#ccc' : 'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'14px', cursor: assigning === job.id ? 'not-allowed' : 'pointer'}}>
-                      {assigning === job.id ? 'Accepting...' : job.category === 'Buy & Sell' ? "I'm Interested / Me Interesa →" : "I Can Help / Puedo Ayudar →"}
+                      {assigning === job.id ? 'Accepting...' : 'I Can Help / Puedo Ayudar →'}
                     </button>
                   ) : (
                     <span style={{fontSize:'13px', color:'#16a34a', fontWeight:'600'}}>✓ Provider assigned</span>

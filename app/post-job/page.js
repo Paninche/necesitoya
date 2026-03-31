@@ -7,6 +7,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 )
 
+const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
+
 export default function PostJob() {
   const [userType, setUserType] = useState(null)
   const [form, setForm] = useState({
@@ -35,7 +38,7 @@ export default function PostJob() {
 
   const categories = [
     "Hauling & Pickup", "Handyman", "Lawn & Garden", "Cleaning",
-    "Tutoring", "Transport", "Buy & Sell", "Home Cooking",
+    "Tutoring", "Transport", "Home Cooking",
     "Catering", "Baker & Pastries", "Pet Care", "Beauty & Hair",
     "Babysitting", "Tech Help", "Painting", "Photography",
     "Mechanic", "Roadside & Towing"
@@ -60,7 +63,7 @@ export default function PostJob() {
       if (imageFile) {
         const fileExt = imageFile.name.split('.').pop()
         const fileName = `${Date.now()}.${fileExt}`
-        const { data: uploadData, error: uploadError } = await supabase
+        const { error: uploadError } = await supabase
           .storage.from('job-images').upload(fileName, imageFile)
         if (!uploadError) {
           const { data: urlData } = supabase.storage.from('job-images').getPublicUrl(fileName)
@@ -76,23 +79,32 @@ export default function PostJob() {
 
       if (error) throw error
 
-      const { data: providers } = await supabase
-        .from('users')
-        .select('email, full_name, services')
-        .eq('type', 'provider')
+      // Send customer confirmation email
+      await fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'job_confirmation',
+          job,
+          customerEmail: form.customer_email,
+          customerName: form.customer_name,
+        }),
+      })
 
-      const matchingProviders = (providers || []).filter(p =>
-        p.services && p.services.toLowerCase().includes(form.category.toLowerCase())
-      )
+      // Notify ALL providers — not just category match since services field may not match exactly
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/users?type=eq.provider&select=email,full_name,services`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      })
+      const providers = await res.json()
 
-      for (const provider of matchingProviders) {
+      for (const provider of (providers || [])) {
         await fetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             type: 'job_posted',
             job,
-            providerName: provider.full_name,
+            providerName: provider.full_name || provider.email.split('@')[0],
             providerEmail: provider.email,
           }),
         })
@@ -106,7 +118,6 @@ export default function PostJob() {
     setLoading(false)
   }
 
-  // Block logged-in providers
   if (isProvider) {
     return (
       <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px'}}>
@@ -126,7 +137,6 @@ export default function PostJob() {
     )
   }
 
-  // User type selector — only shows when coming from "Post Job" nav link
   if (!userType) {
     return (
       <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px'}}>
@@ -136,22 +146,16 @@ export default function PostJob() {
           <h2 style={{color:'#1a1a2e', marginBottom:'8px', fontSize:'24px'}}>Before we start...</h2>
           <p style={{color:'#FF6B35', fontWeight:'bold', marginBottom:'8px'}}>Antes de comenzar...</p>
           <p style={{color:'#888', fontSize:'14px', marginBottom:'32px'}}>Are you looking for help or offering services? / ¿Buscas ayuda o ofreces servicios?</p>
-
           <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))', gap:'16px', marginBottom:'24px'}}>
-            <button
-              onClick={() => setUserType('customer')}
-              style={{padding:'24px 16px', borderRadius:'16px', border:'2px solid #F0EDE8', background:'white', cursor:'pointer', textAlign:'center'}}
-            >
+            <button onClick={() => setUserType('customer')}
+              style={{padding:'24px 16px', borderRadius:'16px', border:'2px solid #F0EDE8', background:'white', cursor:'pointer', textAlign:'center'}}>
               <div style={{fontSize:'40px', marginBottom:'12px'}}>🙋</div>
               <div style={{fontWeight:'bold', color:'#1a1a2e', fontSize:'16px', marginBottom:'4px'}}>I Need Help</div>
               <div style={{color:'#FF6B35', fontSize:'13px', fontWeight:'600', marginBottom:'8px'}}>Necesito Ayuda</div>
               <div style={{color:'#888', fontSize:'12px'}}>I want to post a job and find a local provider</div>
             </button>
-
-            <button
-              onClick={() => window.location.href = '/signup-provider'}
-              style={{padding:'24px 16px', borderRadius:'16px', border:'2px solid #F0EDE8', background:'white', cursor:'pointer', textAlign:'center'}}
-            >
+            <button onClick={() => window.location.href = '/signup-provider'}
+              style={{padding:'24px 16px', borderRadius:'16px', border:'2px solid #F0EDE8', background:'white', cursor:'pointer', textAlign:'center'}}>
               <div style={{fontSize:'40px', marginBottom:'12px'}}>🔧</div>
               <div style={{fontWeight:'bold', color:'#1a1a2e', fontSize:'16px', marginBottom:'4px'}}>I Offer Services</div>
               <div style={{color:'#FF6B35', fontSize:'13px', fontWeight:'600', marginBottom:'8px'}}>Ofrezco Servicios</div>
@@ -170,7 +174,8 @@ export default function PostJob() {
           <div style={{fontSize:'64px', marginBottom:'16px'}}>🎉</div>
           <h2 style={{color:'#1a1a2e', marginBottom:'8px'}}>Job Posted!</h2>
           <p style={{color:'#888', marginBottom:'4px'}}>Your job is now live and providers near you will respond soon.</p>
-          <p style={{color:'#888', fontSize:'14px', marginBottom:'24px'}}>Tu trabajo está publicado y los proveedores cercanos responderán pronto.</p>
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'4px'}}>Tu trabajo está publicado y los proveedores cercanos responderán pronto.</p>
+          <p style={{color:'#16a34a', fontSize:'13px', marginBottom:'24px'}}>✅ Confirmation email sent!</p>
           <a href="/jobs" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 32px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', marginRight:'12px'}}>See All Jobs →</a>
           <a href="/" style={{display:'inline-block', color:'#888', padding:'12px 24px', textDecoration:'none'}}>Home</a>
         </div>
@@ -224,7 +229,7 @@ export default function PostJob() {
 
         <div style={{marginBottom:'20px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>
-            {form.category === 'Buy & Sell' ? 'Price / Precio (optional)' : 'Budget / Presupuesto (optional)'}
+            Budget / Presupuesto (optional)
           </label>
           <input type="text" placeholder="e.g. $50 - $100" value={form.budget} onChange={e => setForm({...form, budget: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
@@ -235,7 +240,7 @@ export default function PostJob() {
             <input type="text" placeholder="Haines City" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
           </div>
           <div>
-            <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>State / Estado *</label>
+            <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>State / Estado</label>
             <input type="text" placeholder="FL" value={form.state} onChange={e => setForm({...form, state: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
           </div>
         </div>

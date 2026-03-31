@@ -7,6 +7,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 )
 
+const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
+
 const conditions = ['New / Nuevo', 'Like New / Como Nuevo', 'Good / Bueno', 'Fair / Regular', 'For Parts / Para Piezas']
 
 export default function BuySell() {
@@ -33,9 +36,10 @@ export default function BuySell() {
   useEffect(() => { fetchListings() }, [])
 
   const fetchListings = async () => {
-    const { data } = await supabase
-      .from('jobs').select('*').eq('category', 'Buy & Sell')
-      .order('created_at', { ascending: false })
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/jobs?category=eq.Buy %26 Sell&order=created_at.desc&select=*`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    })
+    const data = await res.json()
     setListings(data || [])
     setLoading(false)
   }
@@ -101,23 +105,48 @@ export default function BuySell() {
         ? `Condition: ${form.condition}\n\n${form.description}`
         : form.description
 
-      const { error } = await supabase.from('jobs').insert({
-        customer_name: form.customer_name,
-        customer_email: form.customer_email,
-        customer_phone: form.customer_phone,
-        title: `${listingType === 'selling' ? 'FOR SALE:' : 'WANTED:'} ${form.title}`,
-        description: descriptionText,
-        budget: form.budget,
-        city: form.city,
-        category: 'Buy & Sell',
-        image_url: imageUrls[0] || null,
-        image_url2: imageUrls[1] || null,
-        image_url3: imageUrls[2] || null,
-        image_url4: imageUrls[3] || null,
-        status: 'open',
+      const jobTitle = `${listingType === 'selling' ? 'FOR SALE:' : 'WANTED:'} ${form.title}`
+
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/jobs`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          customer_name: form.customer_name,
+          customer_email: form.customer_email,
+          customer_phone: form.customer_phone,
+          title: jobTitle,
+          description: descriptionText,
+          budget: form.budget,
+          city: form.city,
+          category: 'Buy & Sell',
+          image_url: imageUrls[0] || null,
+          image_url2: imageUrls[1] || null,
+          image_url3: imageUrls[2] || null,
+          image_url4: imageUrls[3] || null,
+          status: 'open',
+        })
       })
 
-      if (error) throw error
+      if (!res.ok) throw new Error('Failed to post listing')
+      const [job] = await res.json()
+
+      // Send seller confirmation email
+      await fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'listing_posted',
+          job: { title: jobTitle, city: form.city, budget: form.budget },
+          customerEmail: form.customer_email,
+          customerName: form.customer_name,
+        }),
+      })
+
       setSubmitted(true)
       fetchListings()
     } catch(e) {
@@ -132,17 +161,19 @@ export default function BuySell() {
     setActivePhoto(0)
     setShowDetail(true)
     setInterestSent(false)
+    setShowInterestModal(false)
+    setInterestedEmail('')
   }
 
   const sendInterest = async () => {
     if (!interestedEmail) return
+    // Notify seller that someone is interested
     await fetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        type: 'provider_accepted',
+        type: 'buyer_interested',
         job: selectedListing,
-        providerName: interestedEmail.split('@')[0],
         providerEmail: interestedEmail,
         customerEmail: selectedListing.customer_email,
         customerName: selectedListing.customer_name,
@@ -160,7 +191,8 @@ export default function BuySell() {
           <div style={{fontSize:'64px', marginBottom:'16px'}}>{listingType === 'selling' ? '🏷️' : '🔍'}</div>
           <h2 style={{color:'#1a1a2e', marginBottom:'8px'}}>Listing Posted!</h2>
           <p style={{color:'#FF6B35', fontWeight:'600', marginBottom:'8px'}}>¡Anuncio Publicado!</p>
-          <p style={{color:'#888', fontSize:'14px', marginBottom:'24px'}}>Your listing is now live on NecesitoYa</p>
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'4px'}}>Your listing is now live on NecesitoYa.</p>
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'24px'}}>A confirmation email has been sent to you.</p>
           <button onClick={() => { setSubmitted(false); setView('browse'); setForm({customer_name:'',customer_email:'',customer_phone:'',title:'',description:'',budget:'',city:'',condition:'',category:'Buy & Sell'}); setImageFiles([]); setImagePreviews([]) }}
             style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 32px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', border:'none', cursor:'pointer', marginRight:'12px'}}>
             See All Listings →
@@ -174,19 +206,17 @@ export default function BuySell() {
   return (
     <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial'}}>
 
-      {/* Detail Page Modal */}
+      {/* Detail Modal */}
       {showDetail && selectedListing && (
         <div style={{position:'fixed', inset:0, backgroundColor:'rgba(0,0,0,0.8)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:'20px', overflowY:'auto'}}>
           <div style={{backgroundColor:'white', borderRadius:'20px', maxWidth:'560px', width:'100%', overflow:'hidden', maxHeight:'90vh', overflowY:'auto'}}>
-
-            {/* Photo Gallery */}
             {(() => {
               const photos = getPhotos(selectedListing)
               return photos.length > 0 ? (
                 <div>
                   <div style={{position:'relative'}}>
                     <img src={photos[activePhoto]} alt={selectedListing.title} style={{width:'100%', height:'280px', objectFit:'cover'}}/>
-                    <button onClick={() => setShowDetail(false)} style={{position:'absolute', top:'12px', right:'12px', background:'rgba(0,0,0,0.6)', color:'white', border:'none', borderRadius:'50%', width:'36px', height:'36px', cursor:'pointer', fontSize:'18px', display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
+                    <button onClick={() => setShowDetail(false)} style={{position:'absolute', top:'12px', right:'12px', background:'rgba(0,0,0,0.6)', color:'white', border:'none', borderRadius:'50%', width:'36px', height:'36px', cursor:'pointer', fontSize:'20px', display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
                     {photos.length > 1 && (
                       <div style={{position:'absolute', bottom:'12px', left:'50%', transform:'translateX(-50%)', display:'flex', gap:'6px'}}>
                         {photos.map((_, i) => (
@@ -207,12 +237,11 @@ export default function BuySell() {
               ) : (
                 <div style={{position:'relative'}}>
                   <div style={{width:'100%', height:'200px', background:'#f8f6f2', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'64px'}}>🛒</div>
-                  <button onClick={() => setShowDetail(false)} style={{position:'absolute', top:'12px', right:'12px', background:'rgba(0,0,0,0.6)', color:'white', border:'none', borderRadius:'50%', width:'36px', height:'36px', cursor:'pointer', fontSize:'18px'}}>×</button>
+                  <button onClick={() => setShowDetail(false)} style={{position:'absolute', top:'12px', right:'12px', background:'rgba(0,0,0,0.6)', color:'white', border:'none', borderRadius:'50%', width:'36px', height:'36px', cursor:'pointer', fontSize:'20px'}}>×</button>
                 </div>
               )
             })()}
 
-            {/* Listing Details */}
             <div style={{padding:'24px'}}>
               <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'12px'}}>
                 <h2 style={{color:'#1a1a2e', fontSize:'20px', fontWeight:'700', margin:0, flex:1, marginRight:'12px'}}>{selectedListing.title}</h2>
@@ -220,13 +249,11 @@ export default function BuySell() {
                   <div style={{fontSize:'24px', fontWeight:'bold', color:'#2D6A4F', flexShrink:0}}>{selectedListing.budget}</div>
                 )}
               </div>
-
               <div style={{display:'flex', gap:'12px', marginBottom:'16px', flexWrap:'wrap'}}>
                 <span style={{fontSize:'13px', color:'#888'}}>📍 {selectedListing.city}</span>
                 <span style={{fontSize:'13px', color:'#888'}}>🕐 {timeAgo(selectedListing.created_at)}</span>
                 <span style={{fontSize:'13px', color:'#888'}}>👤 {selectedListing.customer_name}</span>
               </div>
-
               <div style={{backgroundColor:'#f8f6f2', borderRadius:'12px', padding:'16px', marginBottom:'20px'}}>
                 <p style={{color:'#333', fontSize:'14px', lineHeight:'1.7', margin:0, whiteSpace:'pre-wrap'}}>{selectedListing.description}</p>
               </div>
@@ -240,7 +267,7 @@ export default function BuySell() {
               ) : showInterestModal ? (
                 <div style={{backgroundColor:'#f8f6f2', borderRadius:'12px', padding:'20px'}}>
                   <h3 style={{color:'#1a1a2e', fontSize:'16px', fontWeight:'700', marginBottom:'8px'}}>I'm Interested!</h3>
-                  <p style={{color:'#6b7280', fontSize:'13px', marginBottom:'16px'}}>Enter your email and the seller will contact you directly.</p>
+                  <p style={{color:'#6b7280', fontSize:'13px', marginBottom:'16px'}}>Enter your email and the seller will contact you directly. / Ingresa tu correo y el vendedor te contactará.</p>
                   <input
                     type="email"
                     value={interestedEmail}
@@ -307,7 +334,8 @@ export default function BuySell() {
               {filteredListings.map(listing => {
                 const photos = getPhotos(listing)
                 return (
-                  <div key={listing.id} onClick={() => openDetail(listing)} style={{background:'white', borderRadius:'20px', overflow:'hidden', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', cursor:'pointer', transition:'transform 0.2s'}}
+                  <div key={listing.id} onClick={() => openDetail(listing)}
+                    style={{background:'white', borderRadius:'20px', overflow:'hidden', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', cursor:'pointer', transition:'transform 0.2s'}}
                     onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'}
                     onMouseLeave={e => e.currentTarget.style.transform='translateY(0)'}
                   >
