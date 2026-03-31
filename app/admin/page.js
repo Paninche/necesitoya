@@ -76,7 +76,9 @@ export default function AdminDashboard() {
   const totalVolume = payments.filter(p => p.status === 'succeeded').reduce((sum, p) => sum + (p.amount_total || 0), 0);
   const providers = users.filter(u => u.type === 'provider');
   const customers = users.filter(u => u.type === 'customer');
-  const openJobs = jobs.filter(j => j.status === 'open');
+  const regularJobs = jobs.filter(j => j.category !== 'Buy & Sell');
+  const buySellListings = jobs.filter(j => j.category === 'Buy & Sell');
+  const openJobs = regularJobs.filter(j => j.status === 'open');
   const featuredProviders = providers.filter(p => p.featured);
 
   if (!authed) {
@@ -139,8 +141,9 @@ export default function AdminDashboard() {
             { label: 'Total Providers', value: providers.length, color: '#7c3aed', icon: '🔧' },
             { label: 'Featured Providers', value: featuredProviders.length, color: '#FF6B35', icon: '⭐' },
             { label: 'Total Customers', value: customers.length, color: '#0891b2', icon: '👥' },
-            { label: 'Total Jobs', value: jobs.length, color: '#f59e0b', icon: '📋' },
+            { label: 'Total Jobs', value: regularJobs.length, color: '#f59e0b', icon: '📋' },
             { label: 'Open Jobs', value: openJobs.length, color: '#ef4444', icon: '🔓' },
+            { label: 'Buy & Sell Listings', value: buySellListings.length, color: '#16a34a', icon: '🛒' },
           ].map(stat => (
             <div key={stat.label} style={{ backgroundColor: '#1e293b', borderRadius: '10px', padding: '20px', border: '1px solid #334155' }}>
               <div style={{ fontSize: '20px', marginBottom: '8px' }}>{stat.icon}</div>
@@ -152,9 +155,9 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: '4px', backgroundColor: '#1e293b', borderRadius: '10px', padding: '4px', marginBottom: '20px', width: 'fit-content', border: '1px solid #334155', flexWrap: 'wrap' }}>
-          {['overview', 'providers', 'users', 'jobs', 'payments'].map(tab => (
+          {['overview', 'providers', 'users', 'jobs', 'buysell', 'payments'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: '500', backgroundColor: activeTab === tab ? '#2563eb' : 'transparent', color: activeTab === tab ? 'white' : '#64748b' }}>
-              {tab === 'overview' ? '📊 Overview' : tab === 'providers' ? '⭐ Providers' : tab === 'users' ? '👥 Users' : tab === 'jobs' ? '📋 Jobs' : '💰 Payments'}
+              {tab === 'overview' ? '📊 Overview' : tab === 'providers' ? '⭐ Providers' : tab === 'users' ? '👥 Users' : tab === 'jobs' ? '📋 Jobs' : tab === 'buysell' ? '🛒 Buy & Sell' : '💰 Payments'}
             </button>
           ))}
         </div>
@@ -168,7 +171,7 @@ export default function AdminDashboard() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div style={{ backgroundColor: '#1e293b', borderRadius: '10px', padding: '20px', border: '1px solid #334155' }}>
                   <div style={{ fontWeight: '600', color: 'white', marginBottom: '16px', fontSize: '15px' }}>🕐 Recent Jobs</div>
-                  {jobs.slice(0, 5).map(job => (
+                  {regularJobs.slice(0, 5).map(job => (
                     <div key={job.id} style={{ padding: '10px 0', borderBottom: '1px solid #334155' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
@@ -262,9 +265,9 @@ export default function AdminDashboard() {
             {activeTab === 'jobs' && (
               <div style={{ backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155', overflow: 'hidden' }}>
                 <div style={{ padding: '16px 20px', borderBottom: '1px solid #334155' }}>
-                  <span style={{ fontWeight: '600', color: 'white' }}>All Jobs ({jobs.length})</span>
+                  <span style={{ fontWeight: '600', color: 'white' }}>All Jobs ({regularJobs.length})</span>
                 </div>
-                {jobs.map(job => (
+                {regularJobs.map(job => (
                   <div key={job.id} style={{ padding: '16px 20px', borderBottom: '1px solid #334155' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
@@ -279,6 +282,40 @@ export default function AdminDashboard() {
                     </div>
                     <div style={{ fontSize: '11px', color: '#475569', marginTop: '6px' }}>
                       {new Date(job.created_at).toLocaleString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Buy & Sell Tab */}
+            {activeTab === 'buysell' && (
+              <div style={{ backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155', overflow: 'hidden' }}>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #334155' }}>
+                  <span style={{ fontWeight: '600', color: 'white' }}>Buy & Sell Listings ({buySellListings.length})</span>
+                </div>
+                {buySellListings.length === 0 ? (
+                  <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No listings yet</div>
+                ) : buySellListings.map(listing => (
+                  <div key={listing.id} style={{ padding: '16px 20px', borderBottom: '1px solid #334155', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                    {listing.image_url && (
+                      <img src={listing.image_url} alt={listing.title} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
+                    )}
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <div style={{ fontSize: '15px', fontWeight: '500', color: '#e2e8f0' }}>{listing.title}</div>
+                          <div style={{ fontSize: '13px', color: '#64748b', marginTop: '2px' }}>{listing.city} · {listing.customer_name} · {listing.customer_email}</div>
+                          <div style={{ fontSize: '12px', color: '#475569', marginTop: '4px' }}>{listing.description}</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginLeft: '16px', flexShrink: 0 }}>
+                          <span style={{ fontWeight: '700', color: '#16a34a', fontSize: '18px' }}>{listing.budget}</span>
+                          <span style={{ backgroundColor: listing.status === 'open' ? '#1d4ed8' : '#166534', color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '12px' }}>{listing.status}</span>
+                        </div>
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#475569', marginTop: '6px' }}>
+                        {new Date(listing.created_at).toLocaleString()}
+                      </div>
                     </div>
                   </div>
                 ))}
