@@ -113,36 +113,25 @@ export default function Messages() {
   if (!identified) {
     return (
       <div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial', padding:'32px'}}>
-        <div style={{background:'white', borderRadius:'24px', padding:'48px', width:'100%', maxWidth:'440px'}}>
-          <a href="/jobs" style={{color:'#888', textDecoration:'none', fontSize:'14px'}}>← Back to Jobs</a>
-          <div style={{fontSize:'40px', margin:'16px 0 8px'}}>💬</div>
-          <h2 style={{color:'#1a1a2e', marginBottom:'4px'}}>Send a Message</h2>
-          <p style={{color:'#888', marginBottom:'8px'}}>Enviar un Mensaje</p>
-          <div style={{background:'#FFF3EE', borderRadius:'12px', padding:'16px', marginBottom:'24px'}}>
+        <div style={{background:'white', borderRadius:'24px', padding:'48px', width:'100%', maxWidth:'440px', textAlign:'center'}}>
+          <div style={{fontSize:'40px', margin:'0 0 16px'}}>🔒</div>
+          <h2 style={{color:'#1a1a2e', marginBottom:'8px'}}>Sign In Required</h2>
+          <p style={{color:'#888', marginBottom:'8px'}}>Inicia sesión para continuar</p>
+          <div style={{background:'#FFF3EE', borderRadius:'12px', padding:'16px', marginBottom:'24px', textAlign:'left'}}>
             <div style={{fontSize:'13px', fontWeight:'bold', color:'#FF6B35', marginBottom:'4px'}}>{job.category}</div>
             <div style={{fontSize:'15px', fontWeight:'bold', color:'#1a1a2e'}}>{job.title}</div>
             <div style={{fontSize:'13px', color:'#888'}}>📍 {job.city} · Posted by {job.customer_name}</div>
           </div>
-
-          <div style={{marginBottom:'16px'}}>
-            <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Your Name / Tu Nombre</label>
-            <input type="text" placeholder="Your name" value={senderName} onChange={e => setSenderName(e.target.value)} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
-          </div>
-
-          <div style={{marginBottom:'24px'}}>
-            <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Your Email / Tu Correo</label>
-            <input type="email" placeholder="you@email.com" value={senderEmail} onChange={e => setSenderEmail(e.target.value)} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
-          </div>
-
-          <button onClick={() => {
-            if (senderName && senderEmail) {
-              setIdentified(true)
-            } else {
-              alert('Please enter your name and email / Por favor ingresa tu nombre y correo')
-            }
-          }} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer'}}>
-            Continue to Chat →
-          </button>
+          <p style={{color:'#555', fontSize:'14px', marginBottom:'24px'}}>You need to be signed in to send messages. Please log in or create a free account to continue.</p>
+          <a href="/login" style={{display:'block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', textDecoration:'none', marginBottom:'12px'}}>
+            Sign In / Iniciar Sesión →
+          </a>
+          <a href="/signup-provider" style={{display:'block', background:'#1a1a2e', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', textDecoration:'none', marginBottom:'12px'}}>
+            Join as Provider / Unirse como Proveedor →
+          </a>
+          <a href="/jobs" style={{display:'block', color:'#888', padding:'12px', fontSize:'14px', textDecoration:'none'}}>
+            ← Back to Jobs
+          </a>
         </div>
       </div>
     )
