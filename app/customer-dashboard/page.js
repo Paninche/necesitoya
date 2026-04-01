@@ -218,6 +218,12 @@ function CustomerDashboardContent() {
                           {job.status === 'paid' && (
                             <span style={{ color: '#16a34a', fontWeight: '600', fontSize: '13px' }}>✅ Paid</span>
                           )}
+                          <button
+                            onClick={() => window.location.href = `/messages?job=${job.id}`}
+                            style={{ backgroundColor: '#1a1a2e', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', fontSize: '12px', fontWeight: '600', cursor: 'pointer', marginLeft: '8px' }}
+                          >
+                            💬 View Chat
+                          </button>
                         </div>
                       )}
                       <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '8px' }}>
