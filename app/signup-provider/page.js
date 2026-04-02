@@ -9,6 +9,7 @@ export default function ProviderSignup() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState([])
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   const serviceOptions = [
     { id: 'Hauling & Pickup', label: '🚛 Hauling & Pickup' },
@@ -44,6 +45,10 @@ export default function ProviderSignup() {
     }
     if (form.password.length < 6) {
       alert('Password must be at least 6 characters / La contraseña debe tener al menos 6 caracteres')
+      return
+    }
+    if (!agreedToTerms) {
+      alert('Please agree to the Terms of Service to continue. / Por favor acepta los Terminos de Servicio para continuar.')
       return
     }
     setLoading(true)
@@ -152,13 +157,20 @@ export default function ProviderSignup() {
             ))}
           </div>
         </div>
+        <div style={{display:'flex', alignItems:'flex-start', gap:'10px', marginBottom:'20px', cursor:'pointer'}} onClick={() => setAgreedToTerms(!agreedToTerms)}>
+          <div style={{width:'22px', height:'22px', borderRadius:'6px', border:'2px solid #FF6B35', backgroundColor: agreedToTerms ? '#FF6B35' : 'white', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:'2px'}}>
+            {agreedToTerms && <span style={{color:'white', fontSize:'13px', fontWeight:'bold'}}>✓</span>}
+          </div>
+          <p style={{color:'#555', fontSize:'12px', lineHeight:'1.5', margin:0}}>
+            I agree to the <a href="/terms" style={{color:'#FF6B35', fontWeight:'600'}}>Terms of Service</a> and confirm there is no tolerance for objectionable content or abusive behavior. / Acepto los <a href="/terms" style={{color:'#FF6B35', fontWeight:'600'}}>Terminos de Servicio</a> y confirmo que no se tolera contenido inapropiado.
+          </p>
+        </div>
         <button onClick={handleSubmit} disabled={loading} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer'}}>
           {loading ? 'Creating account...' : 'Join as Provider — Start Earning →'}
         </button>
         <p style={{textAlign:'center', color:'#888', fontSize:'12px', marginTop:'16px'}}>
           Already have an account? <a href="/login" style={{color:'#FF6B35', fontWeight:'bold'}}>Sign In →</a>
         </p>
-        <p style={{textAlign:'center', color:'#888', fontSize:'12px', marginTop:'8px'}}>By signing up you agree to our <a href="/terms" style={{color:'#FF6B35'}}>terms of service</a></p>
       </div>
     </main>
   )
