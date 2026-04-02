@@ -185,6 +185,42 @@ export async function POST(request) {
       })
     }
 
+    if (type === 'new_message') {
+      await resend.emails.send({
+        from: 'NecesitoYa <hello@necesitoya.app>',
+        to: customerEmail,
+        subject: `💬 New message about "${job.title}"`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #1a1a2e, #0f3460); padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
+              <h1 style="color: white; font-size: 28px; margin: 0;">NecesitoYa</h1>
+              <p style="color: #FF6B35; margin: 8px 0 0; font-weight: bold;">America's Bilingual Local Services App</p>
+            </div>
+            <div style="background: white; padding: 32px; border-radius: 0 0 12px 12px; border: 1px solid #e5e7eb;">
+              <h2 style="color: #1a1a2e; margin-bottom: 8px;">You have a new message! 💬</h2>
+              <p style="color: #4b5563;">Hi ${customerName}, ${providerName} sent you a message about your job:</p>
+              <div style="background: #f0f9ff; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                <div style="font-weight: 600; color: #1a1a2e; font-size: 16px;">${job.title}</div>
+                <div style="color: #6b7280; font-size: 14px; margin-top: 4px;">${job.category} · ${job.city}</div>
+              </div>
+              <div style="background: #f9fafb; border-radius: 8px; padding: 16px; margin: 20px 0; border-left: 4px solid #FF6B35;">
+                <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Message from ${providerName}:</div>
+                <div style="font-size: 15px; color: #1a1a2e;">${job.message}</div>
+              </div>
+              <a href="https://necesitoya.app/messages?job=${job.id}"
+                style="display: block; background: linear-gradient(135deg, #FF6B35, #F4A261); color: white; text-align: center; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px; margin: 24px 0;">
+                Reply to Message / Responder →
+              </a>
+              <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 24px;">
+                NecesitoYa · America's Bilingual Local Services App<br>
+                No platform fees for customers · Sin cargos para clientes
+              </p>
+            </div>
+          </div>
+        `,
+      });
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Email error:', error);
