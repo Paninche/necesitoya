@@ -18,6 +18,7 @@ function CustomerDashboardContent() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('jobs');
+  const [jobMessages, setJobMessages] = useState({});
 
   useEffect(() => {
     const saved = localStorage.getItem('ny_customer');
@@ -64,6 +65,23 @@ function CustomerDashboardContent() {
 
     setJobs(jobsData || []);
     setPayments(paymentsData || []);
+
+    // Check which jobs have messages from providers
+    if (jobsData && jobsData.length > 0) {
+      const msgMap = {};
+      await Promise.all(jobsData.map(async (job) => {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?job_id=eq.${job.id}&select=id,sender_email&limit=1`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const msgs = await res.json();
+        if (msgs && msgs.length > 0) {
+          const providerMsg = msgs.find(m => m.sender_email !== customerEmail);
+          msgMap[job.id] = providerMsg ? providerMsg.sender_email : msgs[0].sender_email;
+        }
+      }));
+      setJobMessages(msgMap);
+    }
+
     setLoading(false);
   }
 
@@ -178,6 +196,18 @@ function CustomerDashboardContent() {
                         </div>
                       </div>
                       <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>{job.description}</div>
+                      {!job.provider_email && jobMessages[job.id] && (
+                        <div style={{ backgroundColor: '#FFF3EE', borderRadius: '6px', padding: '10px 12px', marginBottom: '8px', borderLeft: '3px solid #FF6B35' }}>
+                          <div style={{ color: '#FF6B35', fontWeight: '600', fontSize: '13px' }}>💬 Someone wants to help!</div>
+                          <div style={{ color: '#888', fontSize: '11px', marginTop: '2px' }}>Click View Chat to see their message and accept them</div>
+                          <button
+                            onClick={() => window.location.href = `/messages?job=${job.id}`}
+                            style={{ backgroundColor: '#1a1a2e', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', fontSize: '12px', fontWeight: '600', cursor: 'pointer', marginTop: '8px' }}
+                          >
+                            💬 View Chat
+                          </button>
+                        </div>
+                      )}
                       {job.provider_email && (
                         <div style={{ fontSize: '13px', color: '#6b7280', backgroundColor: '#f0f9ff', padding: '8px 12px', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span>Provider: {job.provider_email}</span>
