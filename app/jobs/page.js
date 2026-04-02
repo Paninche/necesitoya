@@ -59,6 +59,21 @@ export default function JobsBoard() {
     }
   }
 
+  const handleReport = async (job, reason) => {
+    await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'job_reported',
+        customerEmail: 'hello@necesitoya.app',
+        customerName: 'Admin',
+        providerName: 'User Report',
+        job: { id: job.id, title: job.title, category: job.category, city: job.city, message: `Job reported as ${reason}. Job ID: ${job.id} - Title: ${job.title} - Posted by: ${job.customer_email}` }
+      })
+    })
+    alert('Thank you for your report. We will review this content within 24 hours.\nGracias por tu reporte. Revisaremos este contenido en 24 horas.')
+  }
+
   const assignProvider = async (job, providerData) => {
     setAssigning(job.id)
     try {
@@ -261,7 +276,16 @@ export default function JobsBoard() {
                   </div>
                 )}
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                  <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
+                  <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
+                    <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
+                    <select onChange={(e) => { if (e.target.value) { handleReport(job, e.target.value); e.target.value = '' } }}
+                      style={{fontSize:'12px', color:'#9ca3af', border:'none', background:'transparent', cursor:'pointer', outline:'none'}}>
+                      <option value="">🚩 Report</option>
+                      <option value="inappropriate">Inappropriate / Inapropiado</option>
+                      <option value="spam">Spam</option>
+                    </select>
+                  </div>
+                  <div>
                   {job.status === 'open' ? (
                     <button onClick={() => handleICanHelp(job)} disabled={assigning === job.id}
                       style={{background: assigning === job.id ? '#ccc' : 'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'14px', cursor: assigning === job.id ? 'not-allowed' : 'pointer'}}>
@@ -270,6 +294,7 @@ export default function JobsBoard() {
                   ) : (
                     <span style={{fontSize:'13px', color:'#16a34a', fontWeight:'600'}}>✓ Provider assigned</span>
                   )}
+                  </div>
                 </div>
               </div>
             ))}
