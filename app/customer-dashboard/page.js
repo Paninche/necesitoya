@@ -158,9 +158,9 @@ function CustomerDashboardContent() {
         </div>
 
         <div style={{ display: 'flex', gap: '4px', backgroundColor: 'white', borderRadius: '10px', padding: '4px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', width: 'fit-content' }}>
-          {['jobs', 'payments'].map(tab => (
+          {['jobs', 'payments', 'profile'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: '500', backgroundColor: activeTab === tab ? '#2563eb' : 'transparent', color: activeTab === tab ? 'white' : '#6b7280' }}>
-              {tab === 'jobs' ? '📋 My Jobs' : '💰 Payments'}
+              {tab === 'jobs' ? '📋 My Jobs' : tab === 'payments' ? '💰 Payments' : '👤 Profile'}
             </button>
           ))}
         </div>
@@ -264,6 +264,44 @@ function CustomerDashboardContent() {
                 })}
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'profile' && (
+          <div style={{ backgroundColor: 'white', borderRadius: '10px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1a1a2e', marginBottom: '20px' }}>Your Profile / Tu Perfil</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+              {[
+                { label: 'Full Name / Nombre', value: customer.full_name },
+                { label: 'Email', value: customer.email },
+                { label: 'Phone / Telefono', value: customer.phone || 'Not set' },
+                { label: 'City / Ciudad', value: customer.city || 'Not set' },
+              ].map(item => (
+                <div key={item.label} style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '4px' }}>{item.label}</div>
+                  <div style={{ fontSize: '15px', fontWeight: '500', color: '#1a1a2e' }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={async () => {
+                if (confirm('Are you sure? This will permanently delete your account and all data. This cannot be undone.\n\n¿Estás seguro? Esto eliminará tu cuenta permanentemente.')) {
+                  const sbEmail = localStorage.getItem('sb_email');
+                  await fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(sbEmail)}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                  });
+                  localStorage.removeItem('ny_customer');
+                  localStorage.removeItem('sb_email');
+                  localStorage.removeItem('sb_token');
+                  localStorage.removeItem('sb_user_id');
+                  window.location.href = '/';
+                }
+              }}
+              style={{ width: '100%', backgroundColor: '#fef2f2', border: '1px solid #ef4444', color: '#ef4444', padding: '14px', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
+            >
+              🗑️ Delete Account / Eliminar Cuenta
+            </button>
           </div>
         )}
 
