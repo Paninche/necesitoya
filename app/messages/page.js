@@ -63,7 +63,7 @@ export default function Messages() {
   }
 
   const handleAcceptProvider = async () => {
-    const providerMsg = messages.find(m => m.sender_email !== senderEmail)
+    const providerMsg = [...messages].reverse().find(m => m.sender_email !== senderEmail)
     if (!providerMsg) return
     const actualProviderEmail = providerMsg.sender_email
     const actualProviderName = providerMsg.sender_name
