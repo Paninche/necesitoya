@@ -1,6 +1,9 @@
 'use client'
 import { useState, useEffect } from 'react'
 
+const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co'
+const APIKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
+
 export default function Messages() {
   const [jobId, setJobId] = useState(null)
   const [job, setJob] = useState(null)
@@ -11,8 +14,9 @@ export default function Messages() {
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [identified, setIdentified] = useState(false)
-
-  const APIKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
+  const [isCustomer, setIsCustomer] = useState(false)
+  const [jobStatus, setJobStatus] = useState('open')
+  const [accepting, setAccepting] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -22,7 +26,6 @@ export default function Messages() {
       fetchJob(id)
       fetchMessages(id)
     }
-    // Auto-identify from localStorage
     const savedProvider = localStorage.getItem('ny_provider')
     const savedCustomer = localStorage.getItem('ny_customer')
     if (savedProvider) {
@@ -35,30 +38,66 @@ export default function Messages() {
       setSenderName(c.full_name || c.customer_name || c.email)
       setSenderEmail(c.email)
       setIdentified(true)
+      setIsCustomer(true)
     }
   }, [])
 
   const fetchJob = async (id) => {
-    const res = await fetch(`https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/jobs?id=eq.${id}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/jobs?id=eq.${id}`, {
       headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` }
     })
     const data = await res.json()
-    if (data[0]) setJob(data[0])
+    if (data[0]) {
+      setJob(data[0])
+      setJobStatus(data[0].status)
+    }
     setLoading(false)
   }
 
   const fetchMessages = async (id) => {
-    const res = await fetch(`https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/messages?job_id=eq.${id}&order=created_at.asc`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?job_id=eq.${id}&order=created_at.asc`, {
       headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` }
     })
     const data = await res.json()
     setMessages(data)
   }
 
+  const handleAcceptProvider = async () => {
+    const providerMsg = messages.find(m => m.sender_email !== senderEmail)
+    if (!providerMsg) return
+    const actualProviderEmail = providerMsg.sender_email
+    const actualProviderName = providerMsg.sender_name
+
+    if (!confirm(`Accept ${actualProviderName} for this job?`)) return
+
+    setAccepting(true)
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/jobs?id=eq.${jobId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': APIKEY,
+        'Authorization': `Bearer ${APIKEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        status: 'accepted',
+        provider_email: actualProviderEmail,
+        provider_name: actualProviderName
+      })
+    })
+    if (res.ok) {
+      setJobStatus('accepted')
+      alert('✅ Provider accepted! The job has been assigned.')
+    } else {
+      alert('Error accepting provider. Please try again.')
+    }
+    setAccepting(false)
+  }
+
   const sendMessage = async () => {
     if (!newMessage.trim()) return
     setSending(true)
-    const res = await fetch('https://tjtagdqdhgkmgmuozhlc.supabase.co/rest/v1/messages', {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -146,6 +185,28 @@ export default function Messages() {
         <h2 style={{color:'white', margin:'8px 0 4px', fontSize:'20px'}}>{job.title}</h2>
         <p style={{color:'#FF6B35', fontSize:'13px', margin:0}}>{job.category} · 📍 {job.city}</p>
       </div>
+
+      {/* Accept Provider Banner */}
+      {isCustomer && jobStatus === 'open' && messages.some(m => m.sender_email !== senderEmail) && (
+        <div
+          onClick={!accepting ? handleAcceptProvider : undefined}
+          style={{background:'#16a34a', padding:'14px 32px', textAlign:'center', cursor:'pointer'}}
+        >
+          <div style={{color:'white', fontWeight:'bold', fontSize:'15px'}}>
+            {accepting ? 'Accepting...' : '✅ Accept this Provider for the Job'}
+          </div>
+          <div style={{color:'rgba(255,255,255,0.8)', fontSize:'12px', marginTop:'2px'}}>
+            Click to assign them and proceed to payment
+          </div>
+        </div>
+      )}
+
+      {/* Accepted Banner */}
+      {jobStatus === 'accepted' && (
+        <div style={{background:'#dcfce7', padding:'12px 32px', textAlign:'center'}}>
+          <div style={{color:'#16a34a', fontWeight:'600', fontSize:'14px'}}>✅ Provider Accepted — Job Assigned</div>
+        </div>
+      )}
 
       {/* Messages */}
       <div style={{flex:1, padding:'24px 32px', maxWidth:'700px', margin:'0 auto', width:'100%', boxSizing:'border-box'}}>
