@@ -285,6 +285,25 @@ function ProviderDashboardContent() {
                 {provider.stripe_onboarding_complete ? '✅ Connected / Conectada' : '⚠️ Not connected / No conectada'}
               </div>
             </div>
+            <button
+              onClick={async () => {
+                if (confirm('Are you sure? This will permanently delete your account and all data. This cannot be undone.\n\n¿Estás seguro? Esto eliminará tu cuenta permanentemente.')) {
+                  const sbEmail = localStorage.getItem('sb_email');
+                  await fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(sbEmail)}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                  });
+                  localStorage.removeItem('ny_provider');
+                  localStorage.removeItem('sb_email');
+                  localStorage.removeItem('sb_token');
+                  localStorage.removeItem('sb_user_id');
+                  window.location.href = '/';
+                }
+              }}
+              style={{ marginTop: '20px', width: '100%', backgroundColor: '#fef2f2', border: '1px solid #ef4444', color: '#ef4444', padding: '14px', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
+            >
+              🗑️ Delete Account / Eliminar Cuenta
+            </button>
           </div>
         )}
       </div>
