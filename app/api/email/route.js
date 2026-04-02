@@ -221,6 +221,29 @@ export async function POST(request) {
       });
     }
 
+    if (type === 'job_reported') {
+      await resend.emails.send({
+        from: 'NecesitoYa <hello@necesitoya.app>',
+        to: 'hello@necesitoya.app',
+        subject: `🚩 Job Reported: "${job.title}"`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #ef4444; padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
+              <h1 style="color: white; font-size: 28px; margin: 0;">🚩 Content Report</h1>
+            </div>
+            <div style="background: white; padding: 32px; border-radius: 0 0 12px 12px; border: 1px solid #e5e7eb;">
+              <h2 style="color: #1a1a2e;">A job has been reported</h2>
+              <p style="color: #4b5563;">${job.message}</p>
+              <p style="color: #4b5563;">Please review and take action within 24 hours.</p>
+              <a href="https://necesitoya.app/admin" style="display: block; background: #1a1a2e; color: white; text-align: center; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 24px 0;">
+                Go to Admin →
+              </a>
+            </div>
+          </div>
+        `,
+      });
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Email error:', error);
