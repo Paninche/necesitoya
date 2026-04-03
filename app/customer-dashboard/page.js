@@ -192,7 +192,7 @@ function CustomerDashboardContent() {
                           <span style={{ backgroundColor: statusStyle.bg, color: statusStyle.text, padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '500' }}>
                             {job.status}
                           </span>
-                          <span style={{ fontWeight: '700', color: '#1a1a2e' }}>${job.budget}</span>
+                          <span style={{ fontWeight: '700', color: '#1a1a2e' }}>{job.budget?.startsWith('$') ? job.budget : `$${job.budget}`}</span>
                         </div>
                       </div>
                       <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>{job.description}</div>

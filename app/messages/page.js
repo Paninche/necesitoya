@@ -16,6 +16,7 @@ export default function Messages() {
   const [sending, setSending] = useState(false)
   const [identified, setIdentified] = useState(false)
   const [isCustomer, setIsCustomer] = useState(false)
+  const [isProvider, setIsProvider] = useState(false)
   const [jobStatus, setJobStatus] = useState('open')
   const [accepting, setAccepting] = useState(false)
 
@@ -26,7 +27,7 @@ export default function Messages() {
 
     if (id) {
       setJobId(id)
-      fetchJob(id, providerEmailParam)
+      fetchJob(id)
     }
 
     const savedProvider = localStorage.getItem('ny_provider')
@@ -37,6 +38,7 @@ export default function Messages() {
       setSenderName(p.full_name || p.email)
       setSenderEmail(p.email)
       setIdentified(true)
+      setIsProvider(true)
     } else if (savedCustomer) {
       const c = JSON.parse(savedCustomer)
       setSenderName(c.full_name || c.customer_name || c.email)
@@ -47,7 +49,7 @@ export default function Messages() {
     }
   }, [])
 
-  const fetchJob = async (id, providerEmailParam) => {
+  const fetchJob = async (id) => {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/jobs?id=eq.${id}`, {
       headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` }
     })
@@ -62,9 +64,7 @@ export default function Messages() {
   const fetchMessages = async (id, sender, recipient) => {
     const s = sender || senderEmail
     const r = recipient || recipientEmail
-
     if (!s || !r) return
-
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/messages?job_id=eq.${id}&or=(and(sender_email.eq.${encodeURIComponent(s)},recipient_email.eq.${encodeURIComponent(r)}),and(sender_email.eq.${encodeURIComponent(r)},recipient_email.eq.${encodeURIComponent(s)}))&order=created_at.asc`,
       { headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` } }
@@ -140,6 +140,25 @@ export default function Messages() {
     })
 
     if (res.ok) {
+      // Send email notification to recipient
+      fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'new_message',
+          customerEmail: recipient,
+          customerName: recipient?.split('@')[0],
+          providerName: senderName,
+          job: {
+            id: jobId,
+            title: job?.title || '',
+            category: job?.category || '',
+            city: job?.city || '',
+            message: newMessage.trim()
+          }
+        })
+      }).catch(() => {})
+
       setNewMessage('')
       fetchMessages(jobId, senderEmail, recipient)
     }
@@ -175,7 +194,7 @@ export default function Messages() {
     )
   }
 
-  if (!identified) {
+  if (!identified || (!isProvider && !isCustomer)) {
     return (
       <div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial', padding:'32px'}}>
         <div style={{background:'white', borderRadius:'24px', padding:'48px', width:'100%', maxWidth:'440px', textAlign:'center'}}>
@@ -187,7 +206,7 @@ export default function Messages() {
             <div style={{fontSize:'15px', fontWeight:'bold', color:'#1a1a2e'}}>{job.title}</div>
             <div style={{fontSize:'13px', color:'#888'}}>📍 {job.city} · Posted by {job.customer_name}</div>
           </div>
-          <p style={{color:'#555', fontSize:'14px', marginBottom:'24px'}}>You need to be signed in to send messages. Please log in or create a free account to continue.</p>
+          <p style={{color:'#555', fontSize:'14px', marginBottom:'24px'}}>You need to be signed in as a provider to send messages.</p>
           <a href="/login" style={{display:'block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', textDecoration:'none', marginBottom:'12px'}}>
             Sign In / Iniciar Sesión →
           </a>
@@ -205,19 +224,15 @@ export default function Messages() {
   return (
     <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial', display:'flex', flexDirection:'column'}}>
 
-      {/* Header */}
       <div style={{background:'linear-gradient(135deg,#1a1a2e,#0f3460)', padding:'24px 32px'}}>
         <a href="/jobs" style={{color:'rgba(255,255,255,0.5)', textDecoration:'none', fontSize:'14px'}}>← Back to Jobs</a>
         <h2 style={{color:'white', margin:'8px 0 4px', fontSize:'20px'}}>{job.title}</h2>
         <p style={{color:'#FF6B35', fontSize:'13px', margin:0}}>{job.category} · 📍 {job.city}</p>
       </div>
 
-      {/* Accept Provider Banner — only show to customer when job is open AND there are messages from provider */}
       {isCustomer && jobStatus === 'open' && messages.some(m => m.sender_email !== senderEmail) && (
-        <div
-          onClick={!accepting ? handleAcceptProvider : undefined}
-          style={{background:'#16a34a', padding:'14px 32px', textAlign:'center', cursor:'pointer'}}
-        >
+        <div onClick={!accepting ? handleAcceptProvider : undefined}
+          style={{background:'#16a34a', padding:'14px 32px', textAlign:'center', cursor:'pointer'}}>
           <div style={{color:'white', fontWeight:'bold', fontSize:'15px'}}>
             {accepting ? 'Accepting...' : '✅ Accept this Provider for the Job'}
           </div>
@@ -227,14 +242,12 @@ export default function Messages() {
         </div>
       )}
 
-      {/* Accepted Banner */}
       {jobStatus === 'accepted' && (
         <div style={{background:'#dcfce7', padding:'12px 32px', textAlign:'center'}}>
           <div style={{color:'#16a34a', fontWeight:'600', fontSize:'14px'}}>✅ Provider Accepted — Job Assigned</div>
         </div>
       )}
 
-      {/* Messages */}
       <div style={{flex:1, padding:'24px 32px', maxWidth:'700px', margin:'0 auto', width:'100%', boxSizing:'border-box'}}>
         {messages.length === 0 ? (
           <div style={{textAlign:'center', padding:'40px', color:'#888'}}>
@@ -257,17 +270,14 @@ export default function Messages() {
         )}
       </div>
 
-      {/* Message Input */}
       <div style={{background:'white', padding:'16px 32px', borderTop:'1px solid #F0EDE8', display:'flex', gap:'12px', alignItems:'center'}}>
-        <input
-          type="text"
-          placeholder="Type a message... / Escribe un mensaje..."
-          value={newMessage}
-          onChange={e => setNewMessage(e.target.value)}
+        <input type="text" placeholder="Type a message... / Escribe un mensaje..."
+          value={newMessage} onChange={e => setNewMessage(e.target.value)}
           onKeyPress={e => e.key === 'Enter' && sendMessage()}
           style={{flex:1, padding:'12px 16px', borderRadius:'24px', border:'2px solid #F0EDE8', fontSize:'16px', outline:'none'}}
         />
-        <button onClick={sendMessage} disabled={sending} style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'12px 24px', borderRadius:'24px', fontWeight:'bold', cursor:'pointer', fontSize:'15px'}}>
+        <button onClick={sendMessage} disabled={sending}
+          style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'12px 24px', borderRadius:'24px', fontWeight:'bold', cursor:'pointer', fontSize:'15px'}}>
           {sending ? '...' : 'Send →'}
         </button>
       </div>
