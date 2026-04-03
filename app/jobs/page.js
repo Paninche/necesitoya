@@ -14,11 +14,7 @@ export default function JobsBoard() {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('All')
-  const [assigning, setAssigning] = useState(null)
   const [provider, setProvider] = useState(null)
-  const [showProviderModal, setShowProviderModal] = useState(false)
-  const [selectedJob, setSelectedJob] = useState(null)
-  const [providerEmail, setProviderEmail] = useState('')
   const [stateFilter, setStateFilter] = useState('All')
   const [cityFilter, setCityFilter] = useState('All')
   const [blockedEmails, setBlockedEmails] = useState([])
@@ -57,12 +53,13 @@ export default function JobsBoard() {
       alert('This job has already been taken. / Este trabajo ya fue tomado.')
       return
     }
-    setSelectedJob(job)
-    if (provider) {
-      assignProvider(job, provider)
-    } else {
-      setShowProviderModal(true)
+    // Must be a registered provider to help
+    if (!provider) {
+      window.location.href = '/login'
+      return
     }
+    // Go to messages — do NOT auto-assign
+    window.location.href = `/messages?job=${job.id}`
   }
 
   const handleReport = async (job, reason) => {
@@ -85,13 +82,9 @@ export default function JobsBoard() {
       `Block this user and hide their posts?\n¿Bloquear este usuario y ocultar sus publicaciones?\n\nPosted by: ${job.customer_name}`
     )
     if (!confirmed) return
-
-    // Add to local blocked list — removes from feed instantly
     const updated = [...blockedEmails, job.customer_email]
     setBlockedEmails(updated)
     localStorage.setItem('ny_blocked', JSON.stringify(updated))
-
-    // Notify developer
     await fetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -103,70 +96,7 @@ export default function JobsBoard() {
         job: { id: job.id, title: job.title, category: job.category, city: job.city, message: `USER BLOCKED. Job ID: ${job.id} - Title: ${job.title} - Blocked user email: ${job.customer_email} - Posted by: ${job.customer_name}` }
       })
     })
-
     alert('User blocked. Their posts have been removed from your feed.\nUsuario bloqueado. Sus publicaciones han sido eliminadas de tu feed.')
-  }
-
-  const assignProvider = async (job, providerData) => {
-    setAssigning(job.id)
-    try {
-      const { error } = await supabase
-        .from('jobs')
-        .update({
-          provider_id: providerData.id || null,
-          provider_email: providerData.email,
-          status: 'pending',
-          accepted_at: new Date().toISOString(),
-        })
-        .eq('id', job.id)
-
-      if (error) throw error
-
-      await fetch('/api/email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'provider_accepted',
-          job,
-          providerName: providerData.full_name || providerData.email,
-          providerEmail: providerData.email,
-          customerEmail: job.customer_email,
-          customerName: job.customer_name,
-        }),
-      })
-
-      setJobs(prev => prev.map(j =>
-        j.id === job.id
-          ? { ...j, status: 'accepted', provider_email: providerData.email }
-          : j
-      ))
-
-      localStorage.setItem('ny_provider', JSON.stringify(providerData))
-      setProvider(providerData)
-      setShowProviderModal(false)
-      window.location.href = `/messages?job=${job.id}`
-    } catch (e) {
-      console.error(e)
-      alert('Error accepting job. Please try again. / Error al aceptar trabajo.')
-    }
-    setAssigning(null)
-  }
-
-  const handleProviderLogin = async (e) => {
-    e.preventDefault()
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', providerEmail.toLowerCase())
-      .eq('type', 'provider')
-      .single()
-
-    if (data) {
-      assignProvider(selectedJob, data)
-    } else {
-      const guestProvider = { email: providerEmail.toLowerCase(), full_name: providerEmail.split('@')[0] }
-      assignProvider(selectedJob, guestProvider)
-    }
   }
 
   const availableStates = ['All', ...new Set(jobs.map(j => j.state).filter(Boolean))]
@@ -195,33 +125,6 @@ export default function JobsBoard() {
 
   return (
     <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial'}}>
-
-      {showProviderModal && (
-        <div style={{position:'fixed', inset:0, backgroundColor:'rgba(0,0,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:'20px'}}>
-          <div style={{backgroundColor:'white', borderRadius:'16px', padding:'32px', maxWidth:'400px', width:'100%'}}>
-            <h3 style={{fontSize:'20px', fontWeight:'700', color:'#1a1a2e', marginBottom:'8px'}}>Accept This Job</h3>
-            <p style={{color:'#6b7280', fontSize:'14px', marginBottom:'24px'}}>
-              Enter your email to accept: <strong>{selectedJob?.title}</strong>
-            </p>
-            <form onSubmit={handleProviderLogin}>
-              <input
-                type="email"
-                value={providerEmail}
-                onChange={(e) => setProviderEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
-                style={{width:'100%', padding:'10px 14px', border:'1px solid #d1d5db', borderRadius:'8px', fontSize:'14px', boxSizing:'border-box', marginBottom:'12px'}}
-              />
-              <button type="submit" style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px', borderRadius:'8px', fontSize:'16px', fontWeight:'600', border:'none', cursor:'pointer', marginBottom:'8px'}}>
-                Accept Job / Aceptar Trabajo ✓
-              </button>
-              <button type="button" onClick={() => setShowProviderModal(false)} style={{width:'100%', backgroundColor:'white', color:'#6b7280', padding:'10px', borderRadius:'8px', fontSize:'14px', border:'1px solid #e5e7eb', cursor:'pointer'}}>
-                Cancel / Cancelar
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
 
       <div style={{background:'linear-gradient(135deg,#1a1a2e,#0f3460)', padding:'40px 32px 30px'}}>
         <a href="/" style={{color:'rgba(255,255,255,0.5)', textDecoration:'none', fontSize:'14px'}}>← Home</a>
@@ -317,9 +220,9 @@ export default function JobsBoard() {
                   </div>
                   <div>
                     {job.status === 'open' ? (
-                      <button onClick={() => handleICanHelp(job)} disabled={assigning === job.id}
-                        style={{background: assigning === job.id ? '#ccc' : 'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'14px', cursor: assigning === job.id ? 'not-allowed' : 'pointer'}}>
-                        {assigning === job.id ? 'Accepting...' : 'I Can Help / Puedo Ayudar →'}
+                      <button onClick={() => handleICanHelp(job)}
+                        style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'14px', cursor:'pointer'}}>
+                        I Can Help / Puedo Ayudar →
                       </button>
                     ) : (
                       <span style={{fontSize:'13px', color:'#16a34a', fontWeight:'600'}}>✓ Provider assigned</span>
