@@ -53,12 +53,11 @@ export default function JobsBoard() {
       alert('This job has already been taken. / Este trabajo ya fue tomado.')
       return
     }
-    // Must be a registered provider to help
     if (!provider) {
+      localStorage.setItem('redirect_job_web', job.id)
       window.location.href = '/login'
       return
     }
-    // Go to messages — do NOT auto-assign
     window.location.href = `/messages?job=${job.id}`
   }
 

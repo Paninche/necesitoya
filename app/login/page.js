@@ -19,10 +19,7 @@ export default function Login() {
     try {
       const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-        },
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
         body: JSON.stringify({ email: form.email, password: form.password })
       })
       const data = await res.json()
@@ -33,26 +30,29 @@ export default function Login() {
       }
 
       const userEmail = data.user.email
-
-      // Save all session data including email
       localStorage.setItem('sb_token', data.access_token)
       localStorage.setItem('sb_user_id', data.user.id)
       localStorage.setItem('sb_email', userEmail)
 
-      // Look up user in users table by email
       const userRes = await fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(userEmail)}&select=*`, {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
       })
       const users = await userRes.json()
 
       if (users && users.length > 0) {
         const user = users[0]
+
+        // Check for redirect job — if provider was trying to view a job
+        const redirectJob = localStorage.getItem('redirect_job_web')
+        localStorage.removeItem('redirect_job_web')
+
         if (user.type === 'provider') {
           localStorage.setItem('ny_provider', JSON.stringify(user))
-          window.location.href = '/provider-dashboard'
+          if (redirectJob) {
+            window.location.href = `/messages?job=${redirectJob}`
+          } else {
+            window.location.href = '/provider-dashboard'
+          }
         } else {
           localStorage.setItem('ny_customer', JSON.stringify(user))
           window.location.href = '/customer-dashboard'
@@ -82,32 +82,21 @@ export default function Login() {
 
         <div style={{marginBottom:'20px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Email</label>
-          <input
-            type="email"
-            placeholder="you@email.com"
-            value={form.email}
+          <input type="email" placeholder="you@email.com" value={form.email}
             onChange={e => setForm({...form, email: e.target.value})}
-            style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}
-          />
+            style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
 
         <div style={{marginBottom:'28px'}}>
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Password / Contraseña</label>
-          <input
-            type="password"
-            placeholder="••••••••"
-            value={form.password}
+          <input type="password" placeholder="••••••••" value={form.password}
             onChange={e => setForm({...form, password: e.target.value})}
             onKeyDown={e => e.key === 'Enter' && handleLogin()}
-            style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}
-          />
+            style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
 
-        <button
-          onClick={handleLogin}
-          disabled={loading}
-          style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer', marginBottom:'16px'}}
-        >
+        <button onClick={handleLogin} disabled={loading}
+          style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer', marginBottom:'16px'}}>
           {loading ? 'Signing in...' : 'Sign In / Iniciar Sesión →'}
         </button>
 

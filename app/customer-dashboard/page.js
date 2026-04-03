@@ -131,6 +131,7 @@ function CustomerDashboardContent() {
           <button onClick={() => router.push('/post-job')} style={{ backgroundColor: '#2563eb', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: '600' }}>
             + Post Job
           </button>
+          <a href="/" style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none', border: '1px solid #4b5563', padding: '6px 12px', borderRadius: '6px' }}>🏠 Home</a>
           <button onClick={handleLogout} style={{ backgroundColor: 'transparent', border: '1px solid #4b5563', color: '#94a3b8', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', cursor: 'pointer' }}>
             Logout
           </button>

@@ -124,6 +124,7 @@ function ProviderDashboardContent() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <span style={{ fontSize: '14px', color: '#94a3b8' }}>👋 {provider.full_name}</span>
+          <a href="/" style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none', border: '1px solid #4b5563', padding: '6px 12px', borderRadius: '6px' }}>🏠 Home</a>
           <button onClick={handleLogout} style={{ backgroundColor: 'transparent', border: '1px solid #4b5563', color: '#94a3b8', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', cursor: 'pointer' }}>
             Logout
           </button>
@@ -199,7 +200,7 @@ function ProviderDashboardContent() {
                         <span style={{ backgroundColor: job.status === 'paid' ? '#dcfce7' : job.status === 'accepted' ? '#dbeafe' : '#f3f4f6', color: job.status === 'paid' ? '#16a34a' : job.status === 'accepted' ? '#2563eb' : '#6b7280', padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '500' }}>
                           {job.status}
                         </span>
-                        <span style={{ fontWeight: '700', color: '#16a34a' }}>${job.budget}</span>
+                        <span style={{ fontWeight: '700', color: '#16a34a' }}>{job.budget?.startsWith('$') ? job.budget : `$${job.budget}`}</span>
                       </div>
                     </div>
                     <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '8px' }}>{job.description}</div>

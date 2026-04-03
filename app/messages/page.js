@@ -230,7 +230,7 @@ export default function Messages() {
         <p style={{color:'#FF6B35', fontSize:'13px', margin:0}}>{job.category} · 📍 {job.city}</p>
       </div>
 
-      {isCustomer && jobStatus === 'open' && messages.some(m => m.sender_email !== senderEmail) && (
+      {isCustomer && (jobStatus === 'open' || jobStatus === 'pending') && messages.some(m => m.sender_email !== senderEmail) && (
         <div onClick={!accepting ? handleAcceptProvider : undefined}
           style={{background:'#16a34a', padding:'14px 32px', textAlign:'center', cursor:'pointer'}}>
           <div style={{color:'white', fontWeight:'bold', fontSize:'15px'}}>
