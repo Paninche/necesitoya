@@ -30,10 +30,24 @@ export default function PostJob() {
   const [isProvider, setIsProvider] = useState(false)
 
   useEffect(() => {
-    const saved = localStorage.getItem('ny_provider')
-    if (saved) setIsProvider(true)
+    const savedProvider = localStorage.getItem('ny_provider')
+    if (savedProvider) { setIsProvider(true); return }
+
     const params = new URLSearchParams(window.location.search)
-    if (params.get('type') === 'customer') setUserType('customer')
+    if (params.get('type') === 'customer') { setUserType('customer'); return }
+
+    // If logged in as customer, skip the selector
+    const savedCustomer = localStorage.getItem('ny_customer')
+    if (savedCustomer) {
+      const customer = JSON.parse(savedCustomer)
+      setUserType('customer')
+      setForm(prev => ({
+        ...prev,
+        customer_name: customer.full_name || '',
+        customer_email: customer.email || '',
+        customer_phone: customer.phone || ''
+      }))
+    }
   }, [])
 
   const categories = [
@@ -79,7 +93,6 @@ export default function PostJob() {
 
       if (error) throw error
 
-      // Send customer confirmation email
       await fetch('/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -91,7 +104,6 @@ export default function PostJob() {
         }),
       })
 
-      // Notify ALL providers — not just category match since services field may not match exactly
       const res = await fetch(`${SUPABASE_URL}/rest/v1/users?type=eq.provider&select=email,full_name,services`, {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
       })
@@ -228,9 +240,7 @@ export default function PostJob() {
         </div>
 
         <div style={{marginBottom:'20px'}}>
-          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>
-            Budget / Presupuesto (optional)
-          </label>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>Budget / Presupuesto (optional)</label>
           <input type="text" placeholder="e.g. $50 - $100" value={form.budget} onChange={e => setForm({...form, budget: e.target.value})} style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'2px solid #F0EDE8', fontSize:'16px', boxSizing:'border-box', outline:'none'}}/>
         </div>
 
@@ -246,9 +256,7 @@ export default function PostJob() {
         </div>
 
         <div style={{marginBottom:'32px'}}>
-          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>
-            📷 Add a Photo (optional) / Agregar Foto
-          </label>
+          <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'6px', fontSize:'14px'}}>📷 Add a Photo (optional) / Agregar Foto</label>
           <p style={{color:'#888', fontSize:'12px', marginBottom:'10px'}}>Help providers understand the job better</p>
           <input type="file" accept="image/*" onChange={handleImageChange} style={{width:'100%', padding:'12px', borderRadius:'12px', border:'2px dashed #F0EDE8', fontSize:'14px', boxSizing:'border-box', cursor:'pointer'}}/>
           {imagePreview && (

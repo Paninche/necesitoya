@@ -7,6 +7,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 )
 
+const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
+
 export default function JobsBoard() {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
@@ -18,6 +21,7 @@ export default function JobsBoard() {
   const [providerEmail, setProviderEmail] = useState('')
   const [stateFilter, setStateFilter] = useState('All')
   const [cityFilter, setCityFilter] = useState('All')
+  const [blockedEmails, setBlockedEmails] = useState([])
 
   const categories = [
     'All', 'Hauling & Pickup', 'Handyman', 'Lawn & Garden', 'Cleaning',
@@ -30,6 +34,8 @@ export default function JobsBoard() {
     fetchJobs()
     const saved = localStorage.getItem('ny_provider')
     if (saved) setProvider(JSON.parse(saved))
+    const blocked = JSON.parse(localStorage.getItem('ny_blocked') || '[]')
+    setBlockedEmails(blocked)
   }, [])
 
   const fetchJobs = async () => {
@@ -72,6 +78,33 @@ export default function JobsBoard() {
       })
     })
     alert('Thank you for your report. We will review this content within 24 hours.\nGracias por tu reporte. Revisaremos este contenido en 24 horas.')
+  }
+
+  const handleBlock = async (job) => {
+    const confirmed = window.confirm(
+      `Block this user and hide their posts?\n¿Bloquear este usuario y ocultar sus publicaciones?\n\nPosted by: ${job.customer_name}`
+    )
+    if (!confirmed) return
+
+    // Add to local blocked list — removes from feed instantly
+    const updated = [...blockedEmails, job.customer_email]
+    setBlockedEmails(updated)
+    localStorage.setItem('ny_blocked', JSON.stringify(updated))
+
+    // Notify developer
+    await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'job_reported',
+        customerEmail: 'hello@necesitoya.app',
+        customerName: 'Admin',
+        providerName: 'User Block',
+        job: { id: job.id, title: job.title, category: job.category, city: job.city, message: `USER BLOCKED. Job ID: ${job.id} - Title: ${job.title} - Blocked user email: ${job.customer_email} - Posted by: ${job.customer_name}` }
+      })
+    })
+
+    alert('User blocked. Their posts have been removed from your feed.\nUsuario bloqueado. Sus publicaciones han sido eliminadas de tu feed.')
   }
 
   const assignProvider = async (job, providerData) => {
@@ -149,6 +182,7 @@ export default function JobsBoard() {
     .filter(j => filter === 'All' || j.category === filter)
     .filter(j => stateFilter === 'All' || j.state === stateFilter)
     .filter(j => cityFilter === 'All' || j.city === cityFilter)
+    .filter(j => !blockedEmails.includes(j.customer_email))
 
   const timeAgo = (date) => {
     const mins = Math.floor((new Date() - new Date(date + 'Z')) / 60000)
@@ -162,7 +196,6 @@ export default function JobsBoard() {
   return (
     <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial'}}>
 
-      {/* Provider Modal */}
       {showProviderModal && (
         <div style={{position:'fixed', inset:0, backgroundColor:'rgba(0,0,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:'20px'}}>
           <div style={{backgroundColor:'white', borderRadius:'16px', padding:'32px', maxWidth:'400px', width:'100%'}}>
@@ -190,7 +223,6 @@ export default function JobsBoard() {
         </div>
       )}
 
-      {/* Header */}
       <div style={{background:'linear-gradient(135deg,#1a1a2e,#0f3460)', padding:'40px 32px 30px'}}>
         <a href="/" style={{color:'rgba(255,255,255,0.5)', textDecoration:'none', fontSize:'14px'}}>← Home</a>
         <h1 style={{color:'white', fontSize:'32px', fontWeight:'bold', margin:'16px 0 4px'}}>Available Jobs</h1>
@@ -203,7 +235,6 @@ export default function JobsBoard() {
         )}
       </div>
 
-      {/* Category Filter */}
       <div style={{padding:'16px 32px', overflowX:'auto', whiteSpace:'nowrap', background:'white', borderBottom:'1px solid #F0EDE8'}}>
         {categories.map(cat => (
           <button key={cat} onClick={() => setFilter(cat)} style={{display:'inline-block', marginRight:'8px', padding:'8px 16px', borderRadius:'20px', border:`2px solid ${filter === cat ? '#FF6B35' : '#F0EDE8'}`, background: filter === cat ? '#FF6B35' : 'white', color: filter === cat ? 'white' : '#555', cursor:'pointer', fontSize:'13px', fontWeight: filter === cat ? 'bold' : 'normal', whiteSpace:'nowrap'}}>
@@ -212,7 +243,6 @@ export default function JobsBoard() {
         ))}
       </div>
 
-      {/* Location Filter */}
       <div style={{padding:'12px 32px', background:'white', borderBottom:'1px solid #F0EDE8', display:'flex', gap:'12px', alignItems:'center', flexWrap:'wrap'}}>
         <span style={{fontSize:'13px', color:'#888', fontWeight:'600'}}>📍 Filter by location:</span>
         <select value={stateFilter} onChange={(e) => { setStateFilter(e.target.value); setCityFilter('All') }}
@@ -231,7 +261,6 @@ export default function JobsBoard() {
         )}
       </div>
 
-      {/* Jobs List */}
       <div style={{padding:'24px 32px', maxWidth:'800px', margin:'0 auto'}}>
         {loading ? (
           <div style={{textAlign:'center', padding:'60px', color:'#888'}}>
@@ -278,22 +307,23 @@ export default function JobsBoard() {
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                   <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
                     <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
-                    <select onChange={(e) => { if (e.target.value) { handleReport(job, e.target.value); e.target.value = '' } }}
+                    <select onChange={(e) => { if (e.target.value === 'block') { handleBlock(job); e.target.value = '' } else if (e.target.value) { handleReport(job, e.target.value); e.target.value = '' } }}
                       style={{fontSize:'12px', color:'#9ca3af', border:'none', background:'transparent', cursor:'pointer', outline:'none'}}>
-                      <option value="">🚩 Report</option>
-                      <option value="inappropriate">Inappropriate / Inapropiado</option>
-                      <option value="spam">Spam</option>
+                      <option value="">🚩 Report / Block</option>
+                      <option value="inappropriate">Report: Inappropriate / Inapropiado</option>
+                      <option value="spam">Report: Spam</option>
+                      <option value="block">🚫 Block User / Bloquear Usuario</option>
                     </select>
                   </div>
                   <div>
-                  {job.status === 'open' ? (
-                    <button onClick={() => handleICanHelp(job)} disabled={assigning === job.id}
-                      style={{background: assigning === job.id ? '#ccc' : 'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'14px', cursor: assigning === job.id ? 'not-allowed' : 'pointer'}}>
-                      {assigning === job.id ? 'Accepting...' : 'I Can Help / Puedo Ayudar →'}
-                    </button>
-                  ) : (
-                    <span style={{fontSize:'13px', color:'#16a34a', fontWeight:'600'}}>✓ Provider assigned</span>
-                  )}
+                    {job.status === 'open' ? (
+                      <button onClick={() => handleICanHelp(job)} disabled={assigning === job.id}
+                        style={{background: assigning === job.id ? '#ccc' : 'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'14px', cursor: assigning === job.id ? 'not-allowed' : 'pointer'}}>
+                        {assigning === job.id ? 'Accepting...' : 'I Can Help / Puedo Ayudar →'}
+                      </button>
+                    ) : (
+                      <span style={{fontSize:'13px', color:'#16a34a', fontWeight:'600'}}>✓ Provider assigned</span>
+                    )}
                   </div>
                 </div>
               </div>
