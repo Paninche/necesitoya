@@ -25,6 +25,10 @@ function ProviderDashboardContent() {
     const saved = localStorage.getItem('ny_provider');
     if (saved) {
       const p = JSON.parse(saved);
+      // Restore sb_email from ny_provider if missing
+      if (!localStorage.getItem('sb_email') && p.email) {
+        localStorage.setItem('sb_email', p.email);
+      }
       setProvider(p);
       fetchData(p.id, p.email);
       return;
