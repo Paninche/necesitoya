@@ -113,7 +113,7 @@ export default function Home() {
           </div>
           <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px"}}>
             {[
-              {icon: "💰", label: "Keep 92%", sub: "of every job"},
+              {icon: "💰", label: "No monthly fees", sub: "no subscriptions"},
               {icon: "📱", label: "Mobile ready", sub: "work anywhere"},
               {icon: "⭐", label: "Build reviews", sub: "grow your business"},
               {icon: "🔒", label: "Secure payouts", sub: "via Stripe"},
