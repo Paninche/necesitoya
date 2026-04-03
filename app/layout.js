@@ -12,7 +12,7 @@ export const metadata = {
     apple: { url: '/favicon-180x180.png', sizes: '180x180' },
   },
   description: "Find trusted local handymen, cleaners, lawn care, mechanics and more in Orlando, Tampa, Miami, Lakeland and across Florida. Post a job free — providers respond fast. Bilingual English & Spanish. I Need It Now · Lo Necesito Ya.",
-  keywords: "handyman near me, lawn care near me, cleaning service near me, mechanic near me, local services Florida, bilingual services, handyman Orlando, handyman Tampa, handyman Miami, handyman Lakeland, lawn care Orlando, cleaning service Tampa, NecesitoYa, local help near me, hire local, servicios locales, handyman español, servicios bilingues Florida",
+  keywords: "handyman near me, lawn care near me, cleaning service near me, mechanic near me, local services Florida, bilingual services, handyman Orlando, handyman Tampa, handyman Miami, handyman Lakeland, lawn care Orlando, cleaning service Tampa, NecesitoYa, local help near me, hire local, servicios locales, handyman español, servicios bilingues Florida, necesito ayuda, servicios cerca de mi, trabajos locales",
   metadataBase: new URL('https://necesitoya.app'),
   alternates: {
     canonical: 'https://necesitoya.app',
@@ -32,6 +32,7 @@ export const metadata = {
     ],
     type: "website",
     locale: "en_US",
+    alternateLocale: "es_US",
   },
   twitter: {
     card: "summary_large_image",
@@ -66,25 +67,51 @@ export default function RootLayout({ children }) {
           gtag('config', 'G-LBBGNFP1BE');
         `}</Script>
         <Script id="schema-org" type="application/ld+json" strategy="afterInteractive">{`
-          {
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "NecesitoYa",
-            "url": "https://necesitoya.app",
-            "description": "America's Bilingual Local Services App — connect with trusted local handymen, cleaners, lawn care, mechanics and more in Florida.",
-            "applicationCategory": "LifestyleApplication",
-            "operatingSystem": "Web, iOS, Android",
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD"
+          [
+            {
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "NecesitoYa",
+              "url": "https://necesitoya.app",
+              "description": "America's Bilingual Local Services App — connect with trusted local handymen, cleaners, lawn care, mechanics and more in Florida.",
+              "applicationCategory": "LifestyleApplication",
+              "operatingSystem": "Web, iOS, Android",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              "areaServed": {
+                "@type": "State",
+                "name": "Florida"
+              },
+              "availableLanguage": ["English", "Spanish"]
             },
-            "areaServed": {
-              "@type": "State",
-              "name": "Florida"
-            },
-            "availableLanguage": ["English", "Spanish"]
-          }
+            {
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "name": "NecesitoYa",
+              "url": "https://necesitoya.app",
+              "description": "Bilingual local services marketplace connecting customers with handymen, cleaners, lawn care, mechanics and more across Florida.",
+              "telephone": "",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Haines City",
+                "addressRegion": "FL",
+                "addressCountry": "US"
+              },
+              "areaServed": [
+                "Orlando, FL", "Tampa, FL", "Miami, FL", "Lakeland, FL",
+                "Kissimmee, FL", "St. Petersburg, FL", "Haines City, FL",
+                "Sanford, FL", "Daytona Beach, FL", "Fort Lauderdale, FL"
+              ],
+              "sameAs": [
+                "https://play.google.com/store/apps/details?id=com.necesitoya.app"
+              ],
+              "priceRange": "Free to post",
+              "availableLanguage": ["English", "Spanish"]
+            }
+          ]
         `}</Script>
       </body>
     </html>
