@@ -11,6 +11,7 @@ export default function Messages() {
   const [newMessage, setNewMessage] = useState('')
   const [senderName, setSenderName] = useState('')
   const [senderEmail, setSenderEmail] = useState('')
+  const [recipientEmail, setRecipientEmail] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [identified, setIdentified] = useState(false)
@@ -21,13 +22,16 @@ export default function Messages() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const id = params.get('job')
+    const providerEmailParam = params.get('provider')
+
     if (id) {
       setJobId(id)
-      fetchJob(id)
-      fetchMessages(id)
+      fetchJob(id, providerEmailParam)
     }
+
     const savedProvider = localStorage.getItem('ny_provider')
     const savedCustomer = localStorage.getItem('ny_customer')
+
     if (savedProvider) {
       const p = JSON.parse(savedProvider)
       setSenderName(p.full_name || p.email)
@@ -39,10 +43,11 @@ export default function Messages() {
       setSenderEmail(c.email)
       setIdentified(true)
       setIsCustomer(true)
+      if (providerEmailParam) setRecipientEmail(decodeURIComponent(providerEmailParam))
     }
   }, [])
 
-  const fetchJob = async (id) => {
+  const fetchJob = async (id, providerEmailParam) => {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/jobs?id=eq.${id}`, {
       headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` }
     })
@@ -54,13 +59,30 @@ export default function Messages() {
     setLoading(false)
   }
 
-  const fetchMessages = async (id) => {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?job_id=eq.${id}&order=created_at.asc`, {
-      headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` }
-    })
+  const fetchMessages = async (id, sender, recipient) => {
+    const s = sender || senderEmail
+    const r = recipient || recipientEmail
+
+    if (!s || !r) return
+
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/messages?job_id=eq.${id}&or=(and(sender_email.eq.${encodeURIComponent(s)},recipient_email.eq.${encodeURIComponent(r)}),and(sender_email.eq.${encodeURIComponent(r)},recipient_email.eq.${encodeURIComponent(s)}))&order=created_at.asc`,
+      { headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` } }
+    )
     const data = await res.json()
-    setMessages(data)
+    setMessages(data || [])
   }
+
+  useEffect(() => {
+    if (jobId && senderEmail && (recipientEmail || !isCustomer)) {
+      const recipient = isCustomer ? recipientEmail : job?.customer_email
+      if (recipient) {
+        fetchMessages(jobId, senderEmail, recipient)
+        const interval = setInterval(() => fetchMessages(jobId, senderEmail, recipient), 5000)
+        return () => clearInterval(interval)
+      }
+    }
+  }, [jobId, senderEmail, recipientEmail, job, isCustomer])
 
   const handleAcceptProvider = async () => {
     const providerMsg = [...messages].reverse().find(m => m.sender_email !== senderEmail)
@@ -97,6 +119,9 @@ export default function Messages() {
   const sendMessage = async () => {
     if (!newMessage.trim()) return
     setSending(true)
+
+    const recipient = isCustomer ? recipientEmail : job?.customer_email
+
     const res = await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
       method: 'POST',
       headers: {
@@ -109,13 +134,14 @@ export default function Messages() {
         job_id: jobId,
         sender_name: senderName,
         sender_email: senderEmail,
-        recipient_email: job.customer_email,
+        recipient_email: recipient,
         message: newMessage
       })
     })
+
     if (res.ok) {
       setNewMessage('')
-      fetchMessages(jobId)
+      fetchMessages(jobId, senderEmail, recipient)
     }
     setSending(false)
   }
@@ -186,7 +212,7 @@ export default function Messages() {
         <p style={{color:'#FF6B35', fontSize:'13px', margin:0}}>{job.category} · 📍 {job.city}</p>
       </div>
 
-      {/* Accept Provider Banner */}
+      {/* Accept Provider Banner — only show to customer when job is open AND there are messages from provider */}
       {isCustomer && jobStatus === 'open' && messages.some(m => m.sender_email !== senderEmail) && (
         <div
           onClick={!accepting ? handleAcceptProvider : undefined}
