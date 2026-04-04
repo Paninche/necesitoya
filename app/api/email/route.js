@@ -31,7 +31,7 @@ export async function POST(request) {
                 <div style="font-weight: 600; color: #1a1a2e;">${providerName}</div>
                 <div style="color: #6b7280; font-size: 14px;">${providerEmail}</div>
               </div>
-              <a href="https://necesitoya.app/messages?job=${job.id}"
+              <a href="https://necesitoya.app/messages?job=${job.id}&provider=${encodeURIComponent(providerEmail || '')}"
                 style="display: block; background: linear-gradient(135deg, #FF6B35, #F4A261); color: white; text-align: center; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px; margin: 24px 0;">
                 View Messages / Ver Mensajes →
               </a>
@@ -182,7 +182,7 @@ export async function POST(request) {
             </div>
           </div>
         `,
-      })
+      });
     }
 
     if (type === 'new_message') {
@@ -207,7 +207,7 @@ export async function POST(request) {
                 <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Message from ${providerName}:</div>
                 <div style="font-size: 15px; color: #1a1a2e;">${job.message}</div>
               </div>
-              <a href="https://necesitoya.app/messages?job=${job.id}"
+              <a href="https://necesitoya.app/messages?job=${job.id}&provider=${encodeURIComponent(providerEmail || '')}"
                 style="display: block; background: linear-gradient(135deg, #FF6B35, #F4A261); color: white; text-align: center; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px; margin: 24px 0;">
                 Reply to Message / Responder →
               </a>

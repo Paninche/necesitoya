@@ -161,6 +161,7 @@ export default function Messages() {
           customerEmail: recipient,
           customerName: recipient?.split('@')[0],
           providerName: senderName,
+          providerEmail: senderEmail,
           job: {
             id: jobId,
             title: job?.title || '',
