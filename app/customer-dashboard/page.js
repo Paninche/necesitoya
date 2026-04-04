@@ -202,7 +202,7 @@ function CustomerDashboardContent() {
                           <div style={{ color: '#FF6B35', fontWeight: '600', fontSize: '13px' }}>💬 Someone wants to help!</div>
                           <div style={{ color: '#888', fontSize: '11px', marginTop: '2px' }}>Click View Chat to see their message and accept them</div>
                           <button
-                            onClick={() => window.location.href = `/messages?job=${job.id}`}
+                            onClick={() => window.location.href = `/messages?job=${job.id}&provider=${encodeURIComponent(jobMessages[job.id] || job.provider_email || '')}`}
                             style={{ backgroundColor: '#1a1a2e', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', fontSize: '12px', fontWeight: '600', cursor: 'pointer', marginTop: '8px' }}
                           >
                             💬 View Chat
@@ -250,7 +250,7 @@ function CustomerDashboardContent() {
                             <span style={{ color: '#16a34a', fontWeight: '600', fontSize: '13px' }}>✅ Paid</span>
                           )}
                           <button
-                            onClick={() => window.location.href = `/messages?job=${job.id}`}
+                            onClick={() => window.location.href = `/messages?job=${job.id}&provider=${encodeURIComponent(jobMessages[job.id] || job.provider_email || '')}`}
                             style={{ backgroundColor: '#1a1a2e', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', fontSize: '12px', fontWeight: '600', cursor: 'pointer', marginLeft: '8px' }}
                           >
                             💬 View Chat

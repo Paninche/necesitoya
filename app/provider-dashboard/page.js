@@ -33,25 +33,8 @@ function ProviderDashboardContent() {
       fetchData(p.id, p.email);
       return;
     }
-    const sbEmail = localStorage.getItem('sb_email');
-    if (sbEmail) {
-      fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(sbEmail)}&type=eq.provider&select=*`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-      })
-      .then(r => r.json())
-      .then(users => {
-        if (users && users.length > 0) {
-          localStorage.setItem('ny_provider', JSON.stringify(users[0]));
-          setProvider(users[0]);
-          fetchData(users[0].id, users[0].email);
-        } else {
-          window.location.href = '/login';
-        }
-      })
-      .catch(() => { window.location.href = '/login'; });
-    } else {
-      window.location.href = '/login';
-    }
+    // Only redirect if ny_provider is completely missing
+    window.location.href = '/login';
   }, []);
 
   useEffect(() => {
