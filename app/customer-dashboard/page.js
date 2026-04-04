@@ -70,13 +70,13 @@ function CustomerDashboardContent() {
     if (jobsData && jobsData.length > 0) {
       const msgMap = {};
       await Promise.all(jobsData.map(async (job) => {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?job_id=eq.${job.id}&select=id,sender_email&limit=1`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?job_id=eq.${job.id}&select=id,sender_email`, {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const msgs = await res.json();
         if (msgs && msgs.length > 0) {
           const providerMsg = msgs.find(m => m.sender_email !== customerEmail);
-          msgMap[job.id] = providerMsg ? providerMsg.sender_email : msgs[0].sender_email;
+          if (providerMsg) msgMap[job.id] = providerMsg.sender_email;
         }
       }));
       setJobMessages(msgMap);
