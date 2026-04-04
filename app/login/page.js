@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
@@ -8,6 +8,13 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const provider = localStorage.getItem('ny_provider')
+    const customer = localStorage.getItem('ny_customer')
+    if (provider) window.location.href = '/provider-dashboard'
+    else if (customer) window.location.href = '/customer-dashboard'
+  }, [])
 
   const handleLogin = async () => {
     if (!form.email || !form.password) {
@@ -41,8 +48,6 @@ export default function Login() {
 
       if (users && users.length > 0) {
         const user = users[0]
-
-        // Check for redirect job — if provider was trying to view a job
         const redirectJob = localStorage.getItem('redirect_job_web')
         localStorage.removeItem('redirect_job_web')
 

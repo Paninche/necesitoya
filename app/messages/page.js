@@ -74,15 +74,24 @@ export default function Messages() {
   }
 
   useEffect(() => {
-    if (jobId && senderEmail && (recipientEmail || !isCustomer)) {
-      const recipient = isCustomer ? recipientEmail : job?.customer_email
-      if (recipient) {
-        fetchMessages(jobId, senderEmail, recipient)
-        const interval = setInterval(() => fetchMessages(jobId, senderEmail, recipient), 5000)
-        return () => clearInterval(interval)
-      }
+    if (!jobId || !senderEmail) return
+
+    let recipient = ''
+    if (isCustomer) {
+      const params = new URLSearchParams(window.location.search)
+      const providerParam = params.get('provider')
+      recipient = providerParam ? decodeURIComponent(providerParam) : recipientEmail
+    } else {
+      recipient = job?.customer_email
     }
-  }, [jobId, senderEmail, recipientEmail, job, isCustomer])
+
+    if (recipient) {
+      if (!recipientEmail && isCustomer) setRecipientEmail(recipient)
+      fetchMessages(jobId, senderEmail, recipient)
+      const interval = setInterval(() => fetchMessages(jobId, senderEmail, recipient), 5000)
+      return () => clearInterval(interval)
+    }
+  }, [jobId, senderEmail, job, isCustomer])
 
   const handleAcceptProvider = async () => {
     const providerMsg = [...messages].reverse().find(m => m.sender_email !== senderEmail)
@@ -120,7 +129,11 @@ export default function Messages() {
     if (!newMessage.trim()) return
     setSending(true)
 
-    const recipient = isCustomer ? recipientEmail : job?.customer_email
+    const params = new URLSearchParams(window.location.search)
+    const providerParam = params.get('provider')
+    const recipient = isCustomer
+      ? (providerParam ? decodeURIComponent(providerParam) : recipientEmail)
+      : job?.customer_email
 
     const res = await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
       method: 'POST',
@@ -140,7 +153,6 @@ export default function Messages() {
     })
 
     if (res.ok) {
-      // Send email notification to recipient
       fetch('/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
