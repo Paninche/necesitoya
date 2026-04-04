@@ -70,7 +70,7 @@ function CustomerDashboardContent() {
     if (jobsData && jobsData.length > 0) {
       const msgMap = {};
       await Promise.all(jobsData.map(async (job) => {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?job_id=eq.${job.id}&select=id,sender_email`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?job_id=eq.${job.id}&select=id,sender_email&order=created_at.desc`, {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const msgs = await res.json();
