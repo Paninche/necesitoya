@@ -238,7 +238,7 @@ export default function Messages() {
     <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial', display:'flex', flexDirection:'column'}}>
 
       <div style={{background:'linear-gradient(135deg,#1a1a2e,#0f3460)', padding:'24px 32px'}}>
-        <a href="/jobs" style={{color:'rgba(255,255,255,0.5)', textDecoration:'none', fontSize:'14px'}}>← Back to Jobs</a>
+        <a href="/my-dashboard" style={{color:'rgba(255,255,255,0.5)', textDecoration:'none', fontSize:'14px'}}>← My Jobs</a>
         <h2 style={{color:'white', margin:'8px 0 4px', fontSize:'20px'}}>{job.title}</h2>
         <p style={{color:'#FF6B35', fontSize:'13px', margin:0}}>{job.category} · 📍 {job.city}</p>
       </div>
