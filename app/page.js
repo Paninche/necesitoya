@@ -25,16 +25,16 @@ export default function Home() {
         <p style={{fontSize: "14px", color: "rgba(255,255,255,0.3)", marginBottom: "40px"}}>Encuentra ayuda local de confianza — en inglés o español</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
           <a href="/post-job?type=customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
-            I Need Help / Necesito Ayuda →
+            Post & Get Help / Publica y Obtén Ayuda →
           </a>
           <a href="/find-a-pro" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
             Find a Pro / Encuentra un Pro →
           </a>
-          <a href="/signup-provider" style={{background: "transparent", border: "2px solid #FF6B35", color: "#FF6B35", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
+          <a href="/signup-provider" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
             I Offer Services / Ofrezco Servicios →
           </a>
-          <a href="/jobs" style={{background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.4)", padding: "10px 24px", borderRadius: "30px", fontSize: "13px", cursor: "pointer", textDecoration: "none"}}>
-            Providers: Find Jobs →
+          <a href="/jobs" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
+            Find Jobs / Ver Trabajos →
           </a>
         </div>
       </section>
@@ -122,7 +122,7 @@ export default function Home() {
             <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ Chat and pay securely in-app</p>
             <p style={{color: "#888", marginBottom: "24px", fontSize: "14px"}}>✅ Bilingual — English & Spanish</p>
             <a href="/post-job?type=customer" style={{display: "inline-block", background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "14px 32px", borderRadius: "24px", textDecoration: "none", fontWeight: "bold", fontSize: "15px"}}>
-              Get Help Now / Obtener Ayuda →
+              Post & Get Help / Publica y Obtén Ayuda →
             </a>
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function Home() {
         <p style={{color: "rgba(255,255,255,0.6)", marginBottom: "32px"}}>Join thousands of people connecting locally · Únete a miles de personas conectándose localmente</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
           <a href="/post-job?type=customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", textDecoration: "none"}}>
-            I Need Help / Necesito Ayuda →
+            Post & Get Help / Publica y Obtén Ayuda →
           </a>
           <a href="/find-a-pro" style={{background: "transparent", border: "2px solid white", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", textDecoration: "none"}}>
             Find a Pro / Encuentra un Pro →
@@ -188,7 +188,7 @@ export default function Home() {
           <div>
             <div style={{color: "white", fontWeight: "bold", marginBottom: "12px"}}>For Customers</div>
             <div style={{lineHeight: "2.2"}}>
-              <a href="/post-job?type=customer" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Get Help Now</a>
+              <a href="/post-job?type=customer" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Post & Get Help</a>
               <a href="/find-a-pro" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Find a Pro</a>
               <a href="/buy-sell" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Buy & Sell</a>
               <a href="/customer-dashboard" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>My Dashboard</a>
