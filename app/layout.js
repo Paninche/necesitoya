@@ -53,9 +53,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="canonical" href="https://necesitoya.app" />
-      </head>
+      <head />
       <body style={{margin: 0, padding: 0}}>
         {children}
         <Analytics />
