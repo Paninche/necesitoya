@@ -24,16 +24,16 @@ export default function Home() {
         <p style={{fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "16px"}}>Find trusted local help near you — in English or Spanish</p>
         <p style={{fontSize: "14px", color: "rgba(255,255,255,0.3)", marginBottom: "40px"}}>Encuentra ayuda local de confianza — en inglés o español</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
-          <a href="/post-job?type=customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none"}}>
+          <a href="/post-job?type=customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none", whiteSpace: "nowrap"}}>
             Post & Get Help / Publica y Obtén Ayuda →
           </a>
-          <a href="/find-a-pro" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
+          <a href="/find-a-pro" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.5)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "600", cursor: "pointer", textDecoration: "none", whiteSpace: "nowrap"}}>
             Find a Pro / Encuentra un Pro →
           </a>
-          <a href="/signup-provider" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
+          <a href="/signup-provider" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.6)", padding: "16px 40px", borderRadius: "30px", fontSize: "15px", cursor: "pointer", textDecoration: "none", whiteSpace: "nowrap"}}>
             I Offer Services / Ofrezco Servicios →
           </a>
-          <a href="/jobs" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", cursor: "pointer", textDecoration: "none"}}>
+          <a href="/jobs" style={{background: "transparent", border: "2px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.6)", padding: "16px 40px", borderRadius: "30px", fontSize: "15px", cursor: "pointer", textDecoration: "none", whiteSpace: "nowrap"}}>
             Find Jobs / Ver Trabajos →
           </a>
         </div>
