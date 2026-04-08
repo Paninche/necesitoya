@@ -61,7 +61,7 @@ export default function DownloadPage() {
       <section style={{padding: "60px 32px", background: "#f8f6f2"}}>
         <h2 style={{textAlign: "center", fontSize: "28px", color: "#1a1a2e", marginBottom: "4px"}}>Why download the app?</h2>
         <p style={{textAlign: "center", color: "#FF6B35", fontWeight: "bold", marginBottom: "40px"}}>¿Por qué descargar la app?</p>
-        <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px", maxWidth: "800px", margin: "0 auto"}}>
+        <div style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px", maxWidth: "600px", margin: "0 auto"}}>
           {[
             {icon: "🔔", label: "Instant Notifications", sub: "Notificaciones al instante", desc: "Get alerted the moment a provider responds to your job"},
             {icon: "💬", label: "Chat On the Go", sub: "Chatea donde estés", desc: "Message providers in English or Spanish from anywhere"},
