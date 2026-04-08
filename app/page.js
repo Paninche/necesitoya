@@ -16,6 +16,24 @@ export default function Home() {
         </div>
       </nav>
 
+      {/* ===== APP DOWNLOAD BANNER — UNCOMMENT WHEN BOTH APPS ARE LIVE ===== */}
+      {/*
+      <div style={{background: "#FF6B35", padding: "12px 32px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap"}}>
+        <span style={{color: "white", fontWeight: "bold", fontSize: "14px"}}>⚡ NecesitoYa is now on iOS & Android! · ¡Ya disponible en iOS y Android!</span>
+        <div style={{display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center"}}>
+          <a href="https://apps.apple.com/app/id6761226228" target="_blank" rel="noopener noreferrer"
+            style={{background: "white", color: "#FF6B35", padding: "6px 16px", borderRadius: "20px", textDecoration: "none", fontWeight: "bold", fontSize: "13px", whiteSpace: "nowrap"}}>
+            🍎 App Store
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.necesitoya.app" target="_blank" rel="noopener noreferrer"
+            style={{background: "white", color: "#FF6B35", padding: "6px 16px", borderRadius: "20px", textDecoration: "none", fontWeight: "bold", fontSize: "13px", whiteSpace: "nowrap"}}>
+            🤖 Google Play
+          </a>
+        </div>
+      </div>
+      */}
+      {/* ===== END APP DOWNLOAD BANNER ===== */}
+
       {/* HERO */}
       <section style={{background: "linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%)", padding: "80px 32px", textAlign: "center"}}>
         <div style={{fontSize: "14px", color: "#FF6B35", letterSpacing: "4px", marginBottom: "16px"}}>AMERICA'S BILINGUAL LOCAL SERVICES APP · LA APP BILINGÜE DE SERVICIOS LOCALES DE AMÉRICA</div>
