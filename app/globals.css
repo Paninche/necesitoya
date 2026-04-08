@@ -24,15 +24,3 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-.nav-app-buttons {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-@media (max-width: 1024px) {
-  .nav-app-buttons {
-    display: none;
-  }
-}
