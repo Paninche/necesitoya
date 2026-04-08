@@ -6,6 +6,15 @@ export default function Home() {
       <nav style={{background: "#1a1a2e", padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px"}}>
         <div style={{color: "#FF6B35", fontSize: "24px", fontWeight: "bold"}}>⚡ NecesitoYa</div>
         <div style={{display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center"}}>
+          <span style={{color: "rgba(255,255,255,0.5)", fontSize: "12px", whiteSpace: "nowrap"}}>⚡ Now on iOS & Android!</span>
+          <a href="https://apps.apple.com/app/id6761226228" target="_blank" rel="noopener noreferrer" style={{display: "flex", alignItems: "center", gap: "5px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "white", padding: "5px 12px", borderRadius: "16px", textDecoration: "none", fontSize: "12px", whiteSpace: "nowrap"}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            App Store
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.necesitoya.app" target="_blank" rel="noopener noreferrer" style={{display: "flex", alignItems: "center", gap: "5px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "white", padding: "5px 12px", borderRadius: "16px", textDecoration: "none", fontSize: "12px", whiteSpace: "nowrap"}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3.18 23.76c.3.17.64.24.99.2L15.34 12 11.84 8.5 3.18 23.76z" fill="#EA4335"/><path d="M20.47 10.37l-2.75-1.6-3.38 3.23 3.38 3.22 2.78-1.61c.79-.46.79-1.77-.03-2.24z" fill="#FBBC04"/><path d="M3.18.24C2.88.07 2.54 0 2.19.04L14.06 12 3.18 23.76C2.88 23.59 2.67 23.29 2.67 22.88V1.12C2.67.71 2.88.41 3.18.24z" fill="#4285F4"/><path d="M15.34 12L3.18.24c.3-.17.64-.24.99-.2L17.72 7.77 15.34 12z" fill="#34A853"/></svg>
+            Google Play
+          </a>
           <a href="/post-job" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Get Help</a>
           <a href="/find-a-pro" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Find a Pro</a>
           <a href="/jobs" style={{color: "rgba(255,255,255,0.7)", fontSize: "14px", textDecoration: "none"}}>Find Jobs</a>
@@ -15,22 +24,6 @@ export default function Home() {
           <a href="/signup-customer" style={{background: "#FF6B35", border: "none", color: "white", padding: "8px 20px", borderRadius: "20px", cursor: "pointer", fontWeight: "bold", textDecoration: "none", fontSize: "13px"}}>Sign Up / Regístrate</a>
         </div>
       </nav>
-
-      {/* APP DOWNLOAD BANNER */}
-      <div style={{background: "#FF6B35", padding: "12px 32px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap"}}>
-        <span style={{color: "white", fontWeight: "bold", fontSize: "14px"}}>⚡ NecesitoYa is now on iOS & Android! · ¡Ya disponible en iOS y Android!</span>
-        <div style={{display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center"}}>
-          <a href="https://apps.apple.com/app/id6761226228" target="_blank" rel="noopener noreferrer"
-            style={{background: "white", color: "#FF6B35", padding: "6px 16px", borderRadius: "20px", textDecoration: "none", fontWeight: "bold", fontSize: "13px", whiteSpace: "nowrap"}}>
-            🍎 App Store
-          </a>
-          <a href="https://play.google.com/store/apps/details?id=com.necesitoya.app" target="_blank" rel="noopener noreferrer"
-            style={{background: "white", color: "#FF6B35", padding: "6px 16px", borderRadius: "20px", textDecoration: "none", fontWeight: "bold", fontSize: "13px", whiteSpace: "nowrap"}}>
-            🤖 Google Play
-          </a>
-        </div>
-      </div>
-      {/* END APP DOWNLOAD BANNER */}
 
       {/* HERO */}
       <section style={{background: "linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%)", padding: "80px 32px", textAlign: "center"}}>
