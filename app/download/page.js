@@ -53,7 +53,7 @@ export default function DownloadPage() {
 
         <p style={{color: "rgba(255,255,255,0.35)", fontSize: "14px", margin: 0}}>
           Prefer the browser?{" "}
-          <a href="/post-job" style={{color: "#FF6B35", textDecoration: "underline"}}>Use the web app instead →</a>
+          <a href="/" style={{color: "#FF6B35", textDecoration: "underline"}}>Use the web app instead →</a>
         </p>
       </section>
 
@@ -125,7 +125,7 @@ export default function DownloadPage() {
             style={{background: "white", color: "#1a1a2e", padding: "16px 40px", borderRadius: "30px", textDecoration: "none", fontWeight: "bold", fontSize: "15px"}}>
             🤖 Google Play
           </a>
-          <a href="/post-job"
+          <a href="/"
             style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "16px 40px", borderRadius: "30px", textDecoration: "none", fontWeight: "bold", fontSize: "15px"}}>
             🌐 Use Web App →
           </a>
