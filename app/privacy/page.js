@@ -21,13 +21,13 @@ export default function Privacy() {
       <p style={{color:'#555', lineHeight:'1.8'}}>We use Supabase for secure data storage with row-level security policies. All data is encrypted in transit using HTTPS.</p>
 
       <h2 style={{color:'#1a1a2e'}}>6. Your Rights & Data Deletion</h2>
-      <p style={{color:'#555', lineHeight:'1.8'}}>You can request deletion of your account and all associated data at any time by emailing us at <a href="mailto:privacy@necesitoya.app" style={{color:'#FF6B35'}}>privacy@necesitoya.app</a>. We will process all deletion requests within 30 days.</p>
+      <p style={{color:'#555', lineHeight:'1.8'}}>You can request deletion of your account and all associated data at any time by emailing us at <a href="mailto:hello@necesitoya.app" style={{color:'#FF6B35'}}>hello@necesitoya.app</a>. We will process all deletion requests within 30 days.</p>
 
       <h2 style={{color:'#1a1a2e'}}>7. Contact Us</h2>
-      <p style={{color:'#555', lineHeight:'1.8'}}>For privacy questions contact us at: <a href="mailto:privacy@necesitoya.app" style={{color:'#FF6B35'}}>privacy@necesitoya.app</a></p>
+      <p style={{color:'#555', lineHeight:'1.8'}}>For privacy questions contact us at: <a href="mailto:hello@necesitoya.app" style={{color:'#FF6B35'}}>hello@necesitoya.app</a></p>
 
       <h2 style={{color:'#1a1a2e'}}>Política de Privacidad</h2>
-      <p style={{color:'#555', lineHeight:'1.8'}}>NecesitoYa recopila información que usted proporciona: nombre, correo electrónico, teléfono, ciudad y preferencias de servicios. No vendemos su información personal. Los pagos son procesados de forma segura por Stripe. Puede solicitar la eliminación de su cuenta enviando un correo a <a href="mailto:privacy@necesitoya.app" style={{color:'#FF6B35'}}>privacy@necesitoya.app</a>.</p>
+      <p style={{color:'#555', lineHeight:'1.8'}}>NecesitoYa recopila información que usted proporciona: nombre, correo electrónico, teléfono, ciudad y preferencias de servicios. No vendemos su información personal. Los pagos son procesados de forma segura por Stripe. Puede solicitar la eliminación de su cuenta enviando un correo a <a href="mailto:hello@necesitoya.app" style={{color:'#FF6B35'}}>hello@necesitoya.app</a>.</p>
 
       <div style={{marginTop:'48px', padding:'24px', background:'#f8f6f2', borderRadius:'12px'}}>
         <p style={{color:'#888', fontSize:'13px', margin:0}}>© 2026 NecesitoYa.app · Haines City, FL · <a href="/" style={{color:'#FF6B35'}}>necesitoya.app</a></p>
