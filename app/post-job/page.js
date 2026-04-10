@@ -223,20 +223,6 @@ export default function PostJob() {
       </div>
     )
   }
-    return (
-      <div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial'}}>
-        <div style={{background:'white', borderRadius:'24px', padding:'48px', textAlign:'center', maxWidth:'400px'}}>
-          <div style={{fontSize:'64px', marginBottom:'16px'}}>🎉</div>
-          <h2 style={{color:'#1a1a2e', marginBottom:'8px'}}>Job Posted!</h2>
-          <p style={{color:'#888', marginBottom:'4px'}}>Your job is now live and providers near you will respond soon.</p>
-          <p style={{color:'#888', fontSize:'14px', marginBottom:'4px'}}>Tu trabajo está publicado y los proveedores cercanos responderán pronto.</p>
-          <p style={{color:'#16a34a', fontSize:'13px', marginBottom:'24px'}}>✅ Confirmation email sent!</p>
-          <a href="/jobs" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 32px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', marginRight:'12px'}}>See All Jobs →</a>
-          <a href="/" style={{display:'inline-block', color:'#888', padding:'12px 24px', textDecoration:'none'}}>Home</a>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px'}}>
