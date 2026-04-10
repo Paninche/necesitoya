@@ -4,6 +4,16 @@ import { useState, useEffect, useRef } from 'react'
 const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co'
 const APIKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
 
+function getLangFromStorage() {
+  try {
+    const p = localStorage.getItem('ny_provider')
+    if (p) return JSON.parse(p).language || 'en'
+    const c = localStorage.getItem('ny_customer')
+    if (c) return JSON.parse(c).language || 'en'
+  } catch {}
+  return 'en'
+}
+
 export default function Messages() {
   const [jobId, setJobId] = useState(null)
   const [job, setJob] = useState(null)
@@ -54,21 +64,9 @@ export default function Messages() {
     }
   }, [])
 
-  const fetchJob = async (id) => {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/jobs?id=eq.${id}`, {
-      headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` }
-    })
-    const data = await res.json()
-    if (data[0]) {
-      setJob(data[0])
-      setJobStatus(data[0].status)
-    }
-    setLoading(false)
-  }
-
   const translateMessages = async (msgs, lang) => {
-    const targetLang = lang || userLang
-    const toTranslate = msgs.filter(m => !translatingRef.current.has(m.id))
+    const targetLang = lang || getLangFromStorage()
+    const toTranslate = msgs.filter(m => m.message && !translatingRef.current.has(m.id))
     if (toTranslate.length === 0) return
 
     toTranslate.forEach(m => translatingRef.current.add(m.id))
@@ -91,9 +89,7 @@ export default function Messages() {
 
     setTranslations(prev => {
       const updated = { ...prev }
-      results.forEach(r => {
-        updated[r.id] = r
-      })
+      results.forEach(r => { updated[r.id] = r })
       return updated
     })
   }
@@ -109,7 +105,8 @@ export default function Messages() {
     const data = await res.json()
     const msgs = data || []
     setMessages(msgs)
-    translateMessages(msgs)
+    const lang = getLangFromStorage()
+    translateMessages(msgs, lang)
   }
 
   useEffect(() => {
@@ -274,7 +271,6 @@ export default function Messages() {
   }
 
   const langLabel = userLang === 'es' ? 'ES' : 'EN'
-  const otherLang = userLang === 'es' ? 'en' : 'es'
 
   return (
     <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial', display:'flex', flexDirection:'column'}}>
