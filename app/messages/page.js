@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co'
 const APIKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
@@ -8,6 +8,7 @@ export default function Messages() {
   const [jobId, setJobId] = useState(null)
   const [job, setJob] = useState(null)
   const [messages, setMessages] = useState([])
+  const [translations, setTranslations] = useState({})
   const [newMessage, setNewMessage] = useState('')
   const [senderName, setSenderName] = useState('')
   const [senderEmail, setSenderEmail] = useState('')
@@ -19,6 +20,8 @@ export default function Messages() {
   const [isProvider, setIsProvider] = useState(false)
   const [jobStatus, setJobStatus] = useState('open')
   const [accepting, setAccepting] = useState(false)
+  const [userLang, setUserLang] = useState('en')
+  const translatingRef = useRef(new Set())
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -39,12 +42,14 @@ export default function Messages() {
       setSenderEmail(p.email)
       setIdentified(true)
       setIsProvider(true)
+      setUserLang(p.language || 'en')
     } else if (savedCustomer) {
       const c = JSON.parse(savedCustomer)
       setSenderName(c.full_name || c.customer_name || c.email)
       setSenderEmail(c.email)
       setIdentified(true)
       setIsCustomer(true)
+      setUserLang(c.language || 'en')
       if (providerEmailParam) setRecipientEmail(decodeURIComponent(providerEmailParam))
     }
   }, [])
@@ -61,6 +66,38 @@ export default function Messages() {
     setLoading(false)
   }
 
+  const translateMessages = async (msgs, lang) => {
+    const targetLang = lang || userLang
+    const toTranslate = msgs.filter(m => !translatingRef.current.has(m.id))
+    if (toTranslate.length === 0) return
+
+    toTranslate.forEach(m => translatingRef.current.add(m.id))
+
+    const results = await Promise.all(
+      toTranslate.map(async (m) => {
+        try {
+          const res = await fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: m.message, target: targetLang })
+          })
+          const data = await res.json()
+          return { id: m.id, original: m.message, translation: data.translation }
+        } catch {
+          return { id: m.id, original: m.message, translation: m.message }
+        }
+      })
+    )
+
+    setTranslations(prev => {
+      const updated = { ...prev }
+      results.forEach(r => {
+        updated[r.id] = r
+      })
+      return updated
+    })
+  }
+
   const fetchMessages = async (id, sender, recipient) => {
     const s = sender || senderEmail
     const r = recipient || recipientEmail
@@ -70,7 +107,9 @@ export default function Messages() {
       { headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` } }
     )
     const data = await res.json()
-    setMessages(data || [])
+    const msgs = data || []
+    setMessages(msgs)
+    translateMessages(msgs)
   }
 
   useEffect(() => {
@@ -234,13 +273,29 @@ export default function Messages() {
     )
   }
 
+  const langLabel = userLang === 'es' ? 'ES' : 'EN'
+  const otherLang = userLang === 'es' ? 'en' : 'es'
+
   return (
     <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial', display:'flex', flexDirection:'column'}}>
 
-      <div style={{background:'linear-gradient(135deg,#1a1a2e,#0f3460)', padding:'24px 32px'}}>
-        <a href="/my-dashboard" style={{color:'rgba(255,255,255,0.5)', textDecoration:'none', fontSize:'14px'}}>← My Jobs</a>
-        <h2 style={{color:'white', margin:'8px 0 4px', fontSize:'20px'}}>{job.title}</h2>
-        <p style={{color:'#FF6B35', fontSize:'13px', margin:0}}>{job.category} · 📍 {job.city}</p>
+      <div style={{background:'linear-gradient(135deg,#1a1a2e,#0f3460)', padding:'24px 32px', display:'flex', justifyContent:'space-between', alignItems:'flex-end'}}>
+        <div>
+          <a href="/my-dashboard" style={{color:'rgba(255,255,255,0.5)', textDecoration:'none', fontSize:'14px'}}>← My Jobs</a>
+          <h2 style={{color:'white', margin:'8px 0 4px', fontSize:'20px'}}>{job.title}</h2>
+          <p style={{color:'#FF6B35', fontSize:'13px', margin:0}}>{job.category} · 📍 {job.city}</p>
+        </div>
+        <button
+          onClick={() => {
+            const newLang = userLang === 'en' ? 'es' : 'en'
+            setUserLang(newLang)
+            translatingRef.current = new Set()
+            setTranslations({})
+            translateMessages(messages, newLang)
+          }}
+          style={{background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.3)', color:'white', padding:'8px 16px', borderRadius:'20px', cursor:'pointer', fontSize:'13px', fontWeight:'bold'}}>
+          🌐 {langLabel}
+        </button>
       </div>
 
       {isCustomer && (jobStatus === 'open' || jobStatus === 'pending') && messages.some(m => m.sender_email !== senderEmail) && (
@@ -270,15 +325,27 @@ export default function Messages() {
           </div>
         ) : (
           <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
-            {messages.map(msg => (
-              <div key={msg.id} style={{display:'flex', justifyContent: msg.sender_email === senderEmail ? 'flex-end' : 'flex-start'}}>
-                <div style={{maxWidth:'70%', background: msg.sender_email === senderEmail ? 'linear-gradient(135deg,#FF6B35,#F4A261)' : 'white', borderRadius:'16px', padding:'12px 16px', boxShadow:'0 2px 8px rgba(0,0,0,0.06)'}}>
-                  <div style={{fontSize:'11px', fontWeight:'bold', color: msg.sender_email === senderEmail ? 'rgba(255,255,255,0.8)' : '#FF6B35', marginBottom:'4px'}}>{msg.sender_name}</div>
-                  <div style={{fontSize:'15px', color: msg.sender_email === senderEmail ? 'white' : '#1a1a2e', lineHeight:'1.5'}}>{msg.message}</div>
-                  <div style={{fontSize:'11px', color: msg.sender_email === senderEmail ? 'rgba(255,255,255,0.6)' : '#aaa', marginTop:'4px', textAlign:'right'}}>{timeAgo(msg.created_at)}</div>
+            {messages.map(msg => {
+              const isMine = msg.sender_email === senderEmail
+              const t = translations[msg.id]
+              const showTranslation = t && t.translation && t.translation !== t.original
+              return (
+                <div key={msg.id} style={{display:'flex', justifyContent: isMine ? 'flex-end' : 'flex-start'}}>
+                  <div style={{maxWidth:'70%', background: isMine ? 'linear-gradient(135deg,#FF6B35,#F4A261)' : 'white', borderRadius:'16px', padding:'12px 16px', boxShadow:'0 2px 8px rgba(0,0,0,0.06)'}}>
+                    <div style={{fontSize:'11px', fontWeight:'bold', color: isMine ? 'rgba(255,255,255,0.8)' : '#FF6B35', marginBottom:'4px'}}>{msg.sender_name}</div>
+                    {showTranslation ? (
+                      <>
+                        <div style={{fontSize:'15px', color: isMine ? 'white' : '#1a1a2e', lineHeight:'1.5', fontWeight:'600'}}>{t.translation}</div>
+                        <div style={{fontSize:'12px', color: isMine ? 'rgba(255,255,255,0.5)' : '#bbb', lineHeight:'1.4', marginTop:'6px', fontStyle:'italic'}}>{t.original}</div>
+                      </>
+                    ) : (
+                      <div style={{fontSize:'15px', color: isMine ? 'white' : '#1a1a2e', lineHeight:'1.5'}}>{msg.message}</div>
+                    )}
+                    <div style={{fontSize:'11px', color: isMine ? 'rgba(255,255,255,0.6)' : '#aaa', marginTop:'4px', textAlign:'right'}}>{timeAgo(msg.created_at)}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
