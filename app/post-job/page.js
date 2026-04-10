@@ -195,6 +195,34 @@ export default function PostJob() {
   }
 
   if (submitted) {
+    const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('ny_customer')
+    return (
+      <div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial', padding:'32px'}}>
+        <div style={{background:'white', borderRadius:'24px', padding:'48px', textAlign:'center', maxWidth:'400px', width:'100%'}}>
+          <div style={{fontSize:'64px', marginBottom:'16px'}}>🎉</div>
+          <h2 style={{color:'#1a1a2e', marginBottom:'8px'}}>Job Posted!</h2>
+          <p style={{color:'#888', marginBottom:'4px'}}>Your job is now live and providers near you will respond soon.</p>
+          <p style={{color:'#888', fontSize:'14px', marginBottom:'4px'}}>Tu trabajo está publicado y los proveedores cercanos responderán pronto.</p>
+          <p style={{color:'#16a34a', fontSize:'13px', marginBottom:'24px'}}>✅ Confirmation email sent!</p>
+
+          {!isLoggedIn && (
+            <div style={{background:'#FFF3EE', borderRadius:'16px', padding:'20px', marginBottom:'24px', border:'2px solid #FF6B35'}}>
+              <div style={{fontSize:'24px', marginBottom:'8px'}}>💬</div>
+              <p style={{color:'#1a1a2e', fontWeight:'bold', fontSize:'15px', marginBottom:'4px'}}>Want to chat with providers?</p>
+              <p style={{color:'#FF6B35', fontWeight:'bold', fontSize:'13px', marginBottom:'8px'}}>¿Quieres chatear con proveedores?</p>
+              <p style={{color:'#888', fontSize:'12px', marginBottom:'16px'}}>Create a free account to receive responses, chat, and get notified when someone is ready to help.<br/><br/>Crea una cuenta gratis para recibir respuestas, chatear y recibir notificaciones.</p>
+              <a href="/signup-customer" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 24px', borderRadius:'12px', textDecoration:'none', fontWeight:'bold', fontSize:'14px', width:'100%', boxSizing:'border-box'}}>
+                Create Free Account / Crear Cuenta Gratis →
+              </a>
+            </div>
+          )}
+
+          <a href="/jobs" style={{display:'inline-block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'12px 32px', borderRadius:'20px', textDecoration:'none', fontWeight:'bold', marginRight:'12px'}}>See All Jobs →</a>
+          <a href="/" style={{display:'inline-block', color:'#888', padding:'12px 24px', textDecoration:'none'}}>Home</a>
+        </div>
+      </div>
+    )
+  }
     return (
       <div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial'}}>
         <div style={{background:'white', borderRadius:'24px', padding:'48px', textAlign:'center', maxWidth:'400px'}}>
