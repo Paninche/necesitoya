@@ -249,7 +249,7 @@ export default function PostJob() {
       )}
 
       <div style={{background:'white', borderRadius:'24px', padding:'48px', width:'100%', maxWidth:'560px'}}>
-        <button onClick={() => window.history.back()} style={{color:'#888', textDecoration:'none', fontSize:'14px', background:'none', border:'none', cursor:'pointer', padding:0, marginBottom:'16px'}}>← Back / Regresar</button>
+        <button onClick={() => window.history.length > 1 ? window.history.back() : window.location.href = '/'} style={{color:'#888', textDecoration:'none', fontSize:'14px', background:'none', border:'none', cursor:'pointer', padding:0, marginBottom:'16px'}}>← Back / Regresar</button>
         <div style={{fontSize:'40px', margin:'0 0 8px'}}>📋</div>
         <h1 style={{color:'#1a1a2e', marginBottom:'4px'}}>Post a Job</h1>
         <p style={{color:'#888', marginBottom:'32px'}}>Publicar un Trabajo — Describe what you need</p>
