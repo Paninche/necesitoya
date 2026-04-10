@@ -28,6 +28,7 @@ export default function PostJob() {
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [isProvider, setIsProvider] = useState(false)
+  const [showBabysittingDisclaimer, setShowBabysittingDisclaimer] = useState(false)
 
   useEffect(() => {
     const savedProvider = localStorage.getItem('ny_provider')
@@ -36,7 +37,6 @@ export default function PostJob() {
     const params = new URLSearchParams(window.location.search)
     if (params.get('type') === 'customer') { setUserType('customer'); return }
 
-    // If logged in as customer, skip the selector
     const savedCustomer = localStorage.getItem('ny_customer')
     if (savedCustomer) {
       const customer = JSON.parse(savedCustomer)
@@ -63,6 +63,13 @@ export default function PostJob() {
     if (file) {
       setImageFile(file)
       setImagePreview(URL.createObjectURL(file))
+    }
+  }
+
+  const handleCategorySelect = (cat) => {
+    setForm({...form, category: cat})
+    if (cat === 'Babysitting') {
+      setShowBabysittingDisclaimer(true)
     }
   }
 
@@ -197,6 +204,45 @@ export default function PostJob() {
 
   return (
     <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px'}}>
+
+      {/* Babysitting Disclaimer Popup */}
+      {showBabysittingDisclaimer && (
+        <div style={{position:'fixed', top:0, left:0, width:'100%', height:'100%', background:'rgba(0,0,0,0.6)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:'24px', boxSizing:'border-box'}}>
+          <div style={{background:'white', borderRadius:'24px', padding:'32px', maxWidth:'480px', width:'100%'}}>
+            <div style={{fontSize:'32px', marginBottom:'12px'}}>⚠️</div>
+            <h3 style={{color:'#1a1a2e', marginBottom:'4px', fontSize:'18px'}}>Safety Notice — Babysitting</h3>
+            <p style={{color:'#FF6B35', fontWeight:'bold', fontSize:'14px', marginBottom:'16px'}}>Aviso de Seguridad — Cuidado de Niños</p>
+            
+            <p style={{color:'#555', fontSize:'14px', lineHeight:'1.6', marginBottom:'12px'}}>
+              NecesitoYa connects you with local providers but does not conduct background checks. For childcare services, we strongly recommend verifying the provider's identity, checking references, and conducting your own background check before hiring. By continuing, you acknowledge that you are responsible for vetting any provider you hire through this platform.
+            </p>
+            <p style={{color:'#555', fontSize:'13px', lineHeight:'1.6', marginBottom:'16px'}}>
+              NecesitoYa te conecta con proveedores locales pero no realiza verificaciones de antecedentes. Para servicios de cuidado de niños, recomendamos verificar la identidad del proveedor, revisar referencias y realizar tu propia verificación de antecedentes antes de contratar. Al continuar, reconoces que eres responsable de evaluar a cualquier proveedor que contrates a través de esta plataforma.
+            </p>
+
+            <div style={{background:'#FFF3EE', borderRadius:'12px', padding:'12px', marginBottom:'20px'}}>
+              <p style={{color:'#1a1a2e', fontSize:'13px', margin:0}}>
+                🔍 <strong>Free resource / Recurso gratuito:</strong> Check the National Sex Offender Registry at{' '}
+                <a href="https://www.nsopw.gov" target="_blank" rel="noopener noreferrer" style={{color:'#FF6B35', fontWeight:'bold'}}>nsopw.gov</a>
+              </p>
+            </div>
+
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+              <button
+                onClick={() => setShowBabysittingDisclaimer(false)}
+                style={{padding:'12px', borderRadius:'12px', border:'none', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', fontWeight:'bold', cursor:'pointer', fontSize:'14px'}}>
+                I Understand / Entiendo
+              </button>
+              <button
+                onClick={() => { setShowBabysittingDisclaimer(false); setForm({...form, category: ''}) }}
+                style={{padding:'12px', borderRadius:'12px', border:'2px solid #F0EDE8', background:'white', color:'#888', fontWeight:'bold', cursor:'pointer', fontSize:'14px'}}>
+                Cancel / Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div style={{background:'white', borderRadius:'24px', padding:'48px', width:'100%', maxWidth:'560px'}}>
         <button onClick={() => setUserType(null)} style={{color:'#888', textDecoration:'none', fontSize:'14px', background:'none', border:'none', cursor:'pointer', padding:0, marginBottom:'16px'}}>← Back / Regresar</button>
         <div style={{fontSize:'40px', margin:'0 0 8px'}}>📋</div>
@@ -222,7 +268,7 @@ export default function PostJob() {
           <label style={{display:'block', fontWeight:'bold', color:'#1a1a2e', marginBottom:'8px', fontSize:'14px'}}>Category / Categoría *</label>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px'}}>
             {categories.map(cat => (
-              <button key={cat} onClick={() => setForm({...form, category: cat})} style={{padding:'10px 12px', borderRadius:'10px', border:`2px solid ${form.category === cat ? '#FF6B35' : '#F0EDE8'}`, background: form.category === cat ? '#FFF3EE' : 'white', cursor:'pointer', fontSize:'12px', textAlign:'left', color: form.category === cat ? '#FF6B35' : '#333', fontWeight: form.category === cat ? 'bold' : 'normal'}}>
+              <button key={cat} onClick={() => handleCategorySelect(cat)} style={{padding:'10px 12px', borderRadius:'10px', border:`2px solid ${form.category === cat ? '#FF6B35' : '#F0EDE8'}`, background: form.category === cat ? '#FFF3EE' : 'white', cursor:'pointer', fontSize:'12px', textAlign:'left', color: form.category === cat ? '#FF6B35' : '#333', fontWeight: form.category === cat ? 'bold' : 'normal'}}>
                 {cat}
               </button>
             ))}
