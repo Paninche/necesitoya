@@ -5,6 +5,7 @@ const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co'
 const APIKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
 
 function getLangFromStorage() {
+  if (typeof window === 'undefined') return 'en'
   try {
     const p = localStorage.getItem('ny_provider')
     if (p) return JSON.parse(p).language || 'en'
