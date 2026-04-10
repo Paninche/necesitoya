@@ -38,15 +38,18 @@ export default function PostJob() {
     if (params.get('type') === 'customer') { setUserType('customer'); return }
 
     const savedCustomer = localStorage.getItem('ny_customer')
-    if (savedCustomer) {
-      const customer = JSON.parse(savedCustomer)
-      setUserType('customer')
-      setForm(prev => ({
-        ...prev,
-        customer_name: customer.full_name || '',
-        customer_email: customer.email || '',
-        customer_phone: customer.phone || ''
-      }))
+    if (savedCustomer && savedCustomer !== 'undefined') {
+      let customer
+      try { customer = JSON.parse(savedCustomer) } catch(e) { customer = null }
+      if (customer) {
+        setUserType('customer')
+        setForm(prev => ({
+          ...prev,
+          customer_name: customer.full_name || '',
+          customer_email: customer.email || '',
+          customer_phone: customer.phone || ''
+        }))
+      }
     }
   }, [])
 
@@ -181,6 +184,10 @@ export default function PostJob() {
               <div style={{color:'#888', fontSize:'12px'}}>I want to find jobs and earn money</div>
             </button>
           </div>
+          <p style={{color:'#888', fontSize:'13px', marginTop:'8px'}}>
+            Already have an account?{' '}
+            <a href="/login" style={{color:'#FF6B35', fontWeight:'bold', textDecoration:'none'}}>Sign In / Iniciar Sesión</a>
+          </p>
         </div>
       </main>
     )
@@ -212,21 +219,18 @@ export default function PostJob() {
             <div style={{fontSize:'32px', marginBottom:'12px'}}>⚠️</div>
             <h3 style={{color:'#1a1a2e', marginBottom:'4px', fontSize:'18px'}}>Safety Notice — Babysitting</h3>
             <p style={{color:'#FF6B35', fontWeight:'bold', fontSize:'14px', marginBottom:'16px'}}>Aviso de Seguridad — Cuidado de Niños</p>
-            
             <p style={{color:'#555', fontSize:'14px', lineHeight:'1.6', marginBottom:'12px'}}>
               NecesitoYa connects you with local providers but does not conduct background checks. For childcare services, we strongly recommend verifying the provider's identity, checking references, and conducting your own background check before hiring. By continuing, you acknowledge that you are responsible for vetting any provider you hire through this platform.
             </p>
             <p style={{color:'#555', fontSize:'13px', lineHeight:'1.6', marginBottom:'16px'}}>
               NecesitoYa te conecta con proveedores locales pero no realiza verificaciones de antecedentes. Para servicios de cuidado de niños, recomendamos verificar la identidad del proveedor, revisar referencias y realizar tu propia verificación de antecedentes antes de contratar. Al continuar, reconoces que eres responsable de evaluar a cualquier proveedor que contrates a través de esta plataforma.
             </p>
-
             <div style={{background:'#FFF3EE', borderRadius:'12px', padding:'12px', marginBottom:'20px'}}>
               <p style={{color:'#1a1a2e', fontSize:'13px', margin:0}}>
                 🔍 <strong>Free resource / Recurso gratuito:</strong> Check the National Sex Offender Registry at{' '}
                 <a href="https://www.nsopw.gov" target="_blank" rel="noopener noreferrer" style={{color:'#FF6B35', fontWeight:'bold'}}>nsopw.gov</a>
               </p>
             </div>
-
             <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
               <button
                 onClick={() => setShowBabysittingDisclaimer(false)}
