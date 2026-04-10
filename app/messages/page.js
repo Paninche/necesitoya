@@ -42,6 +42,8 @@ export default function Messages() {
     if (id) {
       setJobId(id)
       fetchJob(id)
+    } else {
+      setLoading(false)
     }
 
     const savedProvider = localStorage.getItem('ny_provider')
@@ -64,6 +66,20 @@ export default function Messages() {
       if (providerEmailParam) setRecipientEmail(decodeURIComponent(providerEmailParam))
     }
   }, [])
+
+  const fetchJob = async (id) => {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/jobs?id=eq.${id}`, {
+        headers: { 'apikey': APIKEY, 'Authorization': `Bearer ${APIKEY}` }
+      })
+      const data = await res.json()
+      if (data[0]) {
+        setJob(data[0])
+        setJobStatus(data[0].status)
+      }
+    } catch {}
+    setLoading(false)
+  }
 
   const translateMessages = async (msgs, lang) => {
     const targetLang = lang || getLangFromStorage()
