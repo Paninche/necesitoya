@@ -76,8 +76,8 @@ function CheckoutForm({ jobId, amount, providerName }) {
           <div style={{display:'flex', gap:'10px', flexWrap:'wrap', marginBottom:'12px', alignItems:'center'}}>
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay" style={{height:'20px', opacity:0.7}}/>
             <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" style={{height:'20px', opacity:0.7}}/>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" style={{height:'14px', opacity:0.7}}/>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style={{height:'22px', opacity:0.7}}/>
+            <img src="https://cdn.jsdelivr.net/npm/payment-icons@1.1.0/min/flat/visa.svg" alt="Visa" style={{height:'22px', opacity:0.7}}/>
+            <img src="https://cdn.jsdelivr.net/npm/payment-icons@1.1.0/min/flat/mastercard.svg" alt="Mastercard" style={{height:'22px', opacity:0.7}}/>
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" style={{height:'20px', opacity:0.7}}/>
           </div>
         </div>
