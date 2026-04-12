@@ -27,7 +27,7 @@ export async function POST(request) {
     const paymentIntentData = {
       amount: totalCents,
       currency: 'usd',
-      payment_method_types: ['card'],
+      automatic_payment_methods: { enabled: true },
       metadata: { jobId, customerId, providerId, commission, providerAmount },
     };
 
