@@ -10,6 +10,62 @@ const supabase = createClient(
 const SUPABASE_URL = 'https://tjtagdqdhgkmgmuozhlc.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdGFnZHFkaGdrbWdtdW96aGxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDQzMTIsImV4cCI6MjA4OTg4MDMxMn0.8DdoprOG4hWdwoYznHAX_BIT92kwnV77GhOK3Greh5Y'
 
+// ============================================================
+// SPONSORED ADS CONFIG — edit this to manage ads
+// Set enabled: false to hide an ad without deleting it
+// ============================================================
+const SPONSORED_ADS = [
+  {
+    id: 'ad1',
+    enabled: false, // SET TO true WHEN YOU HAVE A PAYING SPONSOR
+    logo: '🔨',
+    logoColor: '#F96302',
+    businessName: 'Home Depot — Winter Haven',
+    tagline: 'Get 10% off supplies for your project — use code NECESITOYA',
+    url: 'https://www.homedepot.com',
+    cta: 'Shop now',
+    categories: ['Handyman', 'Lawn & Garden', 'Painting', 'All'],
+  },
+  {
+    id: 'ad2',
+    enabled: false, // SET TO true WHEN YOU HAVE A PAYING SPONSOR
+    logo: '🪵',
+    logoColor: '#8B4513',
+    businessName: 'ABC Lumber — Winter Haven\'s trusted hardware store',
+    tagline: 'Quality materials for every home project · Open 7 days',
+    url: '#',
+    cta: 'Visit',
+    categories: ['Handyman', 'Painting', 'All'],
+  },
+]
+
+function SponsoredBanner({ ad }) {
+  if (!ad || !ad.enabled) return null
+  return (
+    <div style={{background:'#f8f6f2', borderRadius:'16px', padding:'12px 16px', marginBottom:'16px', border:'1px solid #F0EDE8'}}>
+      <div style={{fontSize:'10px', color:'#bbb', marginBottom:'6px', textTransform:'uppercase', letterSpacing:'0.5px'}}>Sponsored</div>
+      <div style={{display:'flex', alignItems:'center', gap:'12px', background:'white', borderRadius:'12px', border:'1px solid #F0EDE8', padding:'12px 16px'}}>
+        <div style={{width:'40px', height:'40px', borderRadius:'10px', background:ad.logoColor, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0}}>
+          {ad.logo}
+        </div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:'14px', fontWeight:'bold', color:'#1a1a2e'}}>{ad.businessName}</div>
+          <div style={{fontSize:'12px', color:'#888', marginTop:'2px'}}>{ad.tagline}</div>
+        </div>
+        <a href={ad.url} target="_blank" rel="noopener noreferrer"
+          style={{fontSize:'12px', fontWeight:'bold', color:'#FF6B35', whiteSpace:'nowrap', textDecoration:'none', padding:'6px 12px', border:'1px solid #FF6B35', borderRadius:'8px'}}>
+          {ad.cta}
+        </a>
+      </div>
+    </div>
+  )
+}
+
+function getAdForCategory(category) {
+  const active = SPONSORED_ADS.filter(ad => ad.enabled && (ad.categories.includes(category) || ad.categories.includes('All')))
+  return active.length > 0 ? active[0] : null
+}
+
 export default function JobsBoard() {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
@@ -122,6 +178,8 @@ export default function JobsBoard() {
     return `${Math.floor(hrs / 24)}d ago`
   }
 
+  const topAd = getAdForCategory(filter)
+
   return (
     <main style={{minHeight:'100vh', background:'#f8f6f2', fontFamily:'Arial'}}>
 
@@ -180,54 +238,64 @@ export default function JobsBoard() {
           </div>
         ) : (
           <div style={{display:'flex', flexDirection:'column', gap:'16px'}}>
-            {filteredJobs.map(job => (
-              <div key={job.id} style={{background:'white', borderRadius:'20px', padding:'24px', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', opacity: job.status !== 'open' ? 0.75 : 1}}>
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'12px'}}>
-                  <div>
-                    <div style={{display:'flex', gap:'8px', alignItems:'center'}}>
-                      <span style={{background:'#FFF3EE', color:'#FF6B35', padding:'4px 12px', borderRadius:'20px', fontSize:'12px', fontWeight:'bold'}}>{job.category}</span>
-                      {job.status !== 'open' && (
-                        <span style={{background:'#dcfce7', color:'#16a34a', padding:'4px 12px', borderRadius:'20px', fontSize:'12px', fontWeight:'bold'}}>✓ Taken</span>
-                      )}
+
+            {/* Top sponsored banner */}
+            <SponsoredBanner ad={topAd} />
+
+            {filteredJobs.map((job, index) => (
+              <div key={job.id}>
+                <div style={{background:'white', borderRadius:'20px', padding:'24px', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', opacity: job.status !== 'open' ? 0.75 : 1}}>
+                  <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'12px'}}>
+                    <div>
+                      <div style={{display:'flex', gap:'8px', alignItems:'center'}}>
+                        <span style={{background:'#FFF3EE', color:'#FF6B35', padding:'4px 12px', borderRadius:'20px', fontSize:'12px', fontWeight:'bold'}}>{job.category}</span>
+                        {job.status !== 'open' && (
+                          <span style={{background:'#dcfce7', color:'#16a34a', padding:'4px 12px', borderRadius:'20px', fontSize:'12px', fontWeight:'bold'}}>✓ Taken</span>
+                        )}
+                      </div>
+                      <h3 style={{color:'#1a1a2e', margin:'8px 0 4px', fontSize:'18px'}}>{job.title}</h3>
+                      <p style={{color:'#888', fontSize:'13px'}}>📍 {job.city}{job.state ? `, ${job.state}` : ''} · 🕐 {timeAgo(job.created_at)}</p>
                     </div>
-                    <h3 style={{color:'#1a1a2e', margin:'8px 0 4px', fontSize:'18px'}}>{job.title}</h3>
-                    <p style={{color:'#888', fontSize:'13px'}}>📍 {job.city}{job.state ? `, ${job.state}` : ''} · 🕐 {timeAgo(job.created_at)}</p>
-                  </div>
-                  {job.budget && (
-                    <div style={{textAlign:'right', flexShrink:0, marginLeft:'16px'}}>
-                      <div style={{fontSize:'18px', fontWeight:'bold', color:'#2D6A4F'}}>{job.budget}</div>
-                      <div style={{fontSize:'11px', color:'#888'}}>budget</div>
-                    </div>
-                  )}
-                </div>
-                <p style={{color:'#555', fontSize:'14px', lineHeight:'1.6', marginBottom:'16px'}}>{job.description}</p>
-                {job.image_url && (
-                  <div style={{marginBottom:'16px'}}>
-                    <img src={job.image_url} alt="Job photo" style={{width:'100%', borderRadius:'12px', maxHeight:'200px', objectFit:'cover'}}/>
-                  </div>
-                )}
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                  <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
-                    <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
-                    <select onChange={(e) => { if (e.target.value === 'block') { handleBlock(job); e.target.value = '' } else if (e.target.value) { handleReport(job, e.target.value); e.target.value = '' } }}
-                      style={{fontSize:'12px', color:'#9ca3af', border:'none', background:'transparent', cursor:'pointer', outline:'none'}}>
-                      <option value="">🚩 Report / Block</option>
-                      <option value="inappropriate">Report: Inappropriate / Inapropiado</option>
-                      <option value="spam">Report: Spam</option>
-                      <option value="block">🚫 Block User / Bloquear Usuario</option>
-                    </select>
-                  </div>
-                  <div>
-                    {job.status === 'open' ? (
-                      <button onClick={() => handleICanHelp(job)}
-                        style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'14px', cursor:'pointer'}}>
-                        I Can Help / Puedo Ayudar →
-                      </button>
-                    ) : (
-                      <span style={{fontSize:'13px', color:'#16a34a', fontWeight:'600'}}>✓ Provider assigned</span>
+                    {job.budget && (
+                      <div style={{textAlign:'right', flexShrink:0, marginLeft:'16px'}}>
+                        <div style={{fontSize:'18px', fontWeight:'bold', color:'#2D6A4F'}}>{job.budget}</div>
+                        <div style={{fontSize:'11px', color:'#888'}}>budget</div>
+                      </div>
                     )}
                   </div>
+                  <p style={{color:'#555', fontSize:'14px', lineHeight:'1.6', marginBottom:'16px'}}>{job.description}</p>
+                  {job.image_url && (
+                    <div style={{marginBottom:'16px'}}>
+                      <img src={job.image_url} alt="Job photo" style={{width:'100%', borderRadius:'12px', maxHeight:'200px', objectFit:'cover'}}/>
+                    </div>
+                  )}
+                  <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                    <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
+                      <span style={{fontSize:'13px', color:'#888'}}>Posted by {job.customer_name}</span>
+                      <select onChange={(e) => { if (e.target.value === 'block') { handleBlock(job); e.target.value = '' } else if (e.target.value) { handleReport(job, e.target.value); e.target.value = '' } }}
+                        style={{fontSize:'12px', color:'#9ca3af', border:'none', background:'transparent', cursor:'pointer', outline:'none'}}>
+                        <option value="">🚩 Report / Block</option>
+                        <option value="inappropriate">Report: Inappropriate / Inapropiado</option>
+                        <option value="spam">Report: Spam</option>
+                        <option value="block">🚫 Block User / Bloquear Usuario</option>
+                      </select>
+                    </div>
+                    <div>
+                      {job.status === 'open' ? (
+                        <button onClick={() => handleICanHelp(job)}
+                          style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'10px 20px', borderRadius:'12px', border:'none', fontWeight:'bold', fontSize:'14px', cursor:'pointer'}}>
+                          I Can Help / Puedo Ayudar →
+                        </button>
+                      ) : (
+                        <span style={{fontSize:'13px', color:'#16a34a', fontWeight:'600'}}>✓ Provider assigned</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
+
+                {/* Mid-feed sponsored banner every 3 jobs */}
+                {(index + 1) % 3 === 0 && topAd && <SponsoredBanner ad={topAd} />}
+
               </div>
             ))}
           </div>
