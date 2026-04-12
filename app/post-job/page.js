@@ -115,6 +115,7 @@ export default function PostJob() {
       })
       const providers = await res.json()
       for (const provider of (providers || [])) {
+        await new Promise(resolve => setTimeout(resolve, 300))
         fetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
