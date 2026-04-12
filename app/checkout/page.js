@@ -1,66 +1,190 @@
-import { NextResponse } from 'next/server';
-import { getStripe, calculateSplit } from '@/lib/stripe';
-import { createClient } from '@supabase/supabase-js';
+'use client';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-export async function POST(request) {
-  const stripe = getStripe();
-  try {
-    const { jobId, amount, customerId, providerId } = await request.json();
+function CheckoutForm({ jobId, amount, providerName }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-    const totalCents = Math.round(amount * 100);
-    const { commission, providerAmount } = calculateSplit(totalCents);
-
-    // Look up provider by UUID or email
-    const isEmail = providerId && providerId.includes('@');
-    const query = isEmail
-      ? supabase.from('users').select('id, stripe_account_id').eq('email', providerId).single()
-      : supabase.from('users').select('id, stripe_account_id').eq('id', providerId).single();
-
-    const { data: provider } = await query;
-
-    // Build payment intent — with or without provider stripe account
-    const paymentIntentData = {
-      amount: totalCents,
-      currency: 'usd',
-      payment_method_types: ['card'],
-      metadata: { jobId, customerId, providerId, commission, providerAmount },
-    };
-
-    // Only add transfer if provider has stripe account
-    if (provider?.stripe_account_id) {
-      paymentIntentData.transfer_data = {
-        destination: provider.stripe_account_id,
-        amount: providerAmount,
-      };
+  async function handlePayment(e) {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setLoading(true);
+    setError('');
+    try {
+      const { error: confirmError } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/payment-success?jobId=${jobId}`,
+        },
+      });
+      if (confirmError) {
+        setError(confirmError.message);
+        setLoading(false);
+      }
+    } catch (err) {
+      setError('Payment failed. Please try again. / El pago falló. Inténtalo de nuevo.');
+      setLoading(false);
     }
-
-    const paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
-
-    await supabase.from('payments').insert({
-      job_id: jobId,
-      customer_id: customerId || null,
-      provider_id: provider?.id || providerId || null,
-      stripe_payment_intent_id: paymentIntent.id,
-      amount_total: totalCents,
-      amount_commission: commission,
-      amount_provider: providerAmount,
-      status: 'pending',
-      provider_has_stripe: provider?.stripe_account_id ? true : false,
-    });
-
-    return NextResponse.json({
-      clientSecret: paymentIntent.client_secret,
-      commission,
-      providerAmount,
-      providerHasStripe: !!provider?.stripe_account_id,
-    });
-  } catch (error) {
-    console.error('Payment error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  const amountNum = parseFloat(amount);
+  const commission = (amountNum * 0.08).toFixed(2);
+  const providerPayout = (amountNum * 0.92).toFixed(2);
+
+  return (
+    <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', fontFamily:'Arial', display:'flex', alignItems:'center', justifyContent:'center', padding:'24px'}}>
+      <div style={{background:'white', borderRadius:'24px', padding:'40px', width:'100%', maxWidth:'480px'}}>
+
+        {/* Header */}
+        <div style={{textAlign:'center', marginBottom:'28px'}}>
+          <div style={{fontSize:'32px', marginBottom:'8px'}}>⚡</div>
+          <h1 style={{color:'#1a1a2e', fontSize:'24px', fontWeight:'bold', margin:'0 0 4px'}}>NecesitoYa</h1>
+          <p style={{color:'#888', fontSize:'13px', margin:0}}>Secure Payment / Pago Seguro</p>
+        </div>
+
+        {/* Job Summary */}
+        <div style={{background:'#f8f6f2', borderRadius:'16px', padding:'20px', marginBottom:'24px'}}>
+          <p style={{fontWeight:'bold', color:'#1a1a2e', fontSize:'14px', marginBottom:'12px'}}>Order Summary / Resumen</p>
+          <div style={{display:'flex', justifyContent:'space-between', fontSize:'14px', color:'#555', marginBottom:'8px'}}>
+            <span>Provider / Proveedor</span>
+            <span style={{fontWeight:'600', color:'#1a1a2e'}}>{providerName}</span>
+          </div>
+          <div style={{display:'flex', justifyContent:'space-between', fontSize:'14px', color:'#555', marginBottom:'8px'}}>
+            <span>Service Amount / Servicio</span>
+            <span>${amountNum.toFixed(2)}</span>
+          </div>
+          <div style={{display:'flex', justifyContent:'space-between', fontSize:'14px', color:'#16a34a', marginBottom:'8px'}}>
+            <span>Platform Fee / Plataforma</span>
+            <span style={{fontWeight:'600'}}>FREE ✓</span>
+          </div>
+          <div style={{borderTop:'1px solid #e5e7eb', paddingTop:'12px', marginTop:'4px', display:'flex', justifyContent:'space-between', fontWeight:'bold', fontSize:'16px', color:'#1a1a2e'}}>
+            <span>Total</span>
+            <span>${amountNum.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {/* Payment Methods Label */}
+        <div style={{marginBottom:'16px'}}>
+          <p style={{fontSize:'13px', fontWeight:'bold', color:'#1a1a2e', marginBottom:'4px'}}>Pay with / Pagar con</p>
+          <div style={{display:'flex', gap:'8px', flexWrap:'wrap', marginBottom:'12px'}}>
+            {['Apple Pay', 'Google Pay', 'Card', 'PayPal'].map(method => (
+              <span key={method} style={{fontSize:'11px', padding:'4px 10px', borderRadius:'20px', border:'1px solid #F0EDE8', color:'#555', background:'white'}}>{method}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Stripe Payment Element */}
+        <form onSubmit={handlePayment}>
+          <PaymentElement options={{
+            layout: 'tabs',
+            paymentMethodOrder: ['apple_pay', 'google_pay', 'card', 'paypal']
+          }}/>
+          {error && (
+            <div style={{background:'#fef2f2', border:'1px solid #fca5a5', borderRadius:'10px', padding:'12px', marginTop:'12px'}}>
+              <p style={{color:'#dc2626', fontSize:'13px', margin:0}}>{error}</p>
+            </div>
+          )}
+          <button
+            type="submit"
+            disabled={loading || !stripe}
+            style={{width:'100%', background: loading ? '#ccc' : 'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontWeight:'bold', fontSize:'16px', cursor: loading ? 'not-allowed' : 'pointer', marginTop:'20px'}}
+          >
+            {loading ? 'Processing... / Procesando...' : `Pay $${amountNum.toFixed(2)} →`}
+          </button>
+        </form>
+
+        {/* Footer */}
+        <div style={{textAlign:'center', marginTop:'20px'}}>
+          <p style={{fontSize:'12px', color:'#aaa', margin:'0 0 4px'}}>🔒 Secured by Stripe · End-to-end encrypted</p>
+          <p style={{fontSize:'11px', color:'#ccc', margin:0}}>Provider receives ${providerPayout} · NecesitoYa fee: ${commission}</p>
+        </div>
+
+      </div>
+    </main>
+  );
+}
+
+function CheckoutWrapper() {
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get('jobId');
+  const amount = searchParams.get('amount');
+  const providerId = searchParams.get('providerId');
+  const providerName = searchParams.get('providerName') || 'Your Provider';
+  const [clientSecret, setClientSecret] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!jobId || !amount || !providerId) return;
+    fetch('/api/stripe/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jobId,
+        amount: parseFloat(amount),
+        customerId: 'guest',
+        providerId,
+      }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.clientSecret) setClientSecret(data.clientSecret);
+        else setError(data.error || 'Failed to initialize payment. Please try again.');
+      })
+      .catch(() => setError('Failed to load payment. Please check your connection.'));
+  }, [jobId, amount, providerId]);
+
+  if (error) return (
+    <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial', padding:'24px'}}>
+      <div style={{background:'white', borderRadius:'24px', padding:'48px', maxWidth:'400px', width:'100%', textAlign:'center'}}>
+        <div style={{fontSize:'48px', marginBottom:'16px'}}>⚠️</div>
+        <h2 style={{color:'#1a1a2e', marginBottom:'8px'}}>Payment Error</h2>
+        <p style={{color:'#888', fontSize:'14px', marginBottom:'24px'}}>{error}</p>
+        <a href="/customer-dashboard" style={{display:'block', background:'linear-gradient(135deg,#FF6B35,#F4A261)', color:'white', padding:'14px', borderRadius:'16px', textDecoration:'none', fontWeight:'bold', fontSize:'15px'}}>
+          ← Back to Dashboard
+        </a>
+      </div>
+    </main>
+  );
+
+  if (!clientSecret) return (
+    <main style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Arial'}}>
+      <div style={{textAlign:'center'}}>
+        <div style={{fontSize:'48px', marginBottom:'16px'}}>⚡</div>
+        <p style={{color:'white', fontSize:'16px'}}>Loading payment... / Cargando pago...</p>
+      </div>
+    </main>
+  );
+
+  return (
+    <Elements stripe={stripePromise} options={{
+      clientSecret,
+      appearance: {
+        theme: 'stripe',
+        variables: {
+          colorPrimary: '#FF6B35',
+          colorBackground: '#ffffff',
+          colorText: '#1a1a2e',
+          borderRadius: '12px',
+          fontFamily: 'Arial, sans-serif',
+        }
+      }
+    }}>
+      <CheckoutForm jobId={jobId} amount={amount} providerName={providerName} />
+    </Elements>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div style={{minHeight:'100vh', background:'linear-gradient(135deg,#1a1a2e,#0f3460)', display:'flex', alignItems:'center', justifyContent:'center'}}><p style={{color:'white'}}>Loading...</p></div>}>
+      <CheckoutWrapper />
+    </Suspense>
+  );
 }
