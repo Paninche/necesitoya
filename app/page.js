@@ -220,6 +220,7 @@ export default function Home() {
               <a href="/privacy" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Privacy Policy</a>
               <a href="/terms" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Terms of Service</a>
               <a href="/support" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Support</a>
+              <a href="/about" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>About</a>
               <span style={{display: "block"}}>Haines City, FL</span>
             </div>
           </div>
