@@ -90,6 +90,9 @@ export default function ProviderSignup() {
           type: 'provider'
         })
       })
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'CompleteRegistration', { content_name: 'Provider Signup' })
+      }
       setSubmitted(true)
     } catch(e) {
       console.log(e)

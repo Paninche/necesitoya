@@ -60,6 +60,9 @@ export default function CustomerSignup() {
           type: 'customer'
         })
       })
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'CompleteRegistration', { content_name: 'Customer Signup' })
+      }
       setSubmitted(true)
     } catch(e) {
       console.log(e)
