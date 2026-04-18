@@ -84,6 +84,17 @@ export default function AboutPage() {
           </p>
         </div>
 
+        {/* As Seen On */}
+        <div style={{background:'white', borderRadius:'20px', padding:'32px', marginBottom:'24px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', textAlign:'center'}}>
+          <p style={{color:'#aaa', fontSize:'11px', letterSpacing:'3px', marginBottom:'16px', textTransform:'uppercase'}}>As Seen On</p>
+          <a href="https://usanews.com/newsroom/how-david-cruzado-used-ai-to-build-necesitoya-america-s-first-bilingual-local-services-app" target="_blank" rel="noopener noreferrer">
+            <img src="/usa-news-badge.png" alt="As Seen On USA News" style={{height:'90px', display:'block', margin:'0 auto 16px'}}/>
+          </a>
+          <a href="https://usanews.com/newsroom/how-david-cruzado-used-ai-to-build-necesitoya-america-s-first-bilingual-local-services-app" target="_blank" rel="noopener noreferrer" style={{color:'#FF6B35', fontWeight:'bold', fontSize:'14px', textDecoration:'none'}}>
+            Read the full feature article →
+          </a>
+        </div>
+
         {/* Available on */}
         <div style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', borderRadius:'20px', padding:'32px', marginBottom:'24px', textAlign:'center'}}>
           <h2 style={{fontSize:'24px', fontWeight:'bold', color:'white', marginBottom:'8px'}}>
