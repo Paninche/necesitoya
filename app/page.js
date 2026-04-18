@@ -40,11 +40,11 @@ export default function Home() {
         </div>
         <div style={{marginTop: "32px", display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", marginBottom: "8px"}}>
           <div style={{display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,107,53,0.4)", borderRadius: "30px", padding: "10px 20px"}}>
-            <span style={{fontSize: "18px"}}>🛡️</span>
+            <span style={{fontSize: "18px"}}>🔒</span>
             <span style={{color: "white", fontSize: "13px", fontWeight: "bold"}}>NecesitoYa Guarantee — Your payment is protected</span>
           </div>
           <div style={{display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,107,53,0.4)", borderRadius: "30px", padding: "10px 20px"}}>
-            <span style={{fontSize: "18px"}}>🛡️</span>
+            <span style={{fontSize: "18px"}}>🔒</span>
             <span style={{color: "white", fontSize: "13px", fontWeight: "bold"}}>Garantía NecesitoYa — Tu pago está protegido</span>
           </div>
         </div>
