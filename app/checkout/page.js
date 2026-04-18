@@ -70,6 +70,16 @@ function CheckoutForm({ jobId, amount, providerName }) {
           </div>
         </div>
 
+        {/* Guarantee Badge */}
+        <div style={{background:'#f0fdf4', border:'1px solid #86efac', borderRadius:'12px', padding:'12px 16px', marginBottom:'16px', display:'flex', alignItems:'center', gap:'10px'}}>
+          <span style={{fontSize:'20px'}}>🔒</span>
+          <div>
+            <p style={{margin:0, fontWeight:'bold', color:'#16a34a', fontSize:'13px'}}>NecesitoYa Guarantee</p>
+            <p style={{margin:0, color:'#15803d', fontSize:'12px'}}>Your payment is protected — if something goes wrong, we'll make it right.</p>
+            <p style={{margin:0, color:'#15803d', fontSize:'11px', marginTop:'2px'}}>Tu pago está protegido — si algo sale mal, lo resolvemos.</p>
+          </div>
+        </div>
+
         {/* Payment Methods Label */}
         <div style={{marginBottom:'16px'}}>
           <p style={{fontSize:'13px', fontWeight:'bold', color:'#1a1a2e', marginBottom:'4px'}}>Pay with / Pagar con</p>
