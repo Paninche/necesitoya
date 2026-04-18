@@ -60,6 +60,14 @@ export default function Home() {
         </div>
       </section>
 
+      {/* AS SEEN ON */}
+      <section style={{background: "#0f0f1a", padding: "20px 32px", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.05)"}}>
+        <p style={{color: "rgba(255,255,255,0.4)", fontSize: "11px", letterSpacing: "3px", marginBottom: "12px", textTransform: "uppercase"}}>As Seen On / Presentado En</p>
+        <a href="https://usanews.com/newsroom/how-david-cruzado-used-ai-to-build-necesitoya-america-s-first-bilingual-local-services-app" target="_blank" rel="noopener noreferrer">
+          <img src="/usa-news-badge.png" alt="As Seen On USA News" style={{height: "60px", opacity: 0.9}}/>
+        </a>
+      </section>
+
       {/* CATEGORIES */}
       <section style={{padding: "60px 32px", background: "#f8f6f2"}}>
         <h2 style={{textAlign: "center", fontSize: "28px", color: "#1a1a2e", marginBottom: "4px"}}>What do you need help with?</h2>
