@@ -38,7 +38,17 @@ export default function Home() {
             Find Jobs / Ver Trabajos →
           </a>
         </div>
-        <div style={{marginTop: "32px", display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap"}}>
+        <div style={{marginTop: "32px", display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", marginBottom: "8px"}}>
+          <div style={{display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,107,53,0.4)", borderRadius: "30px", padding: "10px 20px"}}>
+            <span style={{fontSize: "18px"}}>🛡️</span>
+            <span style={{color: "white", fontSize: "13px", fontWeight: "bold"}}>NecesitoYa Guarantee — Your payment is protected</span>
+          </div>
+          <div style={{display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,107,53,0.4)", borderRadius: "30px", padding: "10px 20px"}}>
+            <span style={{fontSize: "18px"}}>🛡️</span>
+            <span style={{color: "white", fontSize: "13px", fontWeight: "bold"}}>Garantía NecesitoYa — Tu pago está protegido</span>
+          </div>
+        </div>
+        <div style={{marginTop: "16px", display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap"}}>
           <a href="https://apps.apple.com/app/id6761226228" target="_blank" rel="noopener noreferrer" style={{display: "flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.3)", color: "white", padding: "10px 20px", borderRadius: "12px", textDecoration: "none", whiteSpace: "nowrap"}}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
             <span style={{fontSize: "14px", fontWeight: "600"}}>App Store</span>
@@ -131,7 +141,8 @@ export default function Home() {
             <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ 100% free to post — no subscription</p>
             <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ Local pros respond directly to you</p>
             <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ Chat and pay securely in-app</p>
-            <p style={{color: "#888", marginBottom: "24px", fontSize: "14px"}}>✅ Bilingual — English & Spanish</p>
+            <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ Bilingual — English & Spanish</p>
+            <p style={{color: "#888", marginBottom: "24px", fontSize: "14px"}}>🛡️ NecesitoYa Guarantee — payment protected if something goes wrong</p>
             <a href="/post-job?type=customer" style={{display: "inline-block", background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "14px 32px", borderRadius: "24px", textDecoration: "none", fontWeight: "bold", fontSize: "15px"}}>
               Post & Get Help / Publica y Obtén Ayuda →
             </a>
