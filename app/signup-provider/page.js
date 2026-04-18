@@ -91,7 +91,7 @@ export default function ProviderSignup() {
         })
       })
       if (typeof window !== 'undefined' && window.fbq) {
-        window.fbq('track', 'CompleteRegistration', { content_name: 'Provider Signup' })
+        window.fbq('track', 'Lead', { content_name: 'Provider Signup' })
       }
       setSubmitted(true)
     } catch(e) {
