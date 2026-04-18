@@ -62,7 +62,7 @@ export default function Home() {
 
       {/* AS SEEN ON */}
       <section style={{background: "white", padding: "24px 32px", textAlign: "center", borderTop: "1px solid #f0ede8"}}>
-        <p style={{color: "#aaa", fontSize: "11px", letterSpacing: "3px", marginBottom: "12px", textTransform: "uppercase"}}>As Seen On / Presentado En</p>
+        <p style={{color: "#aaa", fontSize: "11px", letterSpacing: "3px", marginBottom: "12px", textTransform: "uppercase"}}></p>
         <a href="https://usanews.com/newsroom/how-david-cruzado-used-ai-to-build-necesitoya-america-s-first-bilingual-local-services-app" target="_blank" rel="noopener noreferrer">
           <img src="/usa-news-badge.png" alt="As Seen On USA News" style={{height: "100px"}}/>
         </a>
