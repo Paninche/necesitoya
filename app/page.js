@@ -41,11 +41,11 @@ export default function Home() {
         <div style={{marginTop: "32px", display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", marginBottom: "8px"}}>
           <div style={{display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,107,53,0.4)", borderRadius: "30px", padding: "10px 20px"}}>
             <span style={{fontSize: "18px"}}>🔒</span>
-            <span style={{color: "white", fontSize: "13px", fontWeight: "bold"}}>NecesitoYa Guarantee — Your payment is protected</span>
+            <a href="/guarantee" style={{color: "white", fontSize: "13px", fontWeight: "bold", textDecoration: "none"}}>NecesitoYa Guarantee — Your payment is protected →</a>
           </div>
           <div style={{display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,107,53,0.4)", borderRadius: "30px", padding: "10px 20px"}}>
             <span style={{fontSize: "18px"}}>🔒</span>
-            <span style={{color: "white", fontSize: "13px", fontWeight: "bold"}}>Garantía NecesitoYa — Tu pago está protegido</span>
+            <a href="/guarantee" style={{color: "white", fontSize: "13px", fontWeight: "bold", textDecoration: "none"}}>Garantía NecesitoYa — Tu pago está protegido →</a>
           </div>
         </div>
         <div style={{marginTop: "16px", display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap"}}>
@@ -142,7 +142,7 @@ export default function Home() {
             <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ Local pros respond directly to you</p>
             <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ Chat and pay securely in-app</p>
             <p style={{color: "#888", marginBottom: "8px", fontSize: "14px"}}>✅ Bilingual — English & Spanish</p>
-            <p style={{color: "#888", marginBottom: "24px", fontSize: "14px"}}>🛡️ NecesitoYa Guarantee — payment protected if something goes wrong</p>
+            <p style={{color: "#888", marginBottom: "24px", fontSize: "14px"}}>🔒 <a href="/guarantee" style={{color: "#FF6B35", fontWeight: "bold", textDecoration: "none"}}>NecesitoYa Guarantee</a> — payment protected if something goes wrong</p>
             <a href="/post-job?type=customer" style={{display: "inline-block", background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "14px 32px", borderRadius: "24px", textDecoration: "none", fontWeight: "bold", fontSize: "15px"}}>
               Post & Get Help / Publica y Obtén Ayuda →
             </a>
@@ -214,6 +214,7 @@ export default function Home() {
               <a href="/find-a-pro" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Find a Pro</a>
               <a href="/buy-sell" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Buy & Sell</a>
               <a href="/customer-dashboard" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>My Dashboard</a>
+              <a href="/guarantee" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Our Guarantee</a>
             </div>
           </div>
           <div>
