@@ -15,6 +15,40 @@ function getLangFromStorage() {
   return 'en'
 }
 
+// Compress image to max 1200px wide, 80% JPEG quality
+async function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const reader = new FileReader()
+    reader.onload = (e) => { img.src = e.target.result }
+    reader.onerror = reject
+    img.onload = () => {
+      const MAX_WIDTH = 1200
+      let w = img.width
+      let h = img.height
+      if (w > MAX_WIDTH) {
+        h = Math.round(h * (MAX_WIDTH / w))
+        w = MAX_WIDTH
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0, w, h)
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return reject(new Error('Compression failed'))
+          resolve(blob)
+        },
+        'image/jpeg',
+        0.8
+      )
+    }
+    img.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 export default function Messages() {
   const [jobId, setJobId] = useState(null)
   const [job, setJob] = useState(null)
@@ -26,13 +60,16 @@ export default function Messages() {
   const [recipientEmail, setRecipientEmail] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [identified, setIdentified] = useState(false)
   const [isCustomer, setIsCustomer] = useState(false)
   const [isProvider, setIsProvider] = useState(false)
   const [jobStatus, setJobStatus] = useState('open')
   const [accepting, setAccepting] = useState(false)
   const [userLang, setUserLang] = useState('en')
+  const [expandedImage, setExpandedImage] = useState(null)
   const translatingRef = useRef(new Set())
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -176,6 +213,90 @@ export default function Messages() {
       alert('Error accepting provider. Please try again.')
     }
     setAccepting(false)
+  }
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file. / Por favor selecciona una imagen.')
+      return
+    }
+
+    setUploading(true)
+    try {
+      const compressed = await compressImage(file)
+      const filename = `${jobId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`
+
+      const uploadRes = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/chat-images/${filename}`,
+        {
+          method: 'POST',
+          headers: {
+            'apikey': APIKEY,
+            'Authorization': `Bearer ${APIKEY}`,
+            'Content-Type': 'image/jpeg'
+          },
+          body: compressed
+        }
+      )
+
+      if (!uploadRes.ok) throw new Error('Upload failed')
+
+      const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/chat-images/${filename}`
+
+      const params = new URLSearchParams(window.location.search)
+      const providerParam = params.get('provider')
+      const recipient = isCustomer
+        ? (providerParam ? decodeURIComponent(providerParam) : recipientEmail)
+        : job?.customer_email
+
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': APIKEY,
+          'Authorization': `Bearer ${APIKEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          job_id: jobId,
+          sender_name: senderName,
+          sender_email: senderEmail,
+          recipient_email: recipient,
+          message: '📷 Image',
+          image_url: imageUrl
+        })
+      })
+
+      if (res.ok) {
+        fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'new_message',
+            customerEmail: recipient,
+            customerName: recipient?.split('@')[0],
+            providerName: senderName,
+            providerEmail: senderEmail,
+            job: {
+              id: jobId,
+              title: job?.title || '',
+              category: job?.category || '',
+              city: job?.city || '',
+              message: '📷 Sent an image'
+            }
+          })
+        }).catch(() => {})
+        fetchMessages(jobId, senderEmail, recipient)
+      }
+    } catch (err) {
+      console.error('Image upload error:', err)
+      alert('Failed to upload image. Please try again. / Error al subir la imagen.')
+    }
+    setUploading(false)
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const sendMessage = async () => {
@@ -342,17 +463,36 @@ export default function Messages() {
               const isMine = msg.sender_email === senderEmail
               const t = translations[msg.id]
               const showTranslation = t && t.translation && t.translation !== t.original
+              const hasImage = !!msg.image_url
               return (
                 <div key={msg.id} style={{display:'flex', justifyContent: isMine ? 'flex-end' : 'flex-start'}}>
                   <div style={{maxWidth:'70%', background: isMine ? 'linear-gradient(135deg,#FF6B35,#F4A261)' : 'white', borderRadius:'16px', padding:'12px 16px', boxShadow:'0 2px 8px rgba(0,0,0,0.06)'}}>
                     <div style={{fontSize:'11px', fontWeight:'bold', color: isMine ? 'rgba(255,255,255,0.8)' : '#FF6B35', marginBottom:'4px'}}>{msg.sender_name}</div>
-                    {showTranslation ? (
-                      <>
-                        <div style={{fontSize:'15px', color: isMine ? 'white' : '#1a1a2e', lineHeight:'1.5', fontWeight:'600'}}>{t.translation}</div>
-                        <div style={{fontSize:'12px', color: isMine ? 'rgba(255,255,255,0.5)' : '#bbb', lineHeight:'1.4', marginTop:'6px', fontStyle:'italic'}}>{t.original}</div>
-                      </>
-                    ) : (
-                      <div style={{fontSize:'15px', color: isMine ? 'white' : '#1a1a2e', lineHeight:'1.5'}}>{msg.message}</div>
+                    {hasImage && (
+                      <img
+                        src={msg.image_url}
+                        alt="Shared"
+                        onClick={() => setExpandedImage(msg.image_url)}
+                        style={{
+                          maxWidth:'100%',
+                          maxHeight:'240px',
+                          borderRadius:'12px',
+                          display:'block',
+                          cursor:'pointer',
+                          marginBottom: msg.message && msg.message !== '📷 Image' ? '8px' : '4px',
+                          objectFit:'cover'
+                        }}
+                      />
+                    )}
+                    {(!hasImage || (msg.message && msg.message !== '📷 Image')) && (
+                      showTranslation ? (
+                        <>
+                          <div style={{fontSize:'15px', color: isMine ? 'white' : '#1a1a2e', lineHeight:'1.5', fontWeight:'600'}}>{t.translation}</div>
+                          <div style={{fontSize:'12px', color: isMine ? 'rgba(255,255,255,0.5)' : '#bbb', lineHeight:'1.4', marginTop:'6px', fontStyle:'italic'}}>{t.original}</div>
+                        </>
+                      ) : (
+                        <div style={{fontSize:'15px', color: isMine ? 'white' : '#1a1a2e', lineHeight:'1.5'}}>{msg.message}</div>
+                      )
                     )}
                     <div style={{fontSize:'11px', color: isMine ? 'rgba(255,255,255,0.6)' : '#aaa', marginTop:'4px', textAlign:'right'}}>{timeAgo(msg.created_at)}</div>
                   </div>
@@ -363,13 +503,54 @@ export default function Messages() {
         )}
       </div>
 
-      <div style={{background:'white', padding:'16px 32px', borderTop:'1px solid #F0EDE8', display:'flex', gap:'12px', alignItems:'center'}}>
+      {/* Fullscreen image viewer */}
+      {expandedImage && (
+        <div
+          onClick={() => setExpandedImage(null)}
+          style={{
+            position:'fixed', top:0, left:0, right:0, bottom:0,
+            background:'rgba(0,0,0,0.9)', zIndex:1000,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            padding:'20px', cursor:'pointer'
+          }}
+        >
+          <img
+            src={expandedImage}
+            alt="Full size"
+            style={{maxWidth:'100%', maxHeight:'100%', objectFit:'contain', borderRadius:'12px'}}
+          />
+          <div style={{position:'absolute', top:'20px', right:'20px', color:'white', fontSize:'32px', cursor:'pointer'}}>✕</div>
+        </div>
+      )}
+
+      <div style={{background:'white', padding:'16px 32px', borderTop:'1px solid #F0EDE8', display:'flex', gap:'8px', alignItems:'center'}}>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleImageUpload}
+          style={{display:'none'}}
+        />
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading || sending}
+          title="Send photo / Enviar foto"
+          style={{
+            background:'#f8f6f2', border:'2px solid #F0EDE8', color:'#FF6B35',
+            width:'44px', height:'44px', borderRadius:'50%', cursor:'pointer',
+            fontSize:'20px', display:'flex', alignItems:'center', justifyContent:'center',
+            flexShrink:0
+          }}
+        >
+          {uploading ? '⏳' : '📷'}
+        </button>
         <input type="text" placeholder="Type a message... / Escribe un mensaje..."
           value={newMessage} onChange={e => setNewMessage(e.target.value)}
           onKeyPress={e => e.key === 'Enter' && sendMessage()}
+          disabled={uploading}
           style={{flex:1, padding:'12px 16px', borderRadius:'24px', border:'2px solid #F0EDE8', fontSize:'16px', outline:'none'}}
         />
-        <button onClick={sendMessage} disabled={sending}
+        <button onClick={sendMessage} disabled={sending || uploading}
           style={{background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'12px 24px', borderRadius:'24px', fontWeight:'bold', cursor:'pointer', fontSize:'15px'}}>
           {sending ? '...' : 'Send →'}
         </button>
