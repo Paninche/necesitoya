@@ -30,9 +30,9 @@ export async function POST(request) {
     const { jobId } = paymentIntent.metadata;
 
     await supabase
-  .from('payments')
-  .update({ status: 'succeeded' })
-  .eq('stripe_payment_intent_id', paymentIntent.id);
+      .from('payments')
+      .update({ status: 'succeeded' })
+      .eq('stripe_payment_intent_id', paymentIntent.id);
 
     await supabase
       .from('jobs')
@@ -47,6 +47,19 @@ export async function POST(request) {
       .from('payments')
       .update({ status: 'failed' })
       .eq('stripe_payment_intent_id', paymentIntent.id);
+  }
+
+  // Flip stripe_onboarding_complete ONLY when Stripe confirms the account
+  // is fully ready to charge and receive payouts. This fires when providers
+  // finish the Stripe Express onboarding flow (bank info submitted + verified).
+  if (event.type === 'account.updated') {
+    const account = event.data.object;
+    const isFullyOnboarded = account.charges_enabled && account.payouts_enabled;
+
+    await supabase
+      .from('users')
+      .update({ stripe_onboarding_complete: isFullyOnboarded })
+      .eq('stripe_account_id', account.id);
   }
 
   return NextResponse.json({ received: true });

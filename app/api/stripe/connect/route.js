@@ -9,7 +9,7 @@ const supabase = createClient(
 
 export async function POST(request) {
   console.log('Stripe key starts with:', process.env.STRIPE_SECRET_KEY?.substring(0, 10));
-const stripe = getStripe();
+  const stripe = getStripe();
   try {
     const { userId, email } = await request.json();
 
@@ -24,10 +24,13 @@ const stripe = getStripe();
       },
     });
 
+    // Save the stripe_account_id but DO NOT mark onboarding complete yet.
+    // The account.updated webhook will flip stripe_onboarding_complete to true
+    // only when Stripe confirms charges_enabled and payouts_enabled.
     await supabase
-  .from('users')
-  .update({ stripe_account_id: account.id, stripe_onboarding_complete: true })
-  .eq('id', userId);
+      .from('users')
+      .update({ stripe_account_id: account.id })
+      .eq('id', userId);
 
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
