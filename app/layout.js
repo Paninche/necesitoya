@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
+import CookieBanner from "../components/CookieBanner";
 
 export const metadata = {
   title: "NecesitoYa — Hire Local Handyman, Cleaning, Lawn Care & More | Florida",
@@ -55,6 +56,14 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <script dangerouslySetInnerHTML={{__html: `
+          window.gtag = window.gtag || function(){(window.dataLayer = window.dataLayer || []).push(arguments);}
+          gtag('consent', 'default', {
+            ad_storage: 'denied',
+            analytics_storage: 'denied',
+            wait_for_update: 500
+          });
+        `}} />
+        <script dangerouslySetInnerHTML={{__html: `
           !function(f,b,e,v,n,t,s)
           {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -63,6 +72,7 @@ export default function RootLayout({ children }) {
           t.src=v;s=b.getElementsByTagName(e)[0];
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
+          fbq('consent', 'revoke');
           fbq('init', '1610571833393290');
           fbq('track', 'PageView');
         `}} />
@@ -70,6 +80,7 @@ export default function RootLayout({ children }) {
       </head>
       <body style={{margin: 0, padding: 0}}>
         {children}
+        <CookieBanner />
         <Analytics />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-LBBGNFP1BE" strategy="afterInteractive"/>
         <Script id="google-analytics" strategy="afterInteractive">{`
