@@ -223,6 +223,7 @@ export default function Home() {
               <a href="/buy-sell" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Buy & Sell</a>
               <a href="/customer-dashboard" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>My Dashboard</a>
               <a href="/guarantee" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Our Guarantee</a>
+              <a href="/safety" style={{display: "block", color: "rgba(255,255,255,0.4)", textDecoration: "none"}}>Safety Guidelines</a>
             </div>
           </div>
           <div>
