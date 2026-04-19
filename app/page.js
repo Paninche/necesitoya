@@ -22,8 +22,8 @@ export default function Home() {
         <div style={{fontSize: "14px", color: "#FF6B35", letterSpacing: "4px", marginBottom: "16px"}}>AMERICA'S BILINGUAL LOCAL SERVICES APP · LA APP BILINGÜE DE SERVICIOS LOCALES DE AMÉRICA</div>
         <h1 style={{fontSize: "52px", fontWeight: "bold", color: "white", margin: "0 0 8px 0", lineHeight: 1.1}}>NecesitoYa</h1>
         <p style={{fontSize: "20px", color: "rgba(255,255,255,0.6)", marginBottom: "8px"}}>I Need It Now &nbsp;·&nbsp; Lo Necesito Ya</p>
-        <p style={{fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "16px"}}>Find trusted local help near you — in English or Spanish</p>
-        <p style={{fontSize: "14px", color: "rgba(255,255,255,0.3)", marginBottom: "40px"}}>Encuentra ayuda local de confianza — en inglés o español</p>
+        <p style={{fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "16px"}}>Find local help near you — in English or Spanish</p>
+        <p style={{fontSize: "14px", color: "rgba(255,255,255,0.3)", marginBottom: "40px"}}>Encuentra ayuda local cerca de ti — en inglés o español</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
           <a href="/post-job?type=customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", border: "none", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", cursor: "pointer", textDecoration: "none", whiteSpace: "nowrap"}}>
             Post & Get Help / Publica y Obtén Ayuda →
@@ -194,7 +194,7 @@ export default function Home() {
       <section style={{background: "linear-gradient(135deg, #1a1a2e, #0f3460)", padding: "60px 32px", textAlign: "center"}}>
         <h2 style={{color: "white", fontSize: "32px", marginBottom: "4px"}}>Ready to get started?</h2>
         <p style={{color: "#FF6B35", fontWeight: "bold", marginBottom: "8px"}}>¿Listo para comenzar?</p>
-        <p style={{color: "rgba(255,255,255,0.6)", marginBottom: "32px"}}>Join thousands of people connecting locally · Únete a miles de personas conectándose localmente</p>
+        <p style={{color: "rgba(255,255,255,0.6)", marginBottom: "32px"}}>Join NecesitoYa and connect locally · Únete a NecesitoYa y conéctate localmente</p>
         <div style={{display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap"}}>
           <a href="/post-job?type=customer" style={{background: "linear-gradient(135deg, #FF6B35, #F4A261)", color: "white", padding: "16px 40px", borderRadius: "30px", fontSize: "16px", fontWeight: "bold", textDecoration: "none"}}>
             Post & Get Help / Publica y Obtén Ayuda →
