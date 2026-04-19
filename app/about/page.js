@@ -29,7 +29,7 @@ export default function AboutPage() {
             What is NecesitoYa?
           </h2>
           <p style={{fontSize:'16px', color:'#444', lineHeight:'1.7', marginBottom:'16px'}}>
-            NecesitoYa (necesitoya.app) is America's first bilingual local services marketplace — a two-sided platform that connects customers who need local services with trusted providers in their area, operating seamlessly in both English and Spanish.
+            NecesitoYa (necesitoya.app) is America's Bilingual Local Services App — a two-sided marketplace that connects customers who need local services with independent providers in their area, operating seamlessly in both English and Spanish.
           </p>
           <p style={{fontSize:'16px', color:'#444', lineHeight:'1.7'}}>
             The name NecesitoYa comes from the Spanish phrase "Lo Necesito Ya" — meaning "I Need It Now." Whether you need a handyman, cleaner, lawn care professional, mechanic, tutor, or any other local service, NecesitoYa connects you with local providers fast — in your language.
