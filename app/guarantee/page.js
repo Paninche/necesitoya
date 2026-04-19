@@ -14,10 +14,10 @@ export default function GuaranteePage() {
         <h1 style={{color: 'white', fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px'}}>NecesitoYa Guarantee</h1>
         <p style={{color: '#FF6B35', fontWeight: 'bold', fontSize: '18px', margin: '0 0 12px'}}>Garantía NecesitoYa</p>
         <p style={{color: 'rgba(255,255,255,0.7)', fontSize: '16px', maxWidth: '600px', margin: '0 auto'}}>
-          When you pay through NecesitoYa, your payment is protected. If something goes wrong, we'll make it right.
+          When you pay through NecesitoYa, your payment is protected. If something goes wrong, we'll review your case and work to make it right.
         </p>
         <p style={{color: 'rgba(255,255,255,0.5)', fontSize: '14px', maxWidth: '600px', margin: '8px auto 0'}}>
-          Cuando pagas a través de NecesitoYa, tu pago está protegido. Si algo sale mal, lo resolvemos.
+          Cuando pagas a través de NecesitoYa, tu pago está protegido. Si algo sale mal, revisaremos tu caso y trabajaremos para resolverlo.
         </p>
       </section>
 
@@ -51,6 +51,7 @@ export default function GuaranteePage() {
             'Disputes not reported within 48 hours of the job date',
             'Cash or off-platform payments — guarantee applies only to payments made through NecesitoYa',
             'Damages beyond the amount paid for the job',
+            'Personal injury, property damage, or any consequential damages',
             'False or unsubstantiated claims without evidence',
           ].map((item, i) => (
             <div key={i} style={{display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '12px'}}>
@@ -69,7 +70,7 @@ export default function GuaranteePage() {
             {step: '1', text: 'Email hello@necesitoya.app within 48 hours of the job date'},
             {step: '2', text: 'Include your job details, provider name, and photos if applicable'},
             {step: '3', text: 'We contact both parties and review the case fairly'},
-            {step: '4', text: 'Resolution within 3 business days — refund, credit, or replacement provider'},
+            {step: '4', text: 'We aim to resolve claims within 3 business days — eligible outcomes include a refund or platform credit'},
           ].map((item) => (
             <div key={item.step} style={{display: 'flex', alignItems: 'flex-start', gap: '16px', marginBottom: '16px'}}>
               <div style={{width: '32px', height: '32px', background: 'linear-gradient(135deg, #FF6B35, #F4A261)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '14px', flexShrink: 0}}>{item.step}</div>
@@ -85,8 +86,9 @@ export default function GuaranteePage() {
             'Guarantee applies only to payments made through NecesitoYa',
             'Refunds are limited to the amount paid for the job — no consequential damages',
             'One claim per job',
-            'NecesitoYa reserves the right to review all claims before issuing any refund',
+            'All claims are reviewed on a case-by-case basis. NecesitoYa has sole discretion in determining whether a claim qualifies for coverage',
             'Both parties will be contacted before any resolution is made',
+            'This Guarantee is a goodwill program offered by NecesitoYa and does not create any additional legal obligations beyond those set forth in our Terms of Service',
           ].map((item, i) => (
             <div key={i} style={{display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '10px'}}>
               <span style={{color: '#FF6B35', fontWeight: 'bold', marginTop: '1px'}}>•</span>
