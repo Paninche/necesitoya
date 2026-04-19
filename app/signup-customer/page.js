@@ -116,7 +116,7 @@ export default function CustomerSignup() {
             {agreedToTerms && <span style={{color:'white', fontSize:'13px', fontWeight:'bold'}}>✓</span>}
           </div>
           <p style={{color:'#555', fontSize:'12px', lineHeight:'1.5', margin:0}}>
-            I agree to the <a href="/terms" style={{color:'#FF6B35', fontWeight:'600'}}>Terms of Service</a> and confirm there is no tolerance for objectionable content or abusive behavior. / Acepto los <a href="/terms" style={{color:'#FF6B35', fontWeight:'600'}}>Terminos de Servicio</a> y confirmo que no se tolera contenido inapropiado.
+            I agree to the <a href="/terms" style={{color:'#FF6B35', fontWeight:'600'}}>Terms of Service</a> and <a href="/privacy" style={{color:'#FF6B35', fontWeight:'600'}}>Privacy Policy</a>, and confirm there is no tolerance for objectionable content or abusive behavior. / Acepto los <a href="/terms" style={{color:'#FF6B35', fontWeight:'600'}}>Términos de Servicio</a> y la <a href="/privacy" style={{color:'#FF6B35', fontWeight:'600'}}>Política de Privacidad</a>, y confirmo que no se tolera contenido inapropiado.
           </p>
         </div>
         <button onClick={handleSubmit} disabled={loading} style={{width:'100%', background:'linear-gradient(135deg,#FF6B35,#F4A261)', border:'none', color:'white', padding:'16px', borderRadius:'16px', fontSize:'16px', fontWeight:'bold', cursor:'pointer'}}>
