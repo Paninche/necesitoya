@@ -93,6 +93,13 @@ export default function ProviderSignup() {
       if (typeof window !== 'undefined' && window.fbq) {
         window.fbq('track', 'Lead', { content_name: 'Provider Signup' })
       }
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'conversion', {
+          'send_to': 'AW-18052115379/vOAaCL3b158cELPX9Z9D',
+          'value': 1.0,
+          'currency': 'USD'
+        })
+      }
       setSubmitted(true)
     } catch(e) {
       console.log(e)
