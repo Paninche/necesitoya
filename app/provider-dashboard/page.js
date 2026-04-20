@@ -145,12 +145,15 @@ function ProviderDashboardContent() {
         </div>
 
         {!provider.stripe_onboarding_complete && (
-          <div style={{ backgroundColor: '#fef3c7', border: '1px solid #fcd34d', borderRadius: '10px', padding: '16px 20px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ backgroundColor: '#fef3c7', border: '2px solid #f59e0b', borderRadius: '10px', padding: '16px 20px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
             <div>
-              <div style={{ fontWeight: '600', color: '#92400e', marginBottom: '2px' }}>⚠️ Connect your bank account to receive payments</div>
-              <div style={{ fontSize: '13px', color: '#92400e' }}>Conecta tu cuenta bancaria para recibir pagos</div>
+              <div style={{ fontWeight: '700', color: '#92400e', marginBottom: '4px', fontSize: '15px' }}>⚠️ Complete your payout setup to get paid</div>
+              <div style={{ fontSize: '13px', color: '#92400e', marginBottom: '6px' }}>Without a connected bank account, you cannot accept paid jobs.</div>
+              <div style={{ fontWeight: '700', color: '#92400e', marginBottom: '4px', fontSize: '15px' }}>⚠️ Completa tu configuración de pagos para cobrar</div>
+              <div style={{ fontSize: '13px', color: '#92400e', marginBottom: '8px' }}>Sin cuenta bancaria conectada, no puedes aceptar trabajos pagados.</div>
+              <div style={{ fontSize: '12px', color: '#78350f', fontWeight: '500' }}>✓ 3 min · Bank-grade security · Paid directly after every job</div>
             </div>
-            <button onClick={connectStripe} style={{ backgroundColor: '#2563eb', color: 'white', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <button onClick={connectStripe} style={{ backgroundColor: '#FF6B35', color: 'white', padding: '12px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '700', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 2px 6px rgba(255,107,53,0.3)' }}>
               Connect Bank / Conectar Banco
             </button>
           </div>
