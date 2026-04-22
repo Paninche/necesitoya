@@ -92,7 +92,7 @@ export default function AboutPage() {
               <img src="/usa-news-badge.png" alt="As Seen On USA News" style={{height:'90px', display:'block'}}/>
             </a>
             <a href="https://ceotimes.com/necesitoya-builds-bilingual-service-marketplace/" target="_blank" rel="noopener noreferrer">
-              <img src="/ceotimes-badge.jpg" alt="As Seen On CEOTimes" style={{height:'90px', display:'block'}}/>
+              <img src="/ceotimes-badge.png" alt="As Seen On CEOTimes" style={{height:'90px', display:'block'}}/>
             </a>
           </div>
           <div style={{display:'flex', justifyContent:'center', gap:'24px', flexWrap:'wrap'}}>
