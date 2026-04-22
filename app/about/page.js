@@ -87,12 +87,22 @@ export default function AboutPage() {
         {/* As Seen On */}
         <div style={{background:'white', borderRadius:'20px', padding:'32px', marginBottom:'24px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', textAlign:'center'}}>
           <p style={{color:'#aaa', fontSize:'11px', letterSpacing:'3px', marginBottom:'16px', textTransform:'uppercase'}}>As Seen On</p>
-          <a href="https://usanews.com/newsroom/how-david-cruzado-used-ai-to-build-necesitoya-america-s-first-bilingual-local-services-app" target="_blank" rel="noopener noreferrer">
-            <img src="/usa-news-badge.png" alt="As Seen On USA News" style={{height:'90px', display:'block', margin:'0 auto 16px'}}/>
+          <div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:'40px', flexWrap:'wrap', marginBottom:'16px'}}>
+            <a href="https://usanews.com/newsroom/how-david-cruzado-used-ai-to-build-necesitoya-america-s-first-bilingual-local-services-app" target="_blank" rel="noopener noreferrer">
+              <img src="/usa-news-badge.png" alt="As Seen On USA News" style={{height:'90px', display:'block'}}/>
+            </a>
+            <a href="https://ceotimes.com/necesitoya-builds-bilingual-service-marketplace/" target="_blank" rel="noopener noreferrer">
+              <img src="/ceotimes-badge.jpg" alt="As Seen On CEOTimes" style={{height:'90px', display:'block'}}/>
+            </a>
+          </div>
+          <div style={{display:'flex', justifyContent:'center', gap:'24px', flexWrap:'wrap'}}>
+            <a href="https://usanews.com/newsroom/how-david-cruzado-used-ai-to-build-necesitoya-america-s-first-bilingual-local-services-app" target="_blank" rel="noopener noreferrer" style={{color:'#FF6B35', fontWeight:'bold', fontSize:'14px', textDecoration:'none'}}>
+            Read USA News feature →
           </a>
-          <a href="https://usanews.com/newsroom/how-david-cruzado-used-ai-to-build-necesitoya-america-s-first-bilingual-local-services-app" target="_blank" rel="noopener noreferrer" style={{color:'#FF6B35', fontWeight:'bold', fontSize:'14px', textDecoration:'none'}}>
-            Read the full feature article →
+          <a href="https://ceotimes.com/necesitoya-builds-bilingual-service-marketplace/" target="_blank" rel="noopener noreferrer" style={{color:'#FF6B35', fontWeight:'bold', fontSize:'14px', textDecoration:'none'}}>
+            Read CEOTimes feature →
           </a>
+          </div>
         </div>
 
         {/* Available on */}
