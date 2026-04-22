@@ -62,10 +62,15 @@ export default function Home() {
 
       {/* AS SEEN ON */}
       <section style={{background: "white", padding: "24px 32px", textAlign: "center", borderTop: "1px solid #f0ede8"}}>
-        <p style={{color: "#aaa", fontSize: "11px", letterSpacing: "3px", marginBottom: "12px", textTransform: "uppercase"}}></p>
-        <a href="https://usanews.com/newsroom/how-david-cruzado-used-ai-to-build-necesitoya-america-s-first-bilingual-local-services-app" target="_blank" rel="noopener noreferrer">
-          <img src="/usa-news-badge.png" alt="As Seen On USA News" style={{height: "100px", display: "block", margin: "0 auto"}}/>
-        </a>
+        <p style={{color: "#aaa", fontSize: "11px", letterSpacing: "3px", marginBottom: "16px", textTransform: "uppercase"}}>As Seen On</p>
+        <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "40px", flexWrap: "wrap"}}>
+          <a href="https://usanews.com/newsroom/how-david-cruzado-used-ai-to-build-necesitoya-america-s-first-bilingual-local-services-app" target="_blank" rel="noopener noreferrer">
+            <img src="/usa-news-badge.png" alt="As Seen On USA News" style={{height: "100px", display: "block"}}/>
+          </a>
+          <a href="https://ceotimes.com/necesitoya-builds-bilingual-service-marketplace/" target="_blank" rel="noopener noreferrer">
+            <img src="/ceotimes-badge.jpg" alt="As Seen On CEOTimes" style={{height: "100px", display: "block"}}/>
+          </a>
+        </div>
       </section>
 
       {/* CATEGORIES */}
